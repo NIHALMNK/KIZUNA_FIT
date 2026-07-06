@@ -1,0 +1,32 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "boundaries"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "settings": {
+    "boundaries/elements": [
+      { "type": "domain", "pattern": "domain/*" },
+      { "type": "application", "pattern": "application/*" },
+      { "type": "presentation", "pattern": "presentation/*" },
+      { "type": "infrastructure", "pattern": "infrastructure/*" }
+    ]
+  },
+  "rules": {
+    "boundaries/element-types": [
+      2,
+      {
+        "default": "allow",
+        "rules": [
+          { "from": "domain", "allow": ["domain"] },
+          { "from": "application", "allow": ["domain", "application"] },
+          { "from": "presentation", "allow": ["domain", "application", "presentation"] },
+          { "from": "infrastructure", "allow": ["domain", "application", "infrastructure"] }
+        ]
+      }
+    ]
+  }
+}

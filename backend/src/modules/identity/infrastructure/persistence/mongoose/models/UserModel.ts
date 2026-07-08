@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { UserStatus } from '../../../../domain/entities/UserStatus';
 
 export interface EmailVerificationSubDoc {
@@ -13,7 +13,7 @@ export interface PasswordResetSubDoc {
   usedAt?: Date;
 }
 
-export interface UserDocument extends Document {
+export interface UserDocument {
   _id: string; // UUID
   email: string;
   status: UserStatus;

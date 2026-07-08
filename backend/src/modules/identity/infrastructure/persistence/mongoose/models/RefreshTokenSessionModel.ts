@@ -1,6 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface RefreshTokenSessionDocument extends Document {
+export interface RefreshTokenSessionDocument {
   _id: string; // UUID
   userId: string;
   tokenId: string;

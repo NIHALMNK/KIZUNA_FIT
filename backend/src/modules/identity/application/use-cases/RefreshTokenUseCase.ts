@@ -37,7 +37,7 @@ export class RefreshTokenUseCase {
       await this.unitOfWork.start();
       try {
         await this.sessionRepository.revokeAllForFamily(session.family, this.unitOfWork.session);
-        const events = session.getDomainEvents();
+        const events = session.domainEvents;
         session.clearEvents();
         await this.unitOfWork.commit();
         await this.eventBus.publish(events);
@@ -51,7 +51,7 @@ export class RefreshTokenUseCase {
     try {
       await this.sessionRepository.save(session, this.unitOfWork.session);
       
-      const events = session.getDomainEvents();
+      const events = session.domainEvents;
       session.clearEvents();
 
       await this.unitOfWork.commit();

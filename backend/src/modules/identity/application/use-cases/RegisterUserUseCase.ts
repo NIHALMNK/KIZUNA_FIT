@@ -67,7 +67,7 @@ export class RegisterUserUseCase {
     try {
       await this.userRepository.save(user, this.unitOfWork.session);
       
-      const events = user.getDomainEvents();
+      const events = user.domainEvents;
       user.clearEvents();
 
       await this.unitOfWork.commit();

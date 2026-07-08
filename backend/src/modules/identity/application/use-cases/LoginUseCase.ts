@@ -49,7 +49,7 @@ export class LoginUseCase {
       await this.unitOfWork.start();
       try {
         await this.userRepository.save(user, this.unitOfWork.session);
-        const events = user.getDomainEvents();
+        const events = user.domainEvents;
         user.clearEvents();
         await this.unitOfWork.commit();
         await this.eventBus.publish(events);
@@ -76,7 +76,7 @@ export class LoginUseCase {
       await this.userRepository.save(user, this.unitOfWork.session);
       await this.sessionRepository.save(session, this.unitOfWork.session);
 
-      const events = [...user.getDomainEvents(), ...session.getDomainEvents()];
+      const events = [...user.domainEvents, ...session.domainEvents];
       user.clearEvents();
       session.clearEvents();
 

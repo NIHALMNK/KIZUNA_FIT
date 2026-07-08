@@ -1,6 +1,6 @@
 import { Entity } from '../../../../shared/core/Entity';
 import { VerificationToken } from '../value-objects/VerificationToken';
-import { PasswordHash } from '../value-objects/PasswordHash';
+
 
 export interface PasswordResetProps {
   token: VerificationToken;

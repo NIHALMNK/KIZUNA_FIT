@@ -7,6 +7,7 @@ import { AwilixContainer } from 'awilix';
  * - May ONLY register dependencies via DI.
  * - MUST NEVER create Express routes, instantiate services manually, or execute startup logic.
  */
-export const registerIdentityModule = (container: AwilixContainer): void => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const registerIdentityModule = (_container: AwilixContainer): void => {
   // TODO: Register identity module dependencies in subsequent steps
 };

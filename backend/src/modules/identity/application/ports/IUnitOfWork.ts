@@ -1,5 +1,5 @@
 export interface IUnitOfWork {
-  readonly session: any; // Opaque type, typically ClientSession from Mongoose
+  readonly session: unknown; // Opaque type, typically ClientSession from Mongoose
   start(): Promise<void>;
   commit(): Promise<void>;
   rollback(): Promise<void>;

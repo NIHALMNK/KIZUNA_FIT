@@ -2,7 +2,7 @@ import { ClientSession } from 'mongoose';
 import { IUserRepository } from '../../../../domain/repositories/IUserRepository';
 import { User } from '../../../../domain/entities/User';
 import { EmailAddress } from '../../../../domain/value-objects/EmailAddress';
-import { UserModel, UserDocument } from '../models/UserModel';
+import { UserModel } from '../models/UserModel';
 import { UserMapper } from '../mappers/UserMapper';
 
 export class MongoUserRepository implements IUserRepository {

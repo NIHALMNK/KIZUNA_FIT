@@ -6,7 +6,7 @@ import { RefreshTokenCommand } from '../commands/RefreshTokenCommand';
 import { Result } from '../../../../shared/result/Result';
 import { AuthTokensResult } from '../models/AuthTokensResult';
 import { RefreshTokenId } from '../../domain/value-objects/RefreshTokenId';
-import { TokenFamily } from '../../domain/value-objects/TokenFamily';
+
 
 export class RefreshTokenUseCase {
   constructor(

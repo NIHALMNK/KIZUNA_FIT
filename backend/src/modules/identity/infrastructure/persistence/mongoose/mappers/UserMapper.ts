@@ -1,5 +1,5 @@
 import { User, UserProps } from '../../../../domain/entities/User';
-import { UserId } from '../../../../domain/value-objects/UserId';
+
 import { EmailAddress } from '../../../../domain/value-objects/EmailAddress';
 import { PasswordHash } from '../../../../domain/value-objects/PasswordHash';
 import { VerificationToken } from '../../../../domain/value-objects/VerificationToken';

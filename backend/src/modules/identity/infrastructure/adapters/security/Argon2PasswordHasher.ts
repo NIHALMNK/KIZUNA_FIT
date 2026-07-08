@@ -2,12 +2,11 @@ import * as argon2 from 'argon2';
 import { IPasswordHasher } from '../../../application/ports/IPasswordHasher';
 
 export class Argon2PasswordHasher implements IPasswordHasher {
-  private readonly hashOptions: argon2.Options & { type: argon2.numericArgon2Type } = {
+  private readonly hashOptions: argon2.Options = {
     type: argon2.argon2id,
     memoryCost: 65536,
     timeCost: 3,
     parallelism: 4,
-    saltLength: 16,
     hashLength: 32
   };
 

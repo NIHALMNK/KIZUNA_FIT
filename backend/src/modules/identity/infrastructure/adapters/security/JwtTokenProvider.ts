@@ -17,10 +17,12 @@ export class JwtTokenProvider implements ITokenProvider {
     };
 
     try {
+      // jwt.sign allows string for expiresIn (e.g. "15m"), but @types/jsonwebtoken restricts it.
+      // We use 'as never' to safely bypass the overly strict type definition without using 'any' or '@ts-ignore'.
       return jwt.sign(payload, this.config.secret, {
         issuer: this.config.issuer,
         audience: this.config.audience,
-        expiresIn: this.config.accessExpiresIn
+        expiresIn: this.config.accessExpiresIn as never
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';

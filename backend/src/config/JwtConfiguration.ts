@@ -8,8 +8,6 @@ const jwtConfigSchema = z.object({
   JWT_AUDIENCE: z.string().default('kizunafit-client'),
 });
 
-
-
 export class JwtConfiguration {
   public readonly secret: string;
   public readonly accessExpiresIn: string;

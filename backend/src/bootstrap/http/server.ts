@@ -1,6 +1,6 @@
 import { createApp } from './app';
 import { configureContainer } from '../dependency-injection/container';
-import { globalErrorHandler } from '../middleware/GlobalErrorHandler';
+import { registerIdentityModule } from '../../modules/identity/module';
 import { env } from '../../config/env.config';
 import http from 'http';
 import { ILogger } from '../../shared/contracts/ILogger';
@@ -20,6 +20,10 @@ async function bootstrap() {
   const logger = container.resolve<ILogger>('logger');
   logger.info('✅ Environment Loaded');
   logger.info('✅ Logger Initialized');
+
+  // Register Modules
+  registerIdentityModule(container);
+  logger.info('✅ Identity Module Registered');
 
   // Resolve managers
   const dbManager = container.resolve<DatabaseManager>('dbManager');
@@ -50,12 +54,7 @@ async function bootstrap() {
     logger.info('✅ Email Provider Initialized');
 
     // 8. Create Express App
-    const app = createApp({
-      dbManager,
-      redisManager,
-      jobManager,
-      socketIOManager
-    });
+    const app = createApp(container);
     logger.info('✅ Express App Created');
 
     // 9. Create HTTP Server
@@ -70,13 +69,9 @@ async function bootstrap() {
     webRTCSignaling.initialize();
     logger.info('✅ WebRTC Signaling Initialized');
 
-    // 12. Register Routes
-    // Routes are currently registered inside createApp (/health)
-    logger.info('✅ Routes Registered');
-
-    // 13. Register Global Error Handler
-    app.use(globalErrorHandler(logger));
-    logger.info('✅ Global Error Handler Registered');
+    // 12. Register Routes and Global Error Handler
+    // Routes and handlers are currently registered inside createApp
+    logger.info('✅ Routes and Handlers Registered');
 
     // 14. Start HTTP Server
     server.listen(env.PORT, () => {

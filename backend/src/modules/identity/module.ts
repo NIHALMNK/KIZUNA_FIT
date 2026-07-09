@@ -26,6 +26,8 @@ import { ForgotPasswordUseCase } from './application/use-cases/ForgotPasswordUse
 import { ResetPasswordUseCase } from './application/use-cases/ResetPasswordUseCase';
 import { ChangePasswordUseCase } from './application/use-cases/ChangePasswordUseCase';
 import { DeleteAccountUseCase } from './application/use-cases/DeleteAccountUseCase';
+import { AuthController } from './presentation/controllers/AuthController';
+import { UserController } from './presentation/controllers/UserController';
 
 export const registerIdentityModule = (container: AwilixContainer): void => {
   // Config
@@ -71,5 +73,11 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
     resetPasswordUseCase: asClass(ResetPasswordUseCase).scoped(),
     changePasswordUseCase: asClass(ChangePasswordUseCase).scoped(),
     deleteAccountUseCase: asClass(DeleteAccountUseCase).scoped(),
+  });
+
+  // Presentation Controllers (Scoped)
+  container.register({
+    authController: asClass(AuthController).scoped(),
+    userController: asClass(UserController).scoped(),
   });
 };

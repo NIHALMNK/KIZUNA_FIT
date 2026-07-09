@@ -2,6 +2,8 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { notFoundHandler } from '../../shared/infrastructure/http/middleware/notFoundHandler';
+import { errorHandler } from '../../shared/infrastructure/http/middleware/errorHandler';
 
 export interface HealthDependencies {
   dbManager: { getStatus: () => string };
@@ -29,6 +31,9 @@ export function createApp(deps: HealthDependencies): express.Application {
       timestamp: new Date().toISOString()
     });
   });
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   return app;
 }

@@ -1,16 +1,16 @@
 import { createApp } from './app';
-import { configureContainer } from './bootstrap/dependency-injection/container';
-import { globalErrorHandler } from './bootstrap/middleware/GlobalErrorHandler';
-import { env } from './config/env.config';
+import { configureContainer } from '../dependency-injection/container';
+import { globalErrorHandler } from '../middleware/GlobalErrorHandler';
+import { env } from '../../config/env.config';
 import http from 'http';
-import { ILogger } from './shared/contracts/ILogger';
-import { DatabaseManager } from './infrastructure/database/DatabaseManager';
-import { RedisManager } from './infrastructure/cache/RedisManager';
-import { BackgroundJobManager } from './infrastructure/queue/BackgroundJobManager';
-import { CloudinaryProvider } from './infrastructure/storage/CloudinaryProvider';
-import { MockEmailProvider } from './infrastructure/mail/MockEmailProvider';
-import { SocketIOManager } from './infrastructure/websocket/SocketIOManager';
-import { WebRTCSignaling } from './infrastructure/websocket/WebRTCSignaling';
+import { ILogger } from '../../shared/contracts/ILogger';
+import { DatabaseManager } from '../../infrastructure/database/DatabaseManager';
+import { RedisManager } from '../../infrastructure/cache/RedisManager';
+import { BackgroundJobManager } from '../../infrastructure/queue/BackgroundJobManager';
+import { CloudinaryProvider } from '../../infrastructure/storage/CloudinaryProvider';
+import { MockEmailProvider } from '../../infrastructure/mail/MockEmailProvider';
+import { SocketIOManager } from '../../infrastructure/websocket/SocketIOManager';
+import { WebRTCSignaling } from '../../infrastructure/websocket/WebRTCSignaling';
 
 async function bootstrap() {
   // 1. Load Environment (Handled by env import)

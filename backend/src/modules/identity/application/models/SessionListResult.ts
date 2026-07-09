@@ -3,7 +3,6 @@ export interface SessionModel {
   deviceId: string;
   ipAddress: string;
   expiresAt: Date;
-  createdAt: Date;
 }
 
 export interface SessionListResult {

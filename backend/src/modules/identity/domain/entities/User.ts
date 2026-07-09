@@ -21,8 +21,6 @@ export interface UserProps {
   emailVerification?: EmailVerification;
   passwordReset?: PasswordReset;
   failedLoginAttempts: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export class User extends AggregateRoot<UserProps> {
@@ -63,7 +61,7 @@ export class User extends AggregateRoot<UserProps> {
     return Result.ok<User>(user);
   }
 
-  public verifyEmail(token: VerificationToken): Result<void> {
+  public verifyEmail(token: VerificationToken, now: Date): Result<void> {
     if (this.status === UserStatus.Deleted) {
       return Result.fail<void>('Cannot verify deleted user');
     }
@@ -72,7 +70,7 @@ export class User extends AggregateRoot<UserProps> {
       return Result.fail<void>('No pending verification found');
     }
 
-    if (this.props.emailVerification.isExpired()) {
+    if (this.props.emailVerification.isExpired(now)) {
       return Result.fail<void>('Verification token expired');
     }
 
@@ -80,14 +78,12 @@ export class User extends AggregateRoot<UserProps> {
       return Result.fail<void>('Invalid verification token');
     }
 
-    this.props.emailVerification.verify();
+    this.props.emailVerification.verify(now);
     
     if (this.status === UserStatus.PendingVerification) {
       this.props.status = UserStatus.Active;
     }
 
-    this.props.updatedAt = new Date();
-    
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {
       this.addDomainEvent(new EmailVerifiedEvent({ id: userIdResult.getValue() }));
@@ -102,7 +98,6 @@ export class User extends AggregateRoot<UserProps> {
     }
 
     this.props.passwordHash = newHash;
-    this.props.updatedAt = new Date();
 
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {
@@ -112,16 +107,15 @@ export class User extends AggregateRoot<UserProps> {
     return Result.ok<void>();
   }
 
-  public requestPasswordReset(token: VerificationToken, expiresInMs: number = 3600000): Result<void> {
+  public requestPasswordReset(token: VerificationToken, expiresAt: Date): Result<void> {
     if (this.status === UserStatus.Deleted) {
       return Result.fail<void>('Cannot reset password for deleted user');
     }
 
     this.props.passwordReset = PasswordReset.create({
       token,
-      expiresAt: new Date(Date.now() + expiresInMs)
+      expiresAt
     });
-    this.props.updatedAt = new Date();
 
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {
@@ -134,7 +128,7 @@ export class User extends AggregateRoot<UserProps> {
     return Result.ok<void>();
   }
 
-  public completePasswordReset(token: VerificationToken, newHash: PasswordHash): Result<void> {
+  public completePasswordReset(token: VerificationToken, newHash: PasswordHash, now: Date): Result<void> {
     if (this.status === UserStatus.Deleted) {
       return Result.fail<void>('Cannot reset password for deleted user');
     }
@@ -143,7 +137,7 @@ export class User extends AggregateRoot<UserProps> {
       return Result.fail<void>('No password reset requested');
     }
 
-    if (this.props.passwordReset.isExpired()) {
+    if (this.props.passwordReset.isExpired(now)) {
       return Result.fail<void>('Reset token expired');
     }
 
@@ -155,9 +149,8 @@ export class User extends AggregateRoot<UserProps> {
       return Result.fail<void>('Invalid reset token');
     }
 
-    this.props.passwordReset.markAsUsed();
+    this.props.passwordReset.markAsUsed(now);
     this.props.passwordHash = newHash;
-    this.props.updatedAt = new Date();
 
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {
@@ -171,21 +164,18 @@ export class User extends AggregateRoot<UserProps> {
     if (this.status === UserStatus.Deleted) return;
     
     this.props.failedLoginAttempts += 1;
-    this.props.updatedAt = new Date();
   }
 
   public resetFailedLogins(): void {
     if (this.status === UserStatus.Deleted) return;
 
     this.props.failedLoginAttempts = 0;
-    this.props.updatedAt = new Date();
   }
 
   public lockAccount(): void {
     if (this.status === UserStatus.Deleted) return;
 
     this.props.status = UserStatus.Locked;
-    this.props.updatedAt = new Date();
 
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {
@@ -198,14 +188,12 @@ export class User extends AggregateRoot<UserProps> {
 
     this.props.status = UserStatus.Active;
     this.props.failedLoginAttempts = 0;
-    this.props.updatedAt = new Date();
   }
 
   public deleteAccount(): void {
     if (this.status === UserStatus.Deleted) return;
 
     this.props.status = UserStatus.Deleted;
-    this.props.updatedAt = new Date();
     // Scrub PII
     // EmailAddress should ideally be scrubbed too, but the VO requires a valid email. 
     // We could either leave the email as is and rely on the Deleted state, or overwrite it with a dummy valid email.

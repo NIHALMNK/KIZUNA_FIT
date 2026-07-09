@@ -40,9 +40,7 @@ export class UserMapper {
       passwordHash: raw.passwordHash ? PasswordHash.create(raw.passwordHash).getValue() : undefined,
       emailVerification,
       passwordReset,
-      failedLoginAttempts: raw.failedLoginAttempts,
-      createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt
+      failedLoginAttempts: raw.failedLoginAttempts
     };
 
     // Use reflection/prototype or the public factory if it allows passing ID and doesn't trigger initial events
@@ -56,9 +54,7 @@ export class UserMapper {
       _id: user.id,
       email: user.email.value,
       status: user.status,
-      failedLoginAttempts: user.failedLoginAttempts,
-      createdAt: user.props.createdAt,
-      updatedAt: user.props.updatedAt
+      failedLoginAttempts: user.failedLoginAttempts
     };
 
     if (user.passwordHash) {

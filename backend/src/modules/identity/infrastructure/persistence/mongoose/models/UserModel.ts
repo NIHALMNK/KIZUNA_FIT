@@ -21,8 +21,6 @@ export interface UserDocument {
   emailVerification?: EmailVerificationSubDoc;
   passwordReset?: PasswordResetSubDoc;
   failedLoginAttempts: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 const EmailVerificationSchema = new Schema<EmailVerificationSubDoc>({
@@ -44,12 +42,10 @@ export const UserSchema = new Schema<UserDocument>({
   passwordHash: { type: String, required: false },
   emailVerification: { type: EmailVerificationSchema, required: false },
   passwordReset: { type: PasswordResetSchema, required: false },
-  failedLoginAttempts: { type: Number, required: true, default: 0 },
-  createdAt: { type: Date, required: true },
-  updatedAt: { type: Date, required: true }
+  failedLoginAttempts: { type: Number, required: true, default: 0 }
 }, {
   _id: false, // Prevents auto-generation of ObjectId, we provide our own string UUID
-  timestamps: false, // Manually mapped from Domain
+  timestamps: true,
   versionKey: '__v'
 });
 

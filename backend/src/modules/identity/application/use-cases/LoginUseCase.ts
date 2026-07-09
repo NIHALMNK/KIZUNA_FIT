@@ -4,6 +4,7 @@ import { IPasswordHasher } from '../ports/IPasswordHasher';
 import { ITokenProvider } from '../ports/ITokenProvider';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
+import { IClock } from '../ports/IClock';
 import { LoginCommand } from '../commands/LoginCommand';
 import { Result } from '../../../../shared/result/Result';
 import { AuthTokensResult } from '../models/AuthTokensResult';
@@ -19,7 +20,8 @@ export class LoginUseCase {
     private readonly passwordHasher: IPasswordHasher,
     private readonly tokenProvider: ITokenProvider,
     private readonly unitOfWork: IUnitOfWork,
-    private readonly eventBus: IEventBus
+    private readonly eventBus: IEventBus,
+    private readonly clock: IClock
   ) {}
 
   public async execute(command: LoginCommand): Promise<Result<AuthTokensResult>> {
@@ -64,7 +66,8 @@ export class LoginUseCase {
     const sessionResult = RefreshTokenSession.create(
       userId,
       command.deviceId,
-      command.ipAddress
+      command.ipAddress,
+      new Date(this.clock.now().getTime() + 7 * 24 * 60 * 60 * 1000)
     );
 
     if (sessionResult.isFailure) return Result.fail<AuthTokensResult>(sessionResult.error);

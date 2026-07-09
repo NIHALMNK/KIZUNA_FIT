@@ -1,6 +1,7 @@
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
+import { IClock } from '../ports/IClock';
 import { VerifyEmailCommand } from '../commands/VerifyEmailCommand';
 import { Result } from '../../../../shared/result/Result';
 import { EmailAddress } from '../../domain/value-objects/EmailAddress';
@@ -10,7 +11,8 @@ export class VerifyEmailUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly unitOfWork: IUnitOfWork,
-    private readonly eventBus: IEventBus
+    private readonly eventBus: IEventBus,
+    private readonly clock: IClock
   ) {}
 
   public async execute(command: VerifyEmailCommand): Promise<Result<void>> {
@@ -27,7 +29,7 @@ export class VerifyEmailUseCase {
       return Result.fail<void>('Account not found');
     }
 
-    const verificationResult = user.verifyEmail(tokenResult.getValue());
+    const verificationResult = user.verifyEmail(tokenResult.getValue(), this.clock.now());
     if (verificationResult.isFailure) {
       return verificationResult;
     }

@@ -13,8 +13,7 @@ export class RefreshTokenSessionMapper {
       deviceId: raw.deviceId,
       ipAddress: raw.ipAddress,
       expiresAt: raw.expiresAt,
-      isRevoked: raw.isRevoked,
-      createdAt: raw.createdAt
+      isRevoked: raw.isRevoked
     };
 
     // Hydrate by bypassing events. We need to access private constructor, 
@@ -34,8 +33,7 @@ export class RefreshTokenSessionMapper {
       deviceId: session.props.deviceId,
       ipAddress: session.props.ipAddress,
       expiresAt: session.props.expiresAt,
-      isRevoked: session.isRevoked,
-      createdAt: session.props.createdAt
+      isRevoked: session.isRevoked
     };
   }
 }

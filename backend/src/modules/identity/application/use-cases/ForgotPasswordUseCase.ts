@@ -1,6 +1,7 @@
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
+import { IClock } from '../ports/IClock';
 import { ForgotPasswordCommand } from '../commands/ForgotPasswordCommand';
 import { Result } from '../../../../shared/result/Result';
 import { EmailAddress } from '../../domain/value-objects/EmailAddress';
@@ -10,7 +11,8 @@ export class ForgotPasswordUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly unitOfWork: IUnitOfWork,
-    private readonly eventBus: IEventBus
+    private readonly eventBus: IEventBus,
+    private readonly clock: IClock
   ) {}
 
   public async execute(command: ForgotPasswordCommand): Promise<Result<void>> {
@@ -26,7 +28,7 @@ export class ForgotPasswordUseCase {
     }
 
     const token = VerificationToken.create(crypto.randomUUID()).getValue();
-    const requestResult = user.requestPasswordReset(token);
+    const requestResult = user.requestPasswordReset(token, new Date(this.clock.now().getTime() + 3600000));
     
     if (requestResult.isFailure) {
       // Could be deleted user, return success to anti-enumerate

@@ -9,7 +9,6 @@ export interface RefreshTokenSessionDocument {
   ipAddress: string;
   expiresAt: Date;
   isRevoked: boolean;
-  createdAt: Date;
 }
 
 export const RefreshTokenSessionSchema = new Schema<RefreshTokenSessionDocument>({
@@ -20,11 +19,10 @@ export const RefreshTokenSessionSchema = new Schema<RefreshTokenSessionDocument>
   deviceId: { type: String, required: true },
   ipAddress: { type: String, required: true },
   expiresAt: { type: Date, required: true, index: { expires: '0s' } }, // TTL index for automatic deletion
-  isRevoked: { type: Boolean, required: true },
-  createdAt: { type: Date, required: true }
+  isRevoked: { type: Boolean, required: true }
 }, {
   _id: false,
-  timestamps: false,
+  timestamps: true,
   versionKey: '__v'
 });
 

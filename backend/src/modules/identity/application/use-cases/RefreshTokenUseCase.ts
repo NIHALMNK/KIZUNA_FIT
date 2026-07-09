@@ -2,6 +2,7 @@ import { IRefreshTokenSessionRepository } from '../../domain/repositories/IRefre
 import { ITokenProvider } from '../ports/ITokenProvider';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
+import { IClock } from '../ports/IClock';
 import { RefreshTokenCommand } from '../commands/RefreshTokenCommand';
 import { Result } from '../../../../shared/result/Result';
 import { AuthTokensResult } from '../models/AuthTokensResult';
@@ -13,7 +14,8 @@ export class RefreshTokenUseCase {
     private readonly sessionRepository: IRefreshTokenSessionRepository,
     private readonly tokenProvider: ITokenProvider,
     private readonly unitOfWork: IUnitOfWork,
-    private readonly eventBus: IEventBus
+    private readonly eventBus: IEventBus,
+    private readonly clock: IClock
   ) {}
 
   public async execute(command: RefreshTokenCommand): Promise<Result<AuthTokensResult>> {
@@ -30,7 +32,11 @@ export class RefreshTokenUseCase {
     if (newRefreshTokenIdResult.isFailure) return Result.fail<AuthTokensResult>(newRefreshTokenIdResult.error);
     const newRefreshTokenId = newRefreshTokenIdResult.getValue();
 
-    const rotationResult = session.rotate(newRefreshTokenId, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+    const rotationResult = session.rotate(
+      newRefreshTokenId, 
+      this.clock.now(),
+      new Date(this.clock.now().getTime() + 7 * 24 * 60 * 60 * 1000)
+    );
     
     if (rotationResult.isFailure) {
       // Rotation failed (likely because token was already revoked, implying a compromise)

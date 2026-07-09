@@ -2,6 +2,7 @@ import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IPasswordHasher } from '../ports/IPasswordHasher';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
+import { IClock } from '../ports/IClock';
 import { ResetPasswordCommand } from '../commands/ResetPasswordCommand';
 import { Result } from '../../../../shared/result/Result';
 import { EmailAddress } from '../../domain/value-objects/EmailAddress';
@@ -14,7 +15,8 @@ export class ResetPasswordUseCase {
     private readonly userRepository: IUserRepository,
     private readonly passwordHasher: IPasswordHasher,
     private readonly unitOfWork: IUnitOfWork,
-    private readonly eventBus: IEventBus
+    private readonly eventBus: IEventBus,
+    private readonly clock: IClock
   ) {}
 
   public async execute(command: ResetPasswordCommand): Promise<Result<void>> {
@@ -41,7 +43,7 @@ export class ResetPasswordUseCase {
     const hash = await this.passwordHasher.hash(command.newPlaintextPassword);
     const passwordHashVO = PasswordHash.create(hash).getValue();
 
-    const resetResult = user.completePasswordReset(tokenResult.getValue(), passwordHashVO);
+    const resetResult = user.completePasswordReset(tokenResult.getValue(), passwordHashVO, this.clock.now());
     if (resetResult.isFailure) {
       return resetResult;
     }

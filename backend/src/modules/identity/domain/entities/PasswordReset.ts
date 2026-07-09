@@ -21,16 +21,16 @@ export class PasswordReset extends Entity<PasswordResetProps> {
     return this.props.usedAt;
   }
 
-  public isExpired(): boolean {
-    return new Date() > this.props.expiresAt;
+  public isExpired(now: Date): boolean {
+    return now > this.props.expiresAt;
   }
 
   public isUsed(): boolean {
     return !!this.props.usedAt;
   }
 
-  public markAsUsed(): void {
-    this.props.usedAt = new Date();
+  public markAsUsed(now: Date): void {
+    this.props.usedAt = now;
   }
 
   private constructor(props: PasswordResetProps, id?: string) {

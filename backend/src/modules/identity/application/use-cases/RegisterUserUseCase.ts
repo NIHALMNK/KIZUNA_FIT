@@ -2,6 +2,7 @@ import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IPasswordHasher } from '../ports/IPasswordHasher';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
+import { IClock } from '../ports/IClock';
 import { RegisterUserCommand } from '../commands/RegisterUserCommand';
 import { Result } from '../../../../shared/result/Result';
 import { User, UserProps } from '../../domain/entities/User';
@@ -17,7 +18,8 @@ export class RegisterUserUseCase {
     private readonly userRepository: IUserRepository,
     private readonly passwordHasher: IPasswordHasher,
     private readonly unitOfWork: IUnitOfWork,
-    private readonly eventBus: IEventBus
+    private readonly eventBus: IEventBus,
+    private readonly clock: IClock
   ) {}
 
   public async execute(command: RegisterUserCommand): Promise<Result<void>> {
@@ -45,7 +47,7 @@ export class RegisterUserUseCase {
     const verificationTokenVO = VerificationToken.create(crypto.randomUUID()).getValue();
     const emailVerification = EmailVerification.create({
       token: verificationTokenVO,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+      expiresAt: new Date(this.clock.now().getTime() + 24 * 60 * 60 * 1000) // 24 hours
     });
 
     const userProps: UserProps = {
@@ -53,9 +55,7 @@ export class RegisterUserUseCase {
       status: UserStatus.PendingVerification,
       passwordHash: passwordHashVO,
       emailVerification,
-      failedLoginAttempts: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      failedLoginAttempts: 0
     };
 
     const userResult = User.create(userProps);

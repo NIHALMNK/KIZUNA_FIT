@@ -13,7 +13,6 @@ export interface RefreshTokenSessionProps {
   ipAddress: string;
   expiresAt: Date;
   isRevoked: boolean;
-  createdAt: Date;
 }
 
 export class RefreshTokenSession extends AggregateRoot<RefreshTokenSessionProps> {
@@ -33,8 +32,8 @@ export class RefreshTokenSession extends AggregateRoot<RefreshTokenSessionProps>
     return this.props.isRevoked;
   }
 
-  public get isExpired(): boolean {
-    return new Date() > this.props.expiresAt;
+  public isExpired(now: Date): boolean {
+    return now > this.props.expiresAt;
   }
 
   private constructor(props: RefreshTokenSessionProps, id?: string) {
@@ -45,7 +44,7 @@ export class RefreshTokenSession extends AggregateRoot<RefreshTokenSessionProps>
     userId: UserId,
     deviceId: string,
     ipAddress: string,
-    expiresInMs: number = 7 * 24 * 60 * 60 * 1000 // default 7 days
+    expiresAt: Date
   ): Result<RefreshTokenSession> {
     
     const tokenIdResult = RefreshTokenId.create(crypto.randomUUID());
@@ -60,21 +59,20 @@ export class RefreshTokenSession extends AggregateRoot<RefreshTokenSessionProps>
       family: familyResult.getValue(),
       deviceId,
       ipAddress,
-      expiresAt: new Date(Date.now() + expiresInMs),
-      isRevoked: false,
-      createdAt: new Date()
+      expiresAt,
+      isRevoked: false
     });
 
     return Result.ok<RefreshTokenSession>(session);
   }
 
-  public rotate(newTokenId: RefreshTokenId, newExpiresAt?: Date): Result<void> {
+  public rotate(newTokenId: RefreshTokenId, now: Date, newExpiresAt?: Date): Result<void> {
     if (this.isRevoked) {
       this.flagAsCompromised();
       return Result.fail<void>('Cannot rotate a revoked token. Family compromised.');
     }
 
-    if (this.isExpired) {
+    if (this.isExpired(now)) {
       return Result.fail<void>('Cannot rotate an expired token');
     }
 

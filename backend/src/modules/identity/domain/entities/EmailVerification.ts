@@ -20,16 +20,16 @@ export class EmailVerification extends Entity<EmailVerificationProps> {
     return this.props.verifiedAt;
   }
 
-  public isExpired(): boolean {
-    return new Date() > this.props.expiresAt;
+  public isExpired(now: Date): boolean {
+    return now > this.props.expiresAt;
   }
 
   public isVerified(): boolean {
     return !!this.props.verifiedAt;
   }
 
-  public verify(): void {
-    this.props.verifiedAt = new Date();
+  public verify(now: Date): void {
+    this.props.verifiedAt = now;
   }
 
   private constructor(props: EmailVerificationProps, id?: string) {

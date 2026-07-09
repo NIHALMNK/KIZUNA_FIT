@@ -5,6 +5,4 @@ export interface UserApplicationModel {
   email: string;
   status: UserStatus;
   failedLoginAttempts: number;
-  createdAt: Date;
-  updatedAt: Date;
 }

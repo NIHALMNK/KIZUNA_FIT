@@ -4,9 +4,9 @@ import { EmailAddress } from '../value-objects/EmailAddress';
 
 export class UserRegisteredEvent implements IDomainEvent {
   public dateTimeOccurred: Date;
-  public user: { id: UserId; email: EmailAddress };
+  public user: { id: UserId; email: EmailAddress; provider?: string };
 
-  constructor(user: { id: UserId; email: EmailAddress }) {
+  constructor(user: { id: UserId; email: EmailAddress; provider?: string }) {
     this.dateTimeOccurred = new Date();
     this.user = user;
   }

@@ -13,6 +13,9 @@ import { PasswordChangedEvent } from '../events/PasswordChangedEvent';
 import { PasswordResetRequestedEvent } from '../events/PasswordResetRequestedEvent';
 import { UserLockedEvent } from '../events/UserLockedEvent';
 import { AccountDeletedEvent } from '../events/AccountDeletedEvent';
+import { ExternalIdentity } from '../value-objects/ExternalIdentity';
+import { ExternalIdentityLinkedEvent } from '../events/ExternalIdentityLinkedEvent';
+import { AuthProvider } from '../value-objects/AuthProvider';
 
 export interface UserProps {
   email: EmailAddress;
@@ -21,6 +24,7 @@ export interface UserProps {
   emailVerification?: EmailVerification;
   passwordReset?: PasswordReset;
   failedLoginAttempts: number;
+  externalIdentities?: ExternalIdentity[];
 }
 
 export class User extends AggregateRoot<UserProps> {
@@ -40,6 +44,67 @@ export class User extends AggregateRoot<UserProps> {
     return this.props.failedLoginAttempts;
   }
 
+  get externalIdentities(): ExternalIdentity[] {
+    return this.props.externalIdentities || [];
+  }
+
+  public hasLocalCredentials(): boolean {
+    return this.props.passwordHash !== undefined;
+  }
+
+  public hasExternalIdentity(provider: AuthProvider): boolean {
+    return this.externalIdentities.some(id => id.provider === provider);
+  }
+
+  public canAuthenticateWith(provider: AuthProvider): boolean {
+    if (provider === AuthProvider.LOCAL) return this.hasLocalCredentials();
+    return this.hasExternalIdentity(provider);
+  }
+
+  public linkExternalIdentity(identity: ExternalIdentity): Result<void> {
+    if (this.status === UserStatus.Deleted || this.status === UserStatus.Locked) {
+      return Result.fail<void>('Cannot link identity to deleted or locked account');
+    }
+
+    if (!this.props.externalIdentities) {
+      this.props.externalIdentities = [];
+    }
+
+    if (this.hasExternalIdentity(identity.provider)) {
+      return Result.fail<void>('Provider already linked to this account');
+    }
+
+    this.props.externalIdentities.push(identity);
+    this.addDomainEvent(new ExternalIdentityLinkedEvent({
+      userId: this.id,
+      provider: identity.provider,
+      providerUserId: identity.providerUserId
+    }));
+
+    return Result.ok<void>();
+  }
+
+  public removeExternalIdentity(provider: AuthProvider, isForceRevoke: boolean = false): Result<void> {
+    if (this.status === UserStatus.Deleted) {
+      return Result.fail<void>('Cannot modify deleted account');
+    }
+
+    const isLastMethod = !this.hasLocalCredentials() && this.externalIdentities.length === 1;
+    if (isLastMethod && !isForceRevoke) {
+      return Result.fail<void>('Cannot remove the final authentication method');
+    }
+
+    if (this.props.externalIdentities) {
+      this.props.externalIdentities = this.props.externalIdentities.filter(id => id.provider !== provider);
+    }
+
+    if (isLastMethod && isForceRevoke) {
+      this.lockAccount(); // Safely lock the stranded account
+    }
+
+    return Result.ok<void>();
+  }
+
   private constructor(props: UserProps, id?: string) {
     super(props, id || crypto.randomUUID());
   }
@@ -53,7 +118,8 @@ export class User extends AggregateRoot<UserProps> {
       if (userIdResult.isSuccess) {
         user.addDomainEvent(new UserRegisteredEvent({ 
           id: userIdResult.getValue(), 
-          email: user.email 
+          email: user.email,
+          provider: props.externalIdentities?.[0]?.provider 
         }));
       }
     }
@@ -80,6 +146,23 @@ export class User extends AggregateRoot<UserProps> {
 
     this.props.emailVerification.verify(now);
     
+    if (this.status === UserStatus.PendingVerification) {
+      this.props.status = UserStatus.Active;
+    }
+
+    const userIdResult = UserId.create(this.id);
+    if (userIdResult.isSuccess) {
+      this.addDomainEvent(new EmailVerifiedEvent({ id: userIdResult.getValue() }));
+    }
+
+    return Result.ok<void>();
+  }
+
+  public markEmailAsVerified(): Result<void> {
+    if (this.status === UserStatus.Deleted) {
+      return Result.fail<void>('Cannot verify deleted user');
+    }
+
     if (this.status === UserStatus.PendingVerification) {
       this.props.status = UserStatus.Active;
     }

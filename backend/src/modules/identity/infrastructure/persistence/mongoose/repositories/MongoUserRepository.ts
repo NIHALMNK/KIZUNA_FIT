@@ -30,6 +30,15 @@ export class MongoUserRepository implements IUserRepository {
     return UserMapper.toDomain(raw);
   }
 
+  async findByExternalIdentity(provider: string, providerUserId: string): Promise<User | null> {
+    const doc = await UserModel.findOne({
+      'externalIdentities.provider': provider,
+      'externalIdentities.providerUserId': providerUserId
+    }).exec();
+    if (!doc) return null;
+    return UserMapper.toDomain(doc);
+  }
+
   public async exists(email: EmailAddress): Promise<boolean> {
     const count = await UserModel.countDocuments({ email: email.value }).exec();
     return count > 0;

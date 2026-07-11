@@ -6,6 +6,8 @@ import { VerificationToken } from '../../../../domain/value-objects/Verification
 import { UserStatus } from '../../../../domain/entities/UserStatus';
 import { EmailVerification, EmailVerificationProps } from '../../../../domain/entities/EmailVerification';
 import { PasswordReset, PasswordResetProps } from '../../../../domain/entities/PasswordReset';
+import { ExternalIdentity } from '../../../../domain/value-objects/ExternalIdentity';
+import { AuthProvider } from '../../../../domain/value-objects/AuthProvider';
 import { UserDocument } from '../models/UserModel';
 
 export class UserMapper {
@@ -40,7 +42,14 @@ export class UserMapper {
       passwordHash: raw.passwordHash ? PasswordHash.create(raw.passwordHash).getValue() : undefined,
       emailVerification,
       passwordReset,
-      failedLoginAttempts: raw.failedLoginAttempts
+      failedLoginAttempts: raw.failedLoginAttempts || 0,
+      externalIdentities: raw.externalIdentities?.map(id => {
+        const extIdResult = ExternalIdentity.create({
+          provider: id.provider as AuthProvider,
+          providerUserId: id.providerUserId
+        });
+        return extIdResult.getValue();
+      }) || []
     };
 
     // Use reflection/prototype or the public factory if it allows passing ID and doesn't trigger initial events
@@ -54,7 +63,11 @@ export class UserMapper {
       _id: user.id,
       email: user.email.value,
       status: user.status,
-      failedLoginAttempts: user.failedLoginAttempts
+      failedLoginAttempts: user.failedLoginAttempts,
+      externalIdentities: user.externalIdentities.map(id => ({
+        provider: id.provider,
+        providerUserId: id.providerUserId
+      }))
     };
 
     if (user.passwordHash) {

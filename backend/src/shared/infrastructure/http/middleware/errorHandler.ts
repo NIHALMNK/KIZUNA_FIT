@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { env } from '../../../../config/env.config';
 import { ApiResponse } from '../responses/ApiResponse';
 import { ZodError } from 'zod';
+import { ApiErrorCode } from '../responses/ApiErrorCode';
+import { AppError, AuthenticationIntegrityException } from '../../../exceptions/AppError';
+
 
 export const errorHandler = (
   err: unknown,
@@ -16,9 +19,16 @@ export const errorHandler = (
   // Extract correlation ID if available (from headers or context in future)
   const correlationId = req.headers['x-correlation-id'] || 'unknown';
 
+  // 0. Handle AppError (e.g. AuthenticationIntegrityException or other Custom Operational AppErrors)
+  if (err instanceof AppError) {
+    const statusCode = err instanceof AuthenticationIntegrityException ? 500 : 400;
+    ApiResponse.error(res, err.message, err.code as ApiErrorCode, statusCode);
+    return;
+  }
+
   // 1. Handle JSON Parsing Errors (e.g. malformed body)
   if (error instanceof SyntaxError && 'body' in error) {
-    ApiResponse.error(res, 'Malformed JSON payload', 'MALFORMED_JSON', 400);
+    ApiResponse.error(res, 'Malformed JSON payload', ApiErrorCode.MALFORMED_JSON, 400);
     return;
   }
 
@@ -28,7 +38,7 @@ export const errorHandler = (
       path: e.path.join('.'),
       message: e.message,
     }));
-    ApiResponse.error(res, 'Validation failed', 'VALIDATION_ERROR', 400, details);
+    ApiResponse.error(res, 'Validation failed', ApiErrorCode.VALIDATION_ERROR, 400, details);
     return;
   }
 
@@ -48,5 +58,5 @@ export const errorHandler = (
     ? undefined 
     : { name: error.name, stack: error.stack };
 
-  ApiResponse.error(res, message, 'INTERNAL_SERVER_ERROR', 500, details);
+  ApiResponse.error(res, message, ApiErrorCode.INTERNAL_SERVER_ERROR, 500, details);
 };

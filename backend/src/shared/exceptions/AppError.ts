@@ -28,3 +28,9 @@ export class UnauthorizedError extends AppError {
     super(message, 'UNAUTHORIZED_ERROR', true);
   }
 }
+
+export class AuthenticationIntegrityException extends AppError {
+  constructor(message: string) {
+    super(message, 'AUTHENTICATION_INTEGRITY_ERROR', false);
+  }
+}

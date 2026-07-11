@@ -10,16 +10,19 @@ import { RefreshTokenSessionModel } from './infrastructure/persistence/mongoose/
 import { MongooseUnitOfWork } from '../../shared/infrastructure/persistence/mongoose/MongooseUnitOfWork';
 import { InMemoryEventBus } from '../../shared/infrastructure/events/InMemoryEventBus';
 import { ConsoleEmailProvider } from '../../shared/infrastructure/email/ConsoleEmailProvider';
+import { JwtConfiguration } from '../../config/JwtConfiguration';
 
 // Infrastructure (Adapters)
 import { SystemClock } from './infrastructure/adapters/time/SystemClock';
 import { Argon2PasswordHasher } from './infrastructure/adapters/security/Argon2PasswordHasher';
 import { JwtTokenProvider } from './infrastructure/adapters/security/JwtTokenProvider';
 import { IdentityEmailService } from './infrastructure/adapters/email/IdentityEmailService';
+import { GoogleIdentityProvider } from './infrastructure/adapters/security/GoogleIdentityProvider';
 
 // Application Use Cases
 import { RegisterUserUseCase } from './application/use-cases/RegisterUserUseCase';
 import { LoginUseCase } from './application/use-cases/LoginUseCase';
+import { GoogleLoginUseCase } from './application/use-cases/GoogleLoginUseCase';
 import { RefreshTokenUseCase } from './application/use-cases/RefreshTokenUseCase';
 import { VerifyEmailUseCase } from './application/use-cases/VerifyEmailUseCase';
 import { ForgotPasswordUseCase } from './application/use-cases/ForgotPasswordUseCase';
@@ -32,10 +35,7 @@ import { UserController } from './presentation/controllers/UserController';
 export const registerIdentityModule = (container: AwilixContainer): void => {
   // Config
   container.register({
-    jwtConfig: asValue({
-      secret: process.env.JWT_SECRET || 'fallback_secret',
-      expiresIn: process.env.JWT_EXPIRES_IN || '15m'
-    })
+    config: asClass(JwtConfiguration).singleton()
   });
 
   // Shared Infrastructure (Singletons)
@@ -50,6 +50,7 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
     passwordHasher: asClass(Argon2PasswordHasher).singleton(),
     tokenProvider: asClass(JwtTokenProvider).singleton(),
     emailService: asClass(IdentityEmailService).singleton(),
+    googleIdentityProvider: asValue(new GoogleIdentityProvider(process.env.GOOGLE_CLIENT_ID || 'fallback_client_id')),
   });
 
   // Persistence (Scoped to share transactions if needed, but for now we can just use scoped)
@@ -67,6 +68,7 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
   container.register({
     registerUserUseCase: asClass(RegisterUserUseCase).scoped(),
     loginUseCase: asClass(LoginUseCase).scoped(),
+    googleLoginUseCase: asClass(GoogleLoginUseCase).scoped(),
     refreshTokenUseCase: asClass(RefreshTokenUseCase).scoped(),
     verifyEmailUseCase: asClass(VerifyEmailUseCase).scoped(),
     forgotPasswordUseCase: asClass(ForgotPasswordUseCase).scoped(),

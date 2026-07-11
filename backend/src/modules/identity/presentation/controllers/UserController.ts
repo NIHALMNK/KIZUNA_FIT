@@ -6,6 +6,8 @@ import { ChangePasswordUseCase } from '../../application/use-cases/ChangePasswor
 import { DeleteAccountUseCase } from '../../application/use-cases/DeleteAccountUseCase';
 import { ApiResponse } from '../../../../shared/infrastructure/http/responses/ApiResponse';
 import { CookieHelper } from '../../../../shared/infrastructure/http/utils/CookieHelper';
+import { ApiErrorCode } from '../../../../shared/infrastructure/http/responses/ApiErrorCode';
+
 
 export class UserController {
   constructor(
@@ -23,7 +25,7 @@ export class UserController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, 'VERIFICATION_FAILED', 400);
+      ApiResponse.error(res, result.error as string, ApiErrorCode.VERIFICATION_FAILED, 400);
       return;
     }
 
@@ -36,7 +38,7 @@ export class UserController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, 'FORGOT_PASSWORD_FAILED', 400);
+      ApiResponse.error(res, result.error as string, ApiErrorCode.FORGOT_PASSWORD_FAILED, 400);
       return;
     }
 
@@ -51,7 +53,7 @@ export class UserController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, 'RESET_PASSWORD_FAILED', 400);
+      ApiResponse.error(res, result.error as string, ApiErrorCode.RESET_PASSWORD_FAILED, 400);
       return;
     }
 
@@ -60,7 +62,7 @@ export class UserController {
 
   public changePassword = async (req: Request, res: Response): Promise<void> => {
     if (!req.auth) {
-      ApiResponse.error(res, 'Unauthorized', 'UNAUTHORIZED', 401);
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
       return;
     }
 
@@ -71,7 +73,7 @@ export class UserController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, 'CHANGE_PASSWORD_FAILED', 400);
+      ApiResponse.error(res, result.error as string, ApiErrorCode.CHANGE_PASSWORD_FAILED, 400);
       return;
     }
 
@@ -80,7 +82,7 @@ export class UserController {
 
   public deleteAccount = async (req: Request, res: Response): Promise<void> => {
     if (!req.auth) {
-      ApiResponse.error(res, 'Unauthorized', 'UNAUTHORIZED', 401);
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
       return;
     }
 
@@ -90,7 +92,7 @@ export class UserController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, 'DELETE_ACCOUNT_FAILED', 400);
+      ApiResponse.error(res, result.error as string, ApiErrorCode.DELETE_ACCOUNT_FAILED, 400);
       return;
     }
 

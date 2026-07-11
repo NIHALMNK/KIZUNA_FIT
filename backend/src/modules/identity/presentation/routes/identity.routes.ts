@@ -7,6 +7,7 @@ import { asyncHandler } from '../../../../shared/infrastructure/http/utils/async
 import {
   RegisterUserSchema,
   LoginSchema,
+  GoogleLoginSchema,
   VerifyEmailSchema,
   ForgotPasswordSchema,
   ResetPasswordSchema,
@@ -33,6 +34,12 @@ export const identityRouter = (): Router => {
     '/login',
     validateRequest(LoginSchema),
     asyncHandler((req: Request, res: Response) => resolveAuth(req).login(req, res))
+  );
+
+  router.post(
+    '/google',
+    validateRequest(GoogleLoginSchema),
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).googleLogin(req, res))
   );
 
   router.post(

@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { AnyZodObject, ZodError } from 'zod';
 import { ApiResponse } from '../responses/ApiResponse';
+import { ApiErrorCode } from '../responses/ApiErrorCode';
+
 
 export const validateRequest = (schema: AnyZodObject): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -29,7 +31,7 @@ export const validateRequest = (schema: AnyZodObject): RequestHandler => {
         ApiResponse.error(
           res,
           'Request validation failed',
-          'VALIDATION_ERROR',
+          ApiErrorCode.VALIDATION_ERROR,
           400,
           details
         );

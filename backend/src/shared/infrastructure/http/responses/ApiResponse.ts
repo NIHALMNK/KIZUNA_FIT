@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { ApiErrorCode } from './ApiErrorCode';
 
 export class ApiResponse {
   static ok<T>(res: Response, data: T, statusCode: number = 200): void {
@@ -19,7 +20,7 @@ export class ApiResponse {
   static error(
     res: Response,
     message: string,
-    code: string,
+    code: ApiErrorCode | string,
     statusCode: number = 400,
     details?: unknown
   ): void {

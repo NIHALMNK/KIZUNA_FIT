@@ -14,6 +14,12 @@ export const LoginSchema = z.object({
   }),
 });
 
+export const GoogleLoginSchema = z.object({
+  body: z.object({
+    idToken: z.string().min(1, 'idToken is required'),
+  }),
+});
+
 export const VerifyEmailSchema = z.object({
   body: z.object({
     email: z.string().trim().toLowerCase().email('Invalid email address format'),

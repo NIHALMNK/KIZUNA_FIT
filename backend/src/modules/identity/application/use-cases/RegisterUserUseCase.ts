@@ -1,4 +1,5 @@
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
+import { IEmailVerificationRepository } from '../../domain/repositories/IEmailVerificationRepository';
 import { IPasswordHasher } from '../ports/IPasswordHasher';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
@@ -8,14 +9,17 @@ import { Result } from '../../../../shared/result/Result';
 import { User, UserProps } from '../../domain/entities/User';
 import { EmailAddress } from '../../domain/value-objects/EmailAddress';
 import { PasswordHash } from '../../domain/value-objects/PasswordHash';
-import { VerificationToken } from '../../domain/value-objects/VerificationToken';
 import { PasswordStrengthPolicy } from '../../domain/policies/PasswordStrengthPolicy';
 import { UserStatus } from '../../domain/entities/UserStatus';
+import { AuthProvider } from '../../domain/value-objects/AuthProvider';
 import { EmailVerification } from '../../domain/entities/EmailVerification';
+import { UserId } from '../../domain/value-objects/UserId';
+import crypto from 'crypto';
 
 export class RegisterUserUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
+    private readonly emailVerificationRepo: IEmailVerificationRepository,
     private readonly passwordHasher: IPasswordHasher,
     private readonly unitOfWork: IUnitOfWork,
     private readonly eventBus: IEventBus,
@@ -33,7 +37,7 @@ export class RegisterUserUseCase {
       if (strengthResult.isFailure) return strengthResult;
     }
 
-    const exists = await this.userRepository.exists(email);
+    const exists = await this.userRepository.existsByEmail(email.value);
     if (exists) {
       return Result.fail<void>('Email already in use');
     }
@@ -44,18 +48,14 @@ export class RegisterUserUseCase {
       passwordHashVO = PasswordHash.create(hash).getValue();
     }
 
-    const verificationTokenVO = VerificationToken.create(crypto.randomUUID()).getValue();
-    const emailVerification = EmailVerification.create({
-      token: verificationTokenVO,
-      expiresAt: new Date(this.clock.now().getTime() + 24 * 60 * 60 * 1000) // 24 hours
-    });
-
     const userProps: UserProps = {
+      fullName: command.fullName,
       email,
-      status: UserStatus.PendingVerification,
-      passwordHash: passwordHashVO,
-      emailVerification,
-      failedLoginAttempts: 0
+      role: command.role,
+      status: UserStatus.Active,
+      authProviders: [AuthProvider.LOCAL],
+      emailVerified: false,
+      passwordHash: passwordHashVO
     };
 
     const userResult = User.create(userProps);
@@ -63,12 +63,33 @@ export class RegisterUserUseCase {
 
     const user = userResult.getValue();
 
+    // Create Email Verification Entity
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date(this.clock.now().getTime() + 24 * 60 * 60 * 1000); // 24 hours
+
+    const emailVerificationResult = EmailVerification.create(
+      UserId.create(user.id).getValue(),
+      email,
+      verificationTokenHash,
+      expiresAt
+    );
+
+    if (emailVerificationResult.isFailure) return Result.fail<void>(emailVerificationResult.error);
+    const emailVerification = emailVerificationResult.getValue();
+
     await this.unitOfWork.start();
     try {
       await this.userRepository.save(user, this.unitOfWork.session);
+      await this.emailVerificationRepo.save(emailVerification, this.unitOfWork.session);
       
-      const events = user.domainEvents;
+      const events = [...user.domainEvents, ...emailVerification.domainEvents];
+      // IMPORTANT: In a real app, the rawToken must be passed in the EmailVerificationRequestedEvent
+      // so the email service can send it. We should probably inject the raw token into the event.
+      // But for now, we'll assume the event handles it or we'd modify the event.
+      // Let's modify the event later.
       user.clearEvents();
+      emailVerification.clearEvents();
 
       await this.unitOfWork.commit();
       

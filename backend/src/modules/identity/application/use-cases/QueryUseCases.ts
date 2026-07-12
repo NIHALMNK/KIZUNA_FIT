@@ -7,7 +7,7 @@ import { SessionListResult } from '../models/SessionListResult';
 import { UserApplicationMapper } from '../models/UserApplicationMapper';
 import { SessionApplicationMapper } from '../models/SessionApplicationMapper';
 import { UserId } from '../../domain/value-objects/UserId';
-import { EmailAddress } from '../../domain/value-objects/EmailAddress';
+
 
 export class GetCurrentUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -39,10 +39,7 @@ export class CheckEmailUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
   public async execute(query: CheckEmailQuery): Promise<Result<boolean>> {
-    const emailResult = EmailAddress.create(query.email);
-    if (emailResult.isFailure) return Result.fail<boolean>(emailResult.error);
-
-    const exists = await this.userRepository.exists(emailResult.getValue());
+    const exists = await this.userRepository.existsByEmail(query.email);
     return Result.ok<boolean>(exists);
   }
 }

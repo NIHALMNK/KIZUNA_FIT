@@ -7,20 +7,27 @@ import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
 import { IClock } from '../ports/IClock';
 import { AuthProvider } from '../../domain/value-objects/AuthProvider';
-import { ExternalIdentity } from '../../domain/value-objects/ExternalIdentity';
 import { User, UserProps } from '../../domain/entities/User';
 import { EmailAddress } from '../../domain/value-objects/EmailAddress';
 import { UserStatus } from '../../domain/entities/UserStatus';
+import { UserRole } from '../../domain/value-objects/UserRole';
 import { RefreshTokenSession } from '../../domain/entities/RefreshTokenSession';
 import { UserId } from '../../domain/value-objects/UserId';
-import { AuthenticationIntegrityException } from '../../../../shared/exceptions/AppError';
+import { DeviceInfo } from '../../domain/value-objects/DeviceInfo';
 import { ExternalAuthenticationSucceededEvent } from '../events/ExternalAuthenticationSucceededEvent';
 import { ExternalAuthenticationFailedEvent } from '../events/ExternalAuthenticationFailedEvent';
 
 interface Request {
   idToken: string;
   ipAddress: string;
-  userAgent: string;
+  deviceInfo: {
+    browser?: string;
+    browserVersion?: string;
+    operatingSystem?: string;
+    platform?: string;
+    deviceName?: string;
+    userAgent: string;
+  };
 }
 
 interface Response {
@@ -56,30 +63,9 @@ export class GoogleLoginUseCase {
 
     const payload = payloadResult.getValue();
 
-    const extIdentityResult = ExternalIdentity.create({
-      provider: AuthProvider.GOOGLE,
-      providerUserId: payload.providerUserId,
-    });
-
-    if (extIdentityResult.isFailure) {
-      const reason = extIdentityResult.error || 'Invalid identity payload';
-      try {
-        await this.eventBus.publish([
-          new ExternalAuthenticationFailedEvent(payload.email, AuthProvider.GOOGLE, payload.providerUserId, reason)
-        ]);
-      } catch (err) {
-        console.error('Failed to publish failure event', err);
-      }
-      return Result.fail<Response>(reason);
-    }
-
-    const extIdentity = extIdentityResult.getValue();
-
     await this.unitOfWork.start();
 
     try {
-      const userByExternalId = await this.userRepository.findByExternalIdentity(AuthProvider.GOOGLE, payload.providerUserId);
-      
       const emailResult = EmailAddress.create(payload.email);
       if (emailResult.isFailure) {
         await this.unitOfWork.rollback();
@@ -93,44 +79,19 @@ export class GoogleLoginUseCase {
         }
         return Result.fail<Response>(reason);
       }
-      const emailVal = emailResult.getValue();
-      const userByEmail = await this.userRepository.findByEmail(emailVal);
-
-      // Defense-in-depth: Integrity check
-      if (userByExternalId && userByEmail && userByExternalId.id !== userByEmail.id) {
-        const integrityErrorMsg = `Security Conflict: Google Login resolved to different entities. ExternalId User: ${userByExternalId.id}, Email User: ${userByEmail.id}`;
-        console.error(`[SECURITY ALERT] ${integrityErrorMsg}`);
-
-        try {
-          await this.eventBus.publish([
-            new ExternalAuthenticationFailedEvent(payload.email, AuthProvider.GOOGLE, payload.providerUserId, 'Database integrity conflict')
-          ]);
-        } catch (err) {
-          console.error('Failed to publish failure event', err);
-        }
-
-        throw new AuthenticationIntegrityException('Authentication conflict detected. Please contact support.');
-      }
+      
+      const email = emailResult.getValue();
+      const userByEmail = await this.userRepository.findByEmail(email.value);
 
       let user: User;
       
-      if (userByExternalId) {
-        user = userByExternalId;
-        if (user.status === UserStatus.Deleted || user.status === UserStatus.Locked) {
-          await this.unitOfWork.rollback();
-          const reason = `Account is ${user.status.toLowerCase()}.`;
-          try {
-            await this.eventBus.publish([
-              new ExternalAuthenticationFailedEvent(payload.email, AuthProvider.GOOGLE, payload.providerUserId, reason)
-            ]);
-          } catch (err) {
-            console.error('Failed to publish failure event', err);
-          }
-          return Result.fail<Response>(reason);
-        }
-      } else if (userByEmail) {
+      if (userByEmail) {
         user = userByEmail;
-        if (user.status === UserStatus.Deleted || user.status === UserStatus.Locked) {
+        if (
+          user.status === UserStatus.Deleted || 
+          user.status === UserStatus.Suspended || 
+          user.status === UserStatus.Banned
+        ) {
           await this.unitOfWork.rollback();
           const reason = `Account is ${user.status.toLowerCase()}.`;
           try {
@@ -144,7 +105,7 @@ export class GoogleLoginUseCase {
         }
 
         // Email verification + linking
-        if (user.status === UserStatus.PendingVerification) {
+        if (!user.emailVerified) {
           const verifyResult = user.markEmailAsVerified();
           if (verifyResult.isFailure) {
              await this.unitOfWork.rollback();
@@ -160,26 +121,30 @@ export class GoogleLoginUseCase {
           }
         }
 
-        const linkResult = user.linkExternalIdentity(extIdentity);
-        if (linkResult.isFailure) {
-          await this.unitOfWork.rollback();
-          const reason = linkResult.error || 'Failed to link account';
-          try {
-            await this.eventBus.publish([
-              new ExternalAuthenticationFailedEvent(payload.email, AuthProvider.GOOGLE, payload.providerUserId, reason)
-            ]);
-          } catch (err) {
-            console.error('Failed to publish failure event', err);
+        if (!user.hasExternalIdentity(AuthProvider.GOOGLE)) {
+          const linkResult = user.linkExternalIdentity(AuthProvider.GOOGLE);
+          if (linkResult.isFailure) {
+            await this.unitOfWork.rollback();
+            const reason = linkResult.error || 'Failed to link account';
+            try {
+              await this.eventBus.publish([
+                new ExternalAuthenticationFailedEvent(payload.email, AuthProvider.GOOGLE, payload.providerUserId, reason)
+              ]);
+            } catch (err) {
+              console.error('Failed to publish failure event', err);
+            }
+            return Result.fail<Response>(reason);
           }
-          return Result.fail<Response>(reason);
         }
       } else {
         // Create user
         const newUserProps: UserProps = {
-          email: emailVal,
-          status: UserStatus.Active, 
-          failedLoginAttempts: 0,
-          externalIdentities: [extIdentity]
+          fullName: payload.displayName || payload.email.split('@')[0],
+          email: email,
+          role: UserRole.CLIENT,
+          status: UserStatus.Active,
+          emailVerified: true,
+          authProviders: [AuthProvider.GOOGLE]
         };
 
         const userResult = User.create(newUserProps);
@@ -200,6 +165,8 @@ export class GoogleLoginUseCase {
         user = userResult.getValue();
       }
 
+      const now = this.clock.now();
+      user.recordLogin(now);
       await this.userRepository.save(user, this.unitOfWork.session);
 
       const userIdResult = UserId.create(user.id);
@@ -209,12 +176,22 @@ export class GoogleLoginUseCase {
       }
       const userId = userIdResult.getValue();
 
-      const expiresAt = new Date(this.clock.now().getTime() + 7 * 24 * 60 * 60 * 1000);
+      const deviceInfoResult = DeviceInfo.create(request.deviceInfo);
+      if (deviceInfoResult.isFailure) {
+        await this.unitOfWork.rollback();
+        return Result.fail<Response>(deviceInfoResult.error);
+      }
+
+      const { token: rawRefreshToken, hash: refreshTokenHash } = await this.tokenProvider.generateRefreshToken();
+      const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
       const sessionResult = RefreshTokenSession.create(
         userId,
-        request.userAgent,
-        request.ipAddress,
-        expiresAt
+        refreshTokenHash,
+        deviceInfoResult.getValue(),
+        expiresAt,
+        now,
+        request.ipAddress
       );
 
       if (sessionResult.isFailure) {
@@ -240,7 +217,6 @@ export class GoogleLoginUseCase {
       await this.unitOfWork.commit();
 
       const accessToken = await this.tokenProvider.generateAccessToken(user);
-      const refreshToken = await this.tokenProvider.generateRefreshToken(session);
 
       try {
         const succeededEvent = new ExternalAuthenticationSucceededEvent(
@@ -255,13 +231,10 @@ export class GoogleLoginUseCase {
 
       return Result.ok<Response>({
         accessToken,
-        refreshToken
+        refreshToken: rawRefreshToken
       });
     } catch (error: unknown) {
       await this.unitOfWork.rollback();
-      if (error instanceof AuthenticationIntegrityException) {
-        throw error;
-      }
       const reason = `Login failed: ${(error as Error).message}`;
       try {
         await this.eventBus.publish([

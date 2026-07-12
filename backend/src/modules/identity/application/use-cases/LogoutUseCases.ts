@@ -2,20 +2,20 @@ import { IRefreshTokenSessionRepository } from '../../domain/repositories/IRefre
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { LogoutCommand, LogoutAllCommand } from '../commands/Commands';
 import { Result } from '../../../../shared/result/Result';
-import { RefreshTokenId } from '../../domain/value-objects/RefreshTokenId';
 import { UserId } from '../../domain/value-objects/UserId';
+import crypto from 'crypto';
+import { IClock } from '../ports/IClock';
 
 export class LogoutUseCase {
   constructor(
     private readonly sessionRepository: IRefreshTokenSessionRepository,
-    private readonly unitOfWork: IUnitOfWork
+    private readonly unitOfWork: IUnitOfWork,
+    private readonly clock: IClock
   ) {}
 
   public async execute(command: LogoutCommand): Promise<Result<void>> {
-    const tokenIdResult = RefreshTokenId.create(command.refreshTokenId);
-    if (tokenIdResult.isFailure) return Result.fail<void>(tokenIdResult.error);
-
-    const session = await this.sessionRepository.findByTokenId(tokenIdResult.getValue());
+    const hash = crypto.createHash('sha256').update(command.refreshToken).digest('hex');
+    const session = await this.sessionRepository.findByTokenHash(hash);
 
     if (!session) {
       return Result.ok<void>(); // Idempotent
@@ -25,7 +25,7 @@ export class LogoutUseCase {
       return Result.fail<void>('Unauthorized'); // Authorization block
     }
 
-    session.revoke();
+    session.revoke(this.clock.now());
 
     await this.unitOfWork.start();
     try {

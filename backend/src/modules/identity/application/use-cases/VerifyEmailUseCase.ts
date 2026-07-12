@@ -1,45 +1,53 @@
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
+import { IEmailVerificationRepository } from '../../domain/repositories/IEmailVerificationRepository';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
 import { IClock } from '../ports/IClock';
 import { VerifyEmailCommand } from '../commands/VerifyEmailCommand';
 import { Result } from '../../../../shared/result/Result';
-import { EmailAddress } from '../../domain/value-objects/EmailAddress';
-import { VerificationToken } from '../../domain/value-objects/VerificationToken';
+import crypto from 'crypto';
 
 export class VerifyEmailUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
+    private readonly emailVerificationRepo: IEmailVerificationRepository,
     private readonly unitOfWork: IUnitOfWork,
     private readonly eventBus: IEventBus,
     private readonly clock: IClock
   ) {}
 
   public async execute(command: VerifyEmailCommand): Promise<Result<void>> {
-    const emailResult = EmailAddress.create(command.email);
-    if (emailResult.isFailure) return Result.fail<void>(emailResult.error);
+    const tokenHash = crypto.createHash('sha256').update(command.token).digest('hex');
+    const verification = await this.emailVerificationRepo.findByTokenHash(tokenHash);
+    
+    if (!verification) {
+      return Result.fail<void>('Invalid verification token');
+    }
 
-    const tokenResult = VerificationToken.create(command.token);
-    if (tokenResult.isFailure) return Result.fail<void>(tokenResult.error);
-
-    const email = emailResult.getValue();
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findById(verification.userId.value);
 
     if (!user) {
       return Result.fail<void>('Account not found');
     }
 
-    const verificationResult = user.verifyEmail(tokenResult.getValue(), this.clock.now());
-    if (verificationResult.isFailure) {
-      return verificationResult;
+    const verifyTokenResult = verification.verify(this.clock.now());
+    if (verifyTokenResult.isFailure) {
+      return verifyTokenResult;
+    }
+
+    const userVerifyResult = user.markEmailAsVerified();
+    if (userVerifyResult.isFailure) {
+      return userVerifyResult;
     }
 
     await this.unitOfWork.start();
     try {
       await this.userRepository.save(user, this.unitOfWork.session);
+      await this.emailVerificationRepo.delete(verification.id, this.unitOfWork.session);
       
-      const events = user.domainEvents;
+      const events = [...user.domainEvents, ...verification.domainEvents];
       user.clearEvents();
+      verification.clearEvents();
 
       await this.unitOfWork.commit();
       

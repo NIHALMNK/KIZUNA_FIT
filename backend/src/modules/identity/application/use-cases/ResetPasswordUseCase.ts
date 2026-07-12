@@ -1,18 +1,19 @@
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
+import { IPasswordResetRepository } from '../../domain/repositories/IPasswordResetRepository';
 import { IPasswordHasher } from '../ports/IPasswordHasher';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
 import { IClock } from '../ports/IClock';
 import { ResetPasswordCommand } from '../commands/ResetPasswordCommand';
 import { Result } from '../../../../shared/result/Result';
-import { EmailAddress } from '../../domain/value-objects/EmailAddress';
-import { VerificationToken } from '../../domain/value-objects/VerificationToken';
 import { PasswordHash } from '../../domain/value-objects/PasswordHash';
+import crypto from 'crypto';
 import { PasswordStrengthPolicy } from '../../domain/policies/PasswordStrengthPolicy';
 
 export class ResetPasswordUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
+    private readonly passwordResetRepo: IPasswordResetRepository,
     private readonly passwordHasher: IPasswordHasher,
     private readonly unitOfWork: IUnitOfWork,
     private readonly eventBus: IEventBus,
@@ -24,36 +25,43 @@ export class ResetPasswordUseCase {
       return Result.fail<void>('New password is required');
     }
 
-    const emailResult = EmailAddress.create(command.email);
-    if (emailResult.isFailure) return Result.fail<void>(emailResult.error);
+    const tokenHash = crypto.createHash('sha256').update(command.token).digest('hex');
+    const passwordReset = await this.passwordResetRepo.findByTokenHash(tokenHash);
+    
+    if (!passwordReset) {
+      return Result.fail<void>('Invalid reset token');
+    }
 
-    const tokenResult = VerificationToken.create(command.token);
-    if (tokenResult.isFailure) return Result.fail<void>(tokenResult.error);
-
-    const strengthResult = PasswordStrengthPolicy.validate(command.newPlaintextPassword);
-    if (strengthResult.isFailure) return strengthResult;
-
-    const email = emailResult.getValue();
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findById(passwordReset.userId.value);
 
     if (!user) {
       return Result.fail<void>('Account not found');
+    }
+    
+    const strengthResult = PasswordStrengthPolicy.validate(command.newPlaintextPassword);
+    if (strengthResult.isFailure) return strengthResult;
+
+    const useTokenResult = passwordReset.markAsUsed(this.clock.now());
+    if (useTokenResult.isFailure) {
+      return useTokenResult;
     }
 
     const hash = await this.passwordHasher.hash(command.newPlaintextPassword);
     const passwordHashVO = PasswordHash.create(hash).getValue();
 
-    const resetResult = user.completePasswordReset(tokenResult.getValue(), passwordHashVO, this.clock.now());
-    if (resetResult.isFailure) {
-      return resetResult;
+    const changeResult = user.changePassword(passwordHashVO);
+    if (changeResult.isFailure) {
+      return changeResult;
     }
 
     await this.unitOfWork.start();
     try {
       await this.userRepository.save(user, this.unitOfWork.session);
+      await this.passwordResetRepo.save(passwordReset, this.unitOfWork.session);
       
-      const events = user.domainEvents;
+      const events = [...user.domainEvents, ...passwordReset.domainEvents];
       user.clearEvents();
+      passwordReset.clearEvents();
 
       await this.unitOfWork.commit();
       

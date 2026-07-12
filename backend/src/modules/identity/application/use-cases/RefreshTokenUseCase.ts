@@ -1,16 +1,19 @@
+import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IRefreshTokenSessionRepository } from '../../domain/repositories/IRefreshTokenSessionRepository';
 import { ITokenProvider } from '../ports/ITokenProvider';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
 import { IClock } from '../ports/IClock';
+import { UserStatus } from '../../domain/entities/UserStatus';
 import { RefreshTokenCommand } from '../commands/RefreshTokenCommand';
 import { Result } from '../../../../shared/result/Result';
 import { AuthTokensResult } from '../models/AuthTokensResult';
-import { RefreshTokenId } from '../../domain/value-objects/RefreshTokenId';
-
+import crypto from 'crypto';
+import { UserId } from '../../domain/value-objects/UserId';
 
 export class RefreshTokenUseCase {
   constructor(
+    private readonly userRepository: IUserRepository,
     private readonly sessionRepository: IRefreshTokenSessionRepository,
     private readonly tokenProvider: ITokenProvider,
     private readonly unitOfWork: IUnitOfWork,
@@ -19,30 +22,39 @@ export class RefreshTokenUseCase {
   ) {}
 
   public async execute(command: RefreshTokenCommand): Promise<Result<AuthTokensResult>> {
-    const tokenIdResult = RefreshTokenId.create(command.refreshTokenId);
-    if (tokenIdResult.isFailure) return Result.fail<AuthTokensResult>(tokenIdResult.error);
-
-    const session = await this.sessionRepository.findByTokenId(tokenIdResult.getValue());
+    const providedHash = crypto.createHash('sha256').update(command.refreshToken).digest('hex');
+    const session = await this.sessionRepository.findByTokenHash(providedHash);
 
     if (!session) {
       return Result.fail<AuthTokensResult>('Invalid refresh token');
     }
 
-    const newRefreshTokenIdResult = RefreshTokenId.create(crypto.randomUUID());
-    if (newRefreshTokenIdResult.isFailure) return Result.fail<AuthTokensResult>(newRefreshTokenIdResult.error);
-    const newRefreshTokenId = newRefreshTokenIdResult.getValue();
+    const user = await this.userRepository.findById(session.userId.value);
+    if (!user) {
+      return Result.fail<AuthTokensResult>('User not found');
+    }
+
+    if (user.status === UserStatus.Suspended || user.status === UserStatus.Banned) {
+      return Result.fail<AuthTokensResult>('Account is suspended or banned');
+    }
+
+    const { token: newRawRefreshToken, hash: newRefreshTokenHash } = await this.tokenProvider.generateRefreshToken();
+    
+    const now = this.clock.now();
+    const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     const rotationResult = session.rotate(
-      newRefreshTokenId, 
-      this.clock.now(),
-      new Date(this.clock.now().getTime() + 7 * 24 * 60 * 60 * 1000)
+      newRefreshTokenHash, 
+      now,
+      expiresAt,
+      command.ipAddress
     );
     
     if (rotationResult.isFailure) {
-      // Rotation failed (likely because token was already revoked, implying a compromise)
+      // Reuse detected, revoke all sessions for user
       await this.unitOfWork.start();
       try {
-        await this.sessionRepository.revokeAllForFamily(session.family, this.unitOfWork.session);
+        await this.sessionRepository.revokeAllForUser(UserId.create(session.userId.value).getValue(), this.unitOfWork.session);
         const events = session.domainEvents;
         session.clearEvents();
         await this.unitOfWork.commit();
@@ -50,7 +62,7 @@ export class RefreshTokenUseCase {
       } catch (err) {
         await this.unitOfWork.rollback();
       }
-      return Result.fail<AuthTokensResult>('Invalid refresh token. Session revoked.');
+      return Result.fail<AuthTokensResult>('Invalid refresh token. Session revoked due to suspected compromise.');
     }
 
     await this.unitOfWork.start();
@@ -63,23 +75,12 @@ export class RefreshTokenUseCase {
       await this.unitOfWork.commit();
       await this.eventBus.publish(events);
 
-      // In a real scenario, we'd also need the User to generate an AccessToken. 
-      // For brevity, assuming the tokenProvider only needs the session for a refresh token, 
-      // but an Access Token usually needs the User. 
-      // Since our ITokenProvider requires User for AccessToken, we actually need to fetch the User here.
-      // This is a known architectural pattern: fetch User. We'll leave as-is for the Usecase structure, 
-      // but note it would need the UserRepository injected to complete the full Token generation properly.
-      // Assuming it's handled or we just generate the tokens.
-      
-      const refreshToken = await this.tokenProvider.generateRefreshToken(session);
-      // Mocking access token fetch because we need user. 
-      // I will add IUserRepository to dependencies if it were a full build, but following strict constraints.
-      // (For this step 4 we just need the structural skeleton)
+      const accessToken = await this.tokenProvider.generateAccessToken(user);
       
       return Result.ok<AuthTokensResult>({
-        accessToken: "placeholder_access_token_requires_user_repo", 
-        refreshToken,
-        expiresAt: session.props.expiresAt
+        accessToken, 
+        refreshToken: newRawRefreshToken,
+        expiresAt: session.expiresAt
       });
     } catch (err) {
       await this.unitOfWork.rollback();

@@ -14,6 +14,7 @@ import { UserStatus } from '../../domain/entities/UserStatus';
 import { AuthProvider } from '../../domain/value-objects/AuthProvider';
 import { EmailVerification } from '../../domain/entities/EmailVerification';
 import { UserId } from '../../domain/value-objects/UserId';
+import { EmailVerificationRequestedEvent } from '../events/EmailVerificationRequestedEvent';
 import crypto from 'crypto';
 
 export class RegisterUserUseCase {
@@ -84,16 +85,21 @@ export class RegisterUserUseCase {
       await this.emailVerificationRepo.save(emailVerification, this.unitOfWork.session);
       
       const events = [...user.domainEvents, ...emailVerification.domainEvents];
-      // IMPORTANT: In a real app, the rawToken must be passed in the EmailVerificationRequestedEvent
-      // so the email service can send it. We should probably inject the raw token into the event.
-      // But for now, we'll assume the event handles it or we'd modify the event.
-      // Let's modify the event later.
+      
       user.clearEvents();
       emailVerification.clearEvents();
 
+      // Application Event
+      const emailVerificationRequestedEvent = new EmailVerificationRequestedEvent(
+        user.id,
+        email.value,
+        rawToken
+      );
+
       await this.unitOfWork.commit();
       
-      await this.eventBus.publish(events);
+      // Dispatch Domain Events + Application Events
+      await this.eventBus.publish([...events, emailVerificationRequestedEvent]);
       
       return Result.ok<void>();
     } catch (err) {

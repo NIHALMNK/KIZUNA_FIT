@@ -13,14 +13,21 @@ import { PasswordResetModel } from './infrastructure/persistence/mongoose/models
 // Infrastructure (Shared)
 import { MongooseUnitOfWork } from '../../shared/infrastructure/persistence/mongoose/MongooseUnitOfWork';
 import { InMemoryEventBus } from '../../shared/infrastructure/events/InMemoryEventBus';
-import { ConsoleEmailProvider } from '../../shared/infrastructure/email/ConsoleEmailProvider';
+import { NodemailerSmtpEmailProvider } from '../../shared/infrastructure/email/NodemailerSmtpEmailProvider';
+import { MockEmailProvider } from '../../shared/infrastructure/email/MockEmailProvider';
+import { SyncEmailDispatcher } from '../../shared/infrastructure/email/SyncEmailDispatcher';
+import { BullMQEmailDispatcher } from '../../shared/infrastructure/email/BullMQEmailDispatcher';
 import { JwtConfiguration } from '../../config/JwtConfiguration';
+import { env } from '../../config/env.config';
+
+// Event Handlers
+import { SendVerificationEmailHandler } from './application/event-handlers/SendVerificationEmailHandler';
+import { SendPasswordResetEmailHandler } from './application/event-handlers/SendPasswordResetEmailHandler';
 
 // Infrastructure (Adapters)
 import { SystemClock } from './infrastructure/adapters/time/SystemClock';
 import { Argon2PasswordHasher } from './infrastructure/adapters/security/Argon2PasswordHasher';
 import { JwtTokenProvider } from './infrastructure/adapters/security/JwtTokenProvider';
-import { IdentityEmailService } from './infrastructure/adapters/email/IdentityEmailService';
 import { GoogleIdentityProvider } from './infrastructure/adapters/security/GoogleIdentityProvider';
 
 // Application Use Cases
@@ -48,15 +55,30 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
   // Shared Infrastructure (Singletons)
   container.register({
     eventBus: asClass(InMemoryEventBus).singleton(),
-    emailProvider: asClass(ConsoleEmailProvider).singleton(),
+    emailProvider: env.EMAIL_PROVIDER === 'mock' 
+      ? asClass(MockEmailProvider).singleton() 
+      : asClass(NodemailerSmtpEmailProvider).singleton(),
+    emailDispatcher: env.EMAIL_DISPATCH_MODE === 'queue'
+      ? asClass(BullMQEmailDispatcher).singleton()
+      : asClass(SyncEmailDispatcher).singleton(),
   });
+
+  // Application Event Handlers (Singletons)
+  container.register({
+    sendVerificationEmailHandler: asClass(SendVerificationEmailHandler).singleton(),
+    sendPasswordResetEmailHandler: asClass(SendPasswordResetEmailHandler).singleton(),
+  });
+
+  // Wire Handlers to EventBus
+  const eventBus = container.resolve('eventBus');
+  eventBus.subscribe('EmailVerificationRequestedEvent', container.resolve('sendVerificationEmailHandler'));
+  eventBus.subscribe('PasswordResetRequestedEvent', container.resolve('sendPasswordResetEmailHandler'));
 
   // Identity Adapters (Singletons)
   container.register({
     clock: asClass(SystemClock).singleton(),
     passwordHasher: asClass(Argon2PasswordHasher).singleton(),
     tokenProvider: asClass(JwtTokenProvider).singleton(),
-    emailService: asClass(IdentityEmailService).singleton(),
     googleIdentityProvider: asValue(new GoogleIdentityProvider(process.env.GOOGLE_CLIENT_ID || 'fallback_client_id')),
   });
 

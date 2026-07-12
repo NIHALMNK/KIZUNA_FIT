@@ -1,10 +1,11 @@
-export interface EmailPayload {
+export interface SendTemplatePayload {
   to: string;
   subject: string;
-  htmlBody: string;
-  textBody?: string;
+  template: string;
+  context: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface IEmailProvider {
-  sendEmail(payload: EmailPayload): Promise<void>;
+  sendTemplate(payload: SendTemplatePayload): Promise<void>;
 }

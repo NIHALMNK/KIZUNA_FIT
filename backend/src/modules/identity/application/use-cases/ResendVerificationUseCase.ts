@@ -7,6 +7,7 @@ import { Result } from '../../../../shared/result/Result';
 import { EmailAddress } from '../../domain/value-objects/EmailAddress';
 import { EmailVerification } from '../../domain/entities/EmailVerification';
 import { UserId } from '../../domain/value-objects/UserId';
+import { EmailVerificationRequestedEvent } from '../events/EmailVerificationRequestedEvent';
 import crypto from 'crypto';
 
 export interface ResendVerificationCommand {
@@ -67,12 +68,15 @@ export class ResendVerificationUseCase {
       const events = emailVerification.domainEvents;
       emailVerification.clearEvents();
 
-      // IMPORTANT: In a real app we'd pass rawToken inside the event here
-      // For now, the domain event is emitted.
+      const emailVerificationRequestedEvent = new EmailVerificationRequestedEvent(
+        user.id,
+        email.value,
+        rawToken
+      );
 
       await this.unitOfWork.commit();
       
-      await this.eventBus.publish(events);
+      await this.eventBus.publish([...events, emailVerificationRequestedEvent]);
       
       return Result.ok<void>();
     } catch (err) {

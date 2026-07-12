@@ -8,8 +8,7 @@ import { Result } from '../../../../shared/result/Result';
 import { EmailAddress } from '../../domain/value-objects/EmailAddress';
 import { PasswordReset } from '../../domain/entities/PasswordReset';
 import { UserId } from '../../domain/value-objects/UserId';
-import { PasswordResetRequestedEvent } from '../../domain/events/PasswordResetRequestedEvent';
-import { VerificationToken } from '../../domain/value-objects/VerificationToken';
+import { PasswordResetRequestedEvent } from '../events/PasswordResetRequestedEvent';
 import crypto from 'crypto';
 
 export class ForgotPasswordUseCase {
@@ -53,8 +52,9 @@ export class ForgotPasswordUseCase {
 
     const passwordReset = resetResult.getValue();
     const event = new PasswordResetRequestedEvent(
-      { id: UserId.create(user.id).getValue(), email: email },
-      VerificationToken.create(rawToken).getValue()
+      user.id,
+      email.value,
+      rawToken
     );
 
     await this.unitOfWork.start();

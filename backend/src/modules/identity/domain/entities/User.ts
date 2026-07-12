@@ -3,49 +3,58 @@ import { Result } from '../../../../shared/result/Result';
 import { UserId } from '../value-objects/UserId';
 import { EmailAddress } from '../value-objects/EmailAddress';
 import { PasswordHash } from '../value-objects/PasswordHash';
-import { VerificationToken } from '../value-objects/VerificationToken';
 import { UserStatus } from './UserStatus';
-import { EmailVerification } from './EmailVerification';
-import { PasswordReset } from './PasswordReset';
+import { UserRole } from '../value-objects/UserRole';
+import { AuthProvider } from '../value-objects/AuthProvider';
 import { UserRegisteredEvent } from '../events/UserRegisteredEvent';
 import { EmailVerifiedEvent } from '../events/EmailVerifiedEvent';
 import { PasswordChangedEvent } from '../events/PasswordChangedEvent';
-import { PasswordResetRequestedEvent } from '../events/PasswordResetRequestedEvent';
-import { UserLockedEvent } from '../events/UserLockedEvent';
 import { AccountDeletedEvent } from '../events/AccountDeletedEvent';
-import { ExternalIdentity } from '../value-objects/ExternalIdentity';
-import { ExternalIdentityLinkedEvent } from '../events/ExternalIdentityLinkedEvent';
-import { AuthProvider } from '../value-objects/AuthProvider';
 
 export interface UserProps {
+  fullName: string;
   email: EmailAddress;
-  status: UserStatus;
+  authProviders: AuthProvider[];
   passwordHash?: PasswordHash;
-  emailVerification?: EmailVerification;
-  passwordReset?: PasswordReset;
-  failedLoginAttempts: number;
-  externalIdentities?: ExternalIdentity[];
+  role: UserRole;
+  status: UserStatus;
+  emailVerified: boolean;
+  lastLoginAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class User extends AggregateRoot<UserProps> {
+  get fullName(): string {
+    return this.props.fullName;
+  }
+
   get email(): EmailAddress {
     return this.props.email;
+  }
+
+  get authProviders(): AuthProvider[] {
+    return this.props.authProviders;
+  }
+
+  get role(): UserRole {
+    return this.props.role;
   }
 
   get status(): UserStatus {
     return this.props.status;
   }
 
+  get emailVerified(): boolean {
+    return this.props.emailVerified;
+  }
+
   get passwordHash(): PasswordHash | undefined {
     return this.props.passwordHash;
   }
 
-  get failedLoginAttempts(): number {
-    return this.props.failedLoginAttempts;
-  }
-
-  get externalIdentities(): ExternalIdentity[] {
-    return this.props.externalIdentities || [];
+  get lastLoginAt(): Date | undefined {
+    return this.props.lastLoginAt;
   }
 
   public hasLocalCredentials(): boolean {
@@ -53,7 +62,7 @@ export class User extends AggregateRoot<UserProps> {
   }
 
   public hasExternalIdentity(provider: AuthProvider): boolean {
-    return this.externalIdentities.some(id => id.provider === provider);
+    return this.authProviders.includes(provider);
   }
 
   public canAuthenticateWith(provider: AuthProvider): boolean {
@@ -61,26 +70,16 @@ export class User extends AggregateRoot<UserProps> {
     return this.hasExternalIdentity(provider);
   }
 
-  public linkExternalIdentity(identity: ExternalIdentity): Result<void> {
-    if (this.status === UserStatus.Deleted || this.status === UserStatus.Locked) {
-      return Result.fail<void>('Cannot link identity to deleted or locked account');
+  public linkExternalIdentity(provider: AuthProvider): Result<void> {
+    if (this.status === UserStatus.Deleted || this.status === UserStatus.Suspended || this.status === UserStatus.Banned) {
+      return Result.fail<void>('Cannot link identity to deleted, suspended, or banned account');
     }
 
-    if (!this.props.externalIdentities) {
-      this.props.externalIdentities = [];
-    }
-
-    if (this.hasExternalIdentity(identity.provider)) {
+    if (this.hasExternalIdentity(provider)) {
       return Result.fail<void>('Provider already linked to this account');
     }
 
-    this.props.externalIdentities.push(identity);
-    this.addDomainEvent(new ExternalIdentityLinkedEvent({
-      userId: this.id,
-      provider: identity.provider,
-      providerUserId: identity.providerUserId
-    }));
-
+    this.props.authProviders.push(provider);
     return Result.ok<void>();
   }
 
@@ -89,24 +88,22 @@ export class User extends AggregateRoot<UserProps> {
       return Result.fail<void>('Cannot modify deleted account');
     }
 
-    const isLastMethod = !this.hasLocalCredentials() && this.externalIdentities.length === 1;
+    const isLastMethod = !this.hasLocalCredentials() && this.authProviders.length === 1;
     if (isLastMethod && !isForceRevoke) {
       return Result.fail<void>('Cannot remove the final authentication method');
     }
 
-    if (this.props.externalIdentities) {
-      this.props.externalIdentities = this.props.externalIdentities.filter(id => id.provider !== provider);
-    }
+    this.props.authProviders = this.props.authProviders.filter(p => p !== provider);
 
     if (isLastMethod && isForceRevoke) {
-      this.lockAccount(); // Safely lock the stranded account
+      this.props.status = UserStatus.Suspended;
     }
 
     return Result.ok<void>();
   }
 
   private constructor(props: UserProps, id?: string) {
-    super(props, id || crypto.randomUUID());
+    super(props, id || crypto.randomUUID().replace(/-/g, '').substring(0, 24));
   }
 
   public static create(props: UserProps, id?: string): Result<User> {
@@ -119,7 +116,7 @@ export class User extends AggregateRoot<UserProps> {
         user.addDomainEvent(new UserRegisteredEvent({ 
           id: userIdResult.getValue(), 
           email: user.email,
-          provider: props.externalIdentities?.[0]?.provider 
+          provider: props.authProviders[0] 
         }));
       }
     }
@@ -127,45 +124,12 @@ export class User extends AggregateRoot<UserProps> {
     return Result.ok<User>(user);
   }
 
-  public verifyEmail(token: VerificationToken, now: Date): Result<void> {
-    if (this.status === UserStatus.Deleted) {
-      return Result.fail<void>('Cannot verify deleted user');
-    }
-
-    if (!this.props.emailVerification) {
-      return Result.fail<void>('No pending verification found');
-    }
-
-    if (this.props.emailVerification.isExpired(now)) {
-      return Result.fail<void>('Verification token expired');
-    }
-
-    if (!this.props.emailVerification.token.equals(token)) {
-      return Result.fail<void>('Invalid verification token');
-    }
-
-    this.props.emailVerification.verify(now);
-    
-    if (this.status === UserStatus.PendingVerification) {
-      this.props.status = UserStatus.Active;
-    }
-
-    const userIdResult = UserId.create(this.id);
-    if (userIdResult.isSuccess) {
-      this.addDomainEvent(new EmailVerifiedEvent({ id: userIdResult.getValue() }));
-    }
-
-    return Result.ok<void>();
-  }
-
   public markEmailAsVerified(): Result<void> {
     if (this.status === UserStatus.Deleted) {
       return Result.fail<void>('Cannot verify deleted user');
     }
-
-    if (this.status === UserStatus.PendingVerification) {
-      this.props.status = UserStatus.Active;
-    }
+    
+    this.props.emailVerified = true;
 
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {
@@ -190,96 +154,15 @@ export class User extends AggregateRoot<UserProps> {
     return Result.ok<void>();
   }
 
-  public requestPasswordReset(token: VerificationToken, expiresAt: Date): Result<void> {
-    if (this.status === UserStatus.Deleted) {
-      return Result.fail<void>('Cannot reset password for deleted user');
-    }
-
-    this.props.passwordReset = PasswordReset.create({
-      token,
-      expiresAt
-    });
-
-    const userIdResult = UserId.create(this.id);
-    if (userIdResult.isSuccess) {
-      this.addDomainEvent(new PasswordResetRequestedEvent({ 
-        id: userIdResult.getValue(), 
-        email: this.email 
-      }, token));
-    }
-
-    return Result.ok<void>();
-  }
-
-  public completePasswordReset(token: VerificationToken, newHash: PasswordHash, now: Date): Result<void> {
-    if (this.status === UserStatus.Deleted) {
-      return Result.fail<void>('Cannot reset password for deleted user');
-    }
-
-    if (!this.props.passwordReset) {
-      return Result.fail<void>('No password reset requested');
-    }
-
-    if (this.props.passwordReset.isExpired(now)) {
-      return Result.fail<void>('Reset token expired');
-    }
-
-    if (this.props.passwordReset.isUsed()) {
-      return Result.fail<void>('Reset token already used');
-    }
-
-    if (!this.props.passwordReset.token.equals(token)) {
-      return Result.fail<void>('Invalid reset token');
-    }
-
-    this.props.passwordReset.markAsUsed(now);
-    this.props.passwordHash = newHash;
-
-    const userIdResult = UserId.create(this.id);
-    if (userIdResult.isSuccess) {
-      this.addDomainEvent(new PasswordChangedEvent({ id: userIdResult.getValue() }));
-    }
-
-    return Result.ok<void>();
-  }
-
-  public recordFailedLogin(): void {
+  public recordLogin(now: Date): void {
     if (this.status === UserStatus.Deleted) return;
-    
-    this.props.failedLoginAttempts += 1;
-  }
-
-  public resetFailedLogins(): void {
-    if (this.status === UserStatus.Deleted) return;
-
-    this.props.failedLoginAttempts = 0;
-  }
-
-  public lockAccount(): void {
-    if (this.status === UserStatus.Deleted) return;
-
-    this.props.status = UserStatus.Locked;
-
-    const userIdResult = UserId.create(this.id);
-    if (userIdResult.isSuccess) {
-      this.addDomainEvent(new UserLockedEvent({ id: userIdResult.getValue() }));
-    }
-  }
-
-  public unlockAccount(): void {
-    if (this.status === UserStatus.Deleted) return;
-
-    this.props.status = UserStatus.Active;
-    this.props.failedLoginAttempts = 0;
+    this.props.lastLoginAt = now;
   }
 
   public deleteAccount(): void {
     if (this.status === UserStatus.Deleted) return;
 
     this.props.status = UserStatus.Deleted;
-    // Scrub PII
-    // EmailAddress should ideally be scrubbed too, but the VO requires a valid email. 
-    // We could either leave the email as is and rely on the Deleted state, or overwrite it with a dummy valid email.
     
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {

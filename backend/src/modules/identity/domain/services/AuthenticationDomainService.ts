@@ -1,7 +1,5 @@
 import { User } from '../entities/User';
 import { Result } from '../../../../shared/result/Result';
-import { AccountLockoutPolicy } from '../policies/AccountLockoutPolicy';
-import { EmailVerificationPolicy } from '../policies/EmailVerificationPolicy';
 import { UserStatus } from '../entities/UserStatus';
 
 /**
@@ -22,28 +20,15 @@ export class AuthenticationDomainService {
       return Result.fail<void>('Account has been suspended by an administrator');
     }
 
-    if (user.status === UserStatus.Locked) {
-      return Result.fail<void>('Account is temporarily locked due to too many failed login attempts');
+    if (user.status === UserStatus.Banned) {
+      return Result.fail<void>('Account has been banned by an administrator');
     }
 
-    const verificationResult = EmailVerificationPolicy.canAuthenticate(user);
-    if (verificationResult.isFailure) {
-      return verificationResult;
+    if (!user.emailVerified) {
+      return Result.fail<void>('Please verify your email address to log in.');
     }
 
     return Result.ok<void>();
   }
 
-  /**
-   * Handles the post-authentication result.
-   * Either resets failures on success, or increments failures and applies lockout on failure.
-   */
-  public static processAuthenticationAttempt(user: User, isValidCredential: boolean): void {
-    if (isValidCredential) {
-      user.resetFailedLogins();
-    } else {
-      user.recordFailedLogin();
-      AccountLockoutPolicy.evaluate(user);
-    }
-  }
 }

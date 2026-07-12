@@ -1,7 +1,7 @@
 import { ClientSession } from 'mongoose';
 import { IUserRepository } from '../../../../domain/repositories/IUserRepository';
 import { User } from '../../../../domain/entities/User';
-import { EmailAddress } from '../../../../domain/value-objects/EmailAddress';
+
 import { UserModel } from '../models/UserModel';
 import { UserMapper } from '../mappers/UserMapper';
 
@@ -12,7 +12,7 @@ export class MongoUserRepository implements IUserRepository {
     
     // We use findOneAndUpdate with upsert to handle both creation and updates safely
     await UserModel.findOneAndUpdate(
-      { _id: user.id },
+      { _id: persistenceData._id },
       { $set: persistenceData },
       { upsert: true, new: true, session }
     ).exec();
@@ -24,23 +24,16 @@ export class MongoUserRepository implements IUserRepository {
     return UserMapper.toDomain(raw);
   }
 
-  public async findByEmail(email: EmailAddress): Promise<User | null> {
-    const raw = await UserModel.findOne({ email: email.value }).exec();
+  public async findByEmail(email: string): Promise<User | null> {
+    const raw = await UserModel.findOne({ email }).exec();
     if (!raw) return null;
     return UserMapper.toDomain(raw);
   }
 
-  async findByExternalIdentity(provider: string, providerUserId: string): Promise<User | null> {
-    const doc = await UserModel.findOne({
-      'externalIdentities.provider': provider,
-      'externalIdentities.providerUserId': providerUserId
-    }).exec();
-    if (!doc) return null;
-    return UserMapper.toDomain(doc);
-  }
 
-  public async exists(email: EmailAddress): Promise<boolean> {
-    const count = await UserModel.countDocuments({ email: email.value }).exec();
+
+  public async existsByEmail(email: string): Promise<boolean> {
+    const count = await UserModel.countDocuments({ email }).exec();
     return count > 0;
   }
 }

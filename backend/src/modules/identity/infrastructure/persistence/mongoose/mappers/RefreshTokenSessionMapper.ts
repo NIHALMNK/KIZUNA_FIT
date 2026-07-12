@@ -1,39 +1,64 @@
-import { RefreshTokenSession, RefreshTokenSessionProps } from '../../../../domain/entities/RefreshTokenSession';
+import { RefreshTokenSession } from '../../../../domain/entities/RefreshTokenSession';
 import { UserId } from '../../../../domain/value-objects/UserId';
-import { RefreshTokenId } from '../../../../domain/value-objects/RefreshTokenId';
-import { TokenFamily } from '../../../../domain/value-objects/TokenFamily';
+import { DeviceInfo } from '../../../../domain/value-objects/DeviceInfo';
 import { RefreshTokenSessionDocument } from '../models/RefreshTokenSessionModel';
+import mongoose from 'mongoose';
 
 export class RefreshTokenSessionMapper {
   public static toDomain(raw: RefreshTokenSessionDocument): RefreshTokenSession {
-    const props: RefreshTokenSessionProps = {
-      userId: UserId.create(raw.userId).getValue(),
-      tokenId: RefreshTokenId.create(raw.tokenId).getValue(),
-      family: TokenFamily.create(raw.family).getValue(),
-      deviceId: raw.deviceId,
-      ipAddress: raw.ipAddress,
-      expiresAt: raw.expiresAt,
-      isRevoked: raw.isRevoked
-    };
+    const deviceInfoResult = DeviceInfo.create({
+      browser: raw.deviceInfo.browser,
+      browserVersion: raw.deviceInfo.browserVersion,
+      operatingSystem: raw.deviceInfo.operatingSystem,
+      platform: raw.deviceInfo.platform,
+      deviceName: raw.deviceInfo.deviceName,
+      userAgent: raw.deviceInfo.userAgent
+    });
 
-    // Hydrate by bypassing events. We need to access private constructor, 
-    // but TS limits it. We use Object.create + Object.assign as a safe anti-corruption hydration 
-    // pattern if standard factories emit unwanted events.
-    const session = Object.create(RefreshTokenSession.prototype);
-    Object.assign(session, { _id: raw._id, props: props, _domainEvents: [] });
-    return session as RefreshTokenSession;
+    const sessionResult = RefreshTokenSession.create(
+      UserId.create(raw.userId.toString()).getValue(),
+      raw.refreshTokenHash,
+      deviceInfoResult.getValue(),
+      raw.expiresAt,
+      raw.lastUsedAt,
+      raw.ipAddress,
+      raw._id.toString()
+    );
+
+    const session = sessionResult.getValue();
+    if (raw.revokedAt) {
+      session.revoke(raw.revokedAt);
+    }
+    
+    // Set audit fields if we had them exposed, but usually we just care about them in persistence.
+    return session;
   }
 
   public static toPersistence(session: RefreshTokenSession): Partial<RefreshTokenSessionDocument> {
-    return {
-      _id: session.id,
-      userId: session.userId.value,
-      tokenId: session.tokenId.value,
-      family: session.family.value,
-      deviceId: session.props.deviceId,
-      ipAddress: session.props.ipAddress,
-      expiresAt: session.props.expiresAt,
-      isRevoked: session.isRevoked
+    const raw: Partial<RefreshTokenSessionDocument> = {
+      _id: new mongoose.Types.ObjectId(session.id),
+      userId: new mongoose.Types.ObjectId(session.userId.value),
+      refreshTokenHash: session.refreshTokenHash,
+      deviceInfo: {
+        browser: session.deviceInfo.browser,
+        browserVersion: session.deviceInfo.browserVersion,
+        operatingSystem: session.deviceInfo.operatingSystem,
+        platform: session.deviceInfo.platform,
+        deviceName: session.deviceInfo.deviceName,
+        userAgent: session.deviceInfo.userAgent
+      },
+      expiresAt: session.expiresAt,
+      lastUsedAt: session.lastUsedAt
     };
+
+    if (session.ipAddress) {
+      raw.ipAddress = session.ipAddress;
+    }
+
+    if (session.revokedAt) {
+      raw.revokedAt = session.revokedAt;
+    }
+
+    return raw;
   }
 }

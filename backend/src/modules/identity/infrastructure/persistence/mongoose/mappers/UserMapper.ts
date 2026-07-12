@@ -1,93 +1,44 @@
 import { User, UserProps } from '../../../../domain/entities/User';
-
 import { EmailAddress } from '../../../../domain/value-objects/EmailAddress';
 import { PasswordHash } from '../../../../domain/value-objects/PasswordHash';
-import { VerificationToken } from '../../../../domain/value-objects/VerificationToken';
 import { UserStatus } from '../../../../domain/entities/UserStatus';
-import { EmailVerification, EmailVerificationProps } from '../../../../domain/entities/EmailVerification';
-import { PasswordReset, PasswordResetProps } from '../../../../domain/entities/PasswordReset';
-import { ExternalIdentity } from '../../../../domain/value-objects/ExternalIdentity';
+import { UserRole } from '../../../../domain/value-objects/UserRole';
 import { AuthProvider } from '../../../../domain/value-objects/AuthProvider';
 import { UserDocument } from '../models/UserModel';
+import mongoose from 'mongoose';
 
 export class UserMapper {
   public static toDomain(raw: UserDocument): User {
-    let emailVerification: EmailVerification | undefined;
-    if (raw.emailVerification) {
-      // Reconstruct using private constructor pattern by bypassing creation validation
-      // Any logic in factory is bypassed since data is trusted
-      const props: EmailVerificationProps = {
-        token: VerificationToken.create(raw.emailVerification.token).getValue(),
-        expiresAt: raw.emailVerification.expiresAt,
-        verifiedAt: raw.emailVerification.verifiedAt
-      };
-      // We rely on the public create or private constructor. 
-      // Using public create here since we designed it to accept the props and id directly without complex logic.
-      emailVerification = EmailVerification.create(props);
-    }
-
-    let passwordReset: PasswordReset | undefined;
-    if (raw.passwordReset) {
-      const props: PasswordResetProps = {
-        token: VerificationToken.create(raw.passwordReset.token).getValue(),
-        expiresAt: raw.passwordReset.expiresAt,
-        usedAt: raw.passwordReset.usedAt
-      };
-      passwordReset = PasswordReset.create(props);
-    }
-
     const userProps: UserProps = {
+      fullName: raw.fullName,
       email: EmailAddress.create(raw.email).getValue(),
       status: raw.status as UserStatus,
+      role: raw.role as UserRole,
       passwordHash: raw.passwordHash ? PasswordHash.create(raw.passwordHash).getValue() : undefined,
-      emailVerification,
-      passwordReset,
-      failedLoginAttempts: raw.failedLoginAttempts || 0,
-      externalIdentities: raw.externalIdentities?.map(id => {
-        const extIdResult = ExternalIdentity.create({
-          provider: id.provider as AuthProvider,
-          providerUserId: id.providerUserId
-        });
-        return extIdResult.getValue();
-      }) || []
+      authProviders: raw.authProviders.map(p => p as AuthProvider),
+      emailVerified: raw.emailVerified,
+      lastLoginAt: raw.lastLoginAt,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt
     };
 
-    // Use reflection/prototype or the public factory if it allows passing ID and doesn't trigger initial events
-    // Wait, User.create() will trigger UserRegisteredEvent if ID is not provided. 
-    // We provide ID, so it skips the event generation according to our Domain logic.
-    return User.create(userProps, raw._id).getValue();
+    return User.create(userProps, raw._id.toString()).getValue();
   }
 
   public static toPersistence(user: User): Partial<UserDocument> {
     const raw: Partial<UserDocument> = {
-      _id: user.id,
+      _id: new mongoose.Types.ObjectId(user.id),
+      fullName: user.fullName,
       email: user.email.value,
+      role: user.role,
       status: user.status,
-      failedLoginAttempts: user.failedLoginAttempts,
-      externalIdentities: user.externalIdentities.map(id => ({
-        provider: id.provider,
-        providerUserId: id.providerUserId
-      }))
+      authProviders: user.authProviders,
+      emailVerified: user.emailVerified,
+      lastLoginAt: user.lastLoginAt
     };
 
     if (user.passwordHash) {
       raw.passwordHash = user.passwordHash.value;
-    }
-
-    if (user.props.emailVerification) {
-      raw.emailVerification = {
-        token: user.props.emailVerification.token.value,
-        expiresAt: user.props.emailVerification.expiresAt,
-        verifiedAt: user.props.emailVerification.verifiedAt
-      };
-    }
-
-    if (user.props.passwordReset) {
-      raw.passwordReset = {
-        token: user.props.passwordReset.token.value,
-        expiresAt: user.props.passwordReset.expiresAt,
-        usedAt: user.props.passwordReset.usedAt
-      };
     }
 
     return raw;

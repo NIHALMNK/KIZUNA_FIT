@@ -3,8 +3,12 @@ import { AwilixContainer, asClass, asValue } from 'awilix';
 // Infrastructure (Persistence)
 import { MongoUserRepository } from './infrastructure/persistence/mongoose/repositories/MongoUserRepository';
 import { MongoRefreshTokenSessionRepository } from './infrastructure/persistence/mongoose/repositories/MongoRefreshTokenSessionRepository';
+import { MongoEmailVerificationRepository } from './infrastructure/persistence/mongoose/repositories/MongoEmailVerificationRepository';
+import { MongoPasswordResetRepository } from './infrastructure/persistence/mongoose/repositories/MongoPasswordResetRepository';
 import { UserModel } from './infrastructure/persistence/mongoose/models/UserModel';
 import { RefreshTokenSessionModel } from './infrastructure/persistence/mongoose/models/RefreshTokenSessionModel';
+import { EmailVerificationModel } from './infrastructure/persistence/mongoose/models/EmailVerificationModel';
+import { PasswordResetModel } from './infrastructure/persistence/mongoose/models/PasswordResetModel';
 
 // Infrastructure (Shared)
 import { MongooseUnitOfWork } from '../../shared/infrastructure/persistence/mongoose/MongooseUnitOfWork';
@@ -24,7 +28,10 @@ import { RegisterUserUseCase } from './application/use-cases/RegisterUserUseCase
 import { LoginUseCase } from './application/use-cases/LoginUseCase';
 import { GoogleLoginUseCase } from './application/use-cases/GoogleLoginUseCase';
 import { RefreshTokenUseCase } from './application/use-cases/RefreshTokenUseCase';
+import { LogoutUseCase } from './application/use-cases/LogoutUseCases';
+import { CheckEmailUseCase } from './application/use-cases/CheckEmailUseCase';
 import { VerifyEmailUseCase } from './application/use-cases/VerifyEmailUseCase';
+import { ResendVerificationUseCase } from './application/use-cases/ResendVerificationUseCase';
 import { ForgotPasswordUseCase } from './application/use-cases/ForgotPasswordUseCase';
 import { ResetPasswordUseCase } from './application/use-cases/ResetPasswordUseCase';
 import { ChangePasswordUseCase } from './application/use-cases/ChangePasswordUseCase';
@@ -58,10 +65,14 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
   container.register({
     userModel: asValue(UserModel),
     refreshTokenSessionModel: asValue(RefreshTokenSessionModel),
+    emailVerificationModel: asValue(EmailVerificationModel),
+    passwordResetModel: asValue(PasswordResetModel),
     
     unitOfWork: asClass(MongooseUnitOfWork).scoped(),
     userRepository: asClass(MongoUserRepository).scoped(),
     sessionRepository: asClass(MongoRefreshTokenSessionRepository).scoped(),
+    emailVerificationRepo: asClass(MongoEmailVerificationRepository).scoped(),
+    passwordResetRepo: asClass(MongoPasswordResetRepository).scoped(),
   });
 
   // Application Use Cases (Scoped because they depend on Scoped UnitOfWork)
@@ -70,7 +81,10 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
     loginUseCase: asClass(LoginUseCase).scoped(),
     googleLoginUseCase: asClass(GoogleLoginUseCase).scoped(),
     refreshTokenUseCase: asClass(RefreshTokenUseCase).scoped(),
+    logoutUseCase: asClass(LogoutUseCase).scoped(),
+    checkEmailUseCase: asClass(CheckEmailUseCase).scoped(),
     verifyEmailUseCase: asClass(VerifyEmailUseCase).scoped(),
+    resendVerificationUseCase: asClass(ResendVerificationUseCase).scoped(),
     forgotPasswordUseCase: asClass(ForgotPasswordUseCase).scoped(),
     resetPasswordUseCase: asClass(ResetPasswordUseCase).scoped(),
     changePasswordUseCase: asClass(ChangePasswordUseCase).scoped(),

@@ -1,16 +1,23 @@
-import { Entity } from '../../../../shared/core/Entity';
-import { VerificationToken } from '../value-objects/VerificationToken';
-
+import { AggregateRoot } from '../../../../shared/core/AggregateRoot';
+import { Result } from '../../../../shared/result/Result';
+import { UserId } from '../value-objects/UserId';
 
 export interface PasswordResetProps {
-  token: VerificationToken;
+  userId: UserId;
+  resetTokenHash: string;
   expiresAt: Date;
   usedAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-export class PasswordReset extends Entity<PasswordResetProps> {
-  get token(): VerificationToken {
-    return this.props.token;
+export class PasswordReset extends AggregateRoot<PasswordResetProps> {
+  get userId(): UserId {
+    return this.props.userId;
+  }
+
+  get resetTokenHash(): string {
+    return this.props.resetTokenHash;
   }
 
   get expiresAt(): Date {
@@ -26,18 +33,38 @@ export class PasswordReset extends Entity<PasswordResetProps> {
   }
 
   public isUsed(): boolean {
-    return !!this.props.usedAt;
-  }
-
-  public markAsUsed(now: Date): void {
-    this.props.usedAt = now;
+    return this.props.usedAt !== undefined;
   }
 
   private constructor(props: PasswordResetProps, id?: string) {
-    super(props, id || crypto.randomUUID());
+    super(props, id || crypto.randomUUID().replace(/-/g, '').substring(0, 24));
   }
 
-  public static create(props: PasswordResetProps, id?: string): PasswordReset {
-    return new PasswordReset(props, id);
+  public static create(
+    userId: UserId,
+    resetTokenHash: string,
+    expiresAt: Date,
+    id?: string
+  ): Result<PasswordReset> {
+    const reset = new PasswordReset({
+      userId,
+      resetTokenHash,
+      expiresAt
+    }, id);
+
+    return Result.ok<PasswordReset>(reset);
+  }
+
+  public markAsUsed(now: Date): Result<void> {
+    if (this.isUsed()) {
+      return Result.fail<void>('Reset token is already used');
+    }
+
+    if (this.isExpired(now)) {
+      return Result.fail<void>('Reset token expired');
+    }
+
+    this.props.usedAt = now;
+    return Result.ok<void>();
   }
 }

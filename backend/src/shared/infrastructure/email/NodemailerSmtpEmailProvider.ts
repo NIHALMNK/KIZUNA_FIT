@@ -12,16 +12,16 @@ export class NodemailerSmtpEmailProvider implements IEmailProvider {
   private compileTemplate(templateName: string, context: Record<string, unknown>): { html: string; text: string } {
     const templateDir = path.resolve(__dirname, 'templates/v1');
     const templatePath = path.join(templateDir, `${templateName}.hbs`);
-    
+
     if (!fs.existsSync(templatePath)) {
       throw new Error(`Template ${templateName} not found at ${templatePath}`);
     }
 
     const source = fs.readFileSync(templatePath, 'utf8');
     const template = Handlebars.compile(source);
-    
+
     const html = template(context);
-    
+
     // Fallback simple text conversion (strip tags roughly for text version)
     const text = html.replace(/<[^>]*>?/gm, '');
 
@@ -55,18 +55,7 @@ export class NodemailerSmtpEmailProvider implements IEmailProvider {
     console.log(`From: ${env.SMTP_FROM || 'noreply@kizunafit.com'}`);
     console.log(`To: ${payload.to}`);
     console.log(`\nSubject:\n${payload.subject}`);
-    
-    if (payload.context.verificationUrl || payload.context.resetUrl) {
-      console.log(`\nAction URL:\n${payload.context.verificationUrl || payload.context.resetUrl}`);
-    }
-    
-    if (payload.context.token) {
-      console.log(`\nVerification Token:\n${payload.context.token}`);
-    }
-
-    if (previewUrl) {
-      console.log(`\nPreview URL:\n${previewUrl}`);
-    }
+    console.log('email sended successfully');
     console.log(`=======================================================\n`);
   }
 
@@ -91,9 +80,9 @@ export class NodemailerSmtpEmailProvider implements IEmailProvider {
       // Fallback to Ethereal Email for development if credentials are missing
       console.log('[NodemailerSmtpEmailProvider] SMTP credentials not found in environment.');
       console.log('[NodemailerSmtpEmailProvider] Generating a test Ethereal Email account automatically...');
-      
+
       const testAccount = await nodemailer.createTestAccount();
-      
+
       this.transporter = nodemailer.createTransport({
         host: testAccount.smtp.host,
         port: testAccount.smtp.port,
@@ -103,7 +92,7 @@ export class NodemailerSmtpEmailProvider implements IEmailProvider {
           pass: testAccount.pass,
         },
       });
-      
+
       console.log('[NodemailerSmtpEmailProvider] Test account generated successfully! Emails will be caught by Ethereal and a preview link will be printed.');
       this.isInitialized = true;
     }

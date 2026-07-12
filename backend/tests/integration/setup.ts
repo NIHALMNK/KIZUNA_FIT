@@ -3,6 +3,8 @@ import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { beforeAll, afterAll, afterEach } from 'vitest';
 import { UserModel } from '../../src/modules/identity/infrastructure/persistence/mongoose/models/UserModel';
 import { RefreshTokenSessionModel } from '../../src/modules/identity/infrastructure/persistence/mongoose/models/RefreshTokenSessionModel';
+import { EmailVerificationModel } from '../../src/modules/identity/infrastructure/persistence/mongoose/models/EmailVerificationModel';
+import { PasswordResetModel } from '../../src/modules/identity/infrastructure/persistence/mongoose/models/PasswordResetModel';
 
 let mongoServer: MongoMemoryReplSet;
 
@@ -19,6 +21,8 @@ beforeAll(async () => {
   
   await UserModel.createCollection();
   await RefreshTokenSessionModel.createCollection();
+  await EmailVerificationModel.createCollection();
+  await PasswordResetModel.createCollection();
 });
 
 afterAll(async () => {

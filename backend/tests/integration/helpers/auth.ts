@@ -6,7 +6,7 @@ export const registerUser = async (email: string, password: string = 'StrongPass
   const app = await getApp();
   const response = await request(app)
     .post('/api/v1/identity/register')
-    .send({ email, password });
+    .send({ fullName: 'Test User', email, password });
     
   return response;
 };
@@ -25,7 +25,7 @@ export const loginUser = async (email: string, password: string = 'StrongPass123
 
 export const verifyUser = async (email: string) => {
   const users = mongoose.connection.collection('users');
-  await users.updateOne({ email }, { $set: { status: 'ACTIVE' } });
+  await users.updateOne({ email }, { $set: { status: 'ACTIVE', emailVerified: true } });
 };
 
 export const getAuthToken = async (email: string = 'test@example.com', password: string = 'StrongPass123!'): Promise<string> => {

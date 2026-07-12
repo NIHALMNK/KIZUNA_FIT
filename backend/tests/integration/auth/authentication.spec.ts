@@ -10,6 +10,7 @@ describe('Authentication Integration Tests', () => {
       const res = await request(app)
         .post('/api/v1/identity/register')
         .send({
+          fullName: 'Test User',
           email: 'testauth@example.com',
           password: 'Password123!'
         });
@@ -23,6 +24,7 @@ describe('Authentication Integration Tests', () => {
       const res = await request(app)
         .post('/api/v1/identity/register')
         .send({
+          fullName: 'Test User',
           email: 'invalid-email',
           password: 'Password123!'
         });

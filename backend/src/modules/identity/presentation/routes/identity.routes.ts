@@ -8,7 +8,9 @@ import {
   RegisterUserSchema,
   LoginSchema,
   GoogleLoginSchema,
+  CheckEmailSchema,
   VerifyEmailSchema,
+  ResendVerificationSchema,
   ForgotPasswordSchema,
   ResetPasswordSchema,
   ChangePasswordSchema,
@@ -53,25 +55,37 @@ export const identityRouter = (): Router => {
     asyncHandler((req: Request, res: Response) => resolveAuth(req).logout(req, res))
   );
 
-  // --- UserController Routes ---
+  router.post(
+    '/check-email',
+    validateRequest(CheckEmailSchema),
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).checkEmail(req, res))
+  );
 
   router.post(
     '/verify-email',
     validateRequest(VerifyEmailSchema),
-    asyncHandler((req: Request, res: Response) => resolveUser(req).verifyEmail(req, res))
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).verifyEmail(req, res))
+  );
+
+  router.post(
+    '/resend-verification',
+    validateRequest(ResendVerificationSchema),
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).resendVerification(req, res))
   );
 
   router.post(
     '/password/forgot',
     validateRequest(ForgotPasswordSchema),
-    asyncHandler((req: Request, res: Response) => resolveUser(req).forgotPassword(req, res))
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).forgotPassword(req, res))
   );
 
   router.post(
     '/password/reset',
     validateRequest(ResetPasswordSchema),
-    asyncHandler((req: Request, res: Response) => resolveUser(req).resetPassword(req, res))
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).resetPassword(req, res))
   );
+
+  // --- UserController Routes ---
 
   router.put(
     '/password/change',

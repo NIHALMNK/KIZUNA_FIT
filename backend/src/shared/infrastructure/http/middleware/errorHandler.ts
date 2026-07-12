@@ -46,9 +46,7 @@ export const errorHandler = (
   // Only log the actual error stack in development/test or dump it cleanly.
   // We use console.error here as the single source of logging. 
   // In a robust implementation, this would use a real logger (e.g. Pino, Winston).
-  if (env.NODE_ENV !== 'test') {
     console.error(`[ERROR] [${correlationId}] ${error.name}: ${error.message}`, error.stack);
-  }
 
   const message = env.NODE_ENV === 'production' 
     ? 'An unexpected system error occurred' 

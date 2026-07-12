@@ -1,9 +1,17 @@
 import { z } from 'zod';
 
-export const RegisterUserSchema = z.object({
+export const CheckEmailSchema = z.object({
   body: z.object({
     email: z.string().trim().toLowerCase().email('Invalid email address format'),
+  }),
+});
+
+export const RegisterUserSchema = z.object({
+  body: z.object({
+    fullName: z.string().min(1, 'Full name is required'),
+    email: z.string().trim().toLowerCase().email('Invalid email address format'),
     password: z.string().min(8, 'Password must be at least 8 characters long'),
+    role: z.enum(['ADMIN', 'CLIENT', 'TRAINER']).optional().default('CLIENT'),
   }),
 });
 
@@ -22,8 +30,13 @@ export const GoogleLoginSchema = z.object({
 
 export const VerifyEmailSchema = z.object({
   body: z.object({
-    email: z.string().trim().toLowerCase().email('Invalid email address format'),
     token: z.string().min(1, 'Verification token is required'),
+  }),
+});
+
+export const ResendVerificationSchema = z.object({
+  body: z.object({
+    email: z.string().trim().toLowerCase().email('Invalid email address format'),
   }),
 });
 
@@ -35,7 +48,6 @@ export const ForgotPasswordSchema = z.object({
 
 export const ResetPasswordSchema = z.object({
   body: z.object({
-    email: z.string().trim().toLowerCase().email('Invalid email address format'),
     token: z.string().min(1, 'Reset token is required'),
     newPassword: z.string().min(8, 'Password must be at least 8 characters long'),
   }),

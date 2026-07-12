@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const jwtConfigSchema = z.object({
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters long for secure HS256 signing.'),
+  JWT_ACCESS_SECRET: z.string().min(16, 'JWT_ACCESS_SECRET must be at least 16 characters long for secure HS256 signing.'),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   JWT_ISSUER: z.string().default('kizunafit-api'),
@@ -22,7 +22,7 @@ export class JwtConfiguration {
       throw new Error(`Fatal configuration error: Invalid JWT environment variables. ${parsed.error.message}`);
     }
 
-    this.secret = parsed.data.JWT_SECRET;
+    this.secret = parsed.data.JWT_ACCESS_SECRET;
     this.accessExpiresIn = parsed.data.JWT_ACCESS_EXPIRES_IN;
     this.refreshExpiresIn = parsed.data.JWT_REFRESH_EXPIRES_IN;
     this.issuer = parsed.data.JWT_ISSUER;

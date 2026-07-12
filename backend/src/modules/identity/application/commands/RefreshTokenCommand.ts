@@ -1,6 +1,4 @@
 export interface RefreshTokenCommand {
-  tokenFamily: string;
-  refreshTokenId: string;
-  deviceId: string;
+  refreshToken: string;
   ipAddress: string;
 }

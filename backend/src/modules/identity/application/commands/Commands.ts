@@ -1,6 +1,6 @@
 export interface LogoutCommand {
   userId: string;
-  refreshTokenId: string;
+  refreshToken: string;
 }
 
 export interface LogoutAllCommand {

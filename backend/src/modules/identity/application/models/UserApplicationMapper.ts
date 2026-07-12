@@ -7,7 +7,7 @@ export class UserApplicationMapper {
       id: user.id,
       email: user.email.value,
       status: user.status,
-      failedLoginAttempts: user.failedLoginAttempts
+      emailVerified: user.emailVerified
     };
   }
 }

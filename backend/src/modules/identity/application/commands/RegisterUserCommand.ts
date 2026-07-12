@@ -1,4 +1,8 @@
+import { UserRole } from '../../domain/value-objects/UserRole';
+
 export interface RegisterUserCommand {
+  fullName: string;
   email: string;
-  plaintextPassword?: string; // Optional if supporting OAuth later, but typical for standard reg
+  plaintextPassword?: string;
+  role: UserRole;
 }

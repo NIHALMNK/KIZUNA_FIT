@@ -85,6 +85,37 @@ export const identityRouter = (): Router => {
     asyncHandler((req: Request, res: Response) => resolveAuth(req).resetPassword(req, res))
   );
 
+  router.post(
+    '/providers/google/link',
+    requireAuth,
+    validateRequest(GoogleLoginSchema),
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).linkGoogle(req, res))
+  );
+
+  router.post(
+    '/providers/google/unlink',
+    requireAuth,
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).unlinkGoogle(req, res))
+  );
+
+  router.get(
+    '/auth-providers',
+    requireAuth,
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).getAuthProviders(req, res))
+  );
+
+  router.post(
+    '/sessions/logout-all',
+    requireAuth,
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).logoutAll(req, res))
+  );
+
+  router.get(
+    '/sessions',
+    requireAuth,
+    asyncHandler((req: Request, res: Response) => resolveAuth(req).getSessions(req, res))
+  );
+
   // --- UserController Routes ---
 
   router.put(

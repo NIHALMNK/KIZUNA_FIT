@@ -9,6 +9,11 @@ import { VerifyEmailUseCase } from '../../application/use-cases/VerifyEmailUseCa
 import { ResendVerificationUseCase } from '../../application/use-cases/ResendVerificationUseCase';
 import { ForgotPasswordUseCase } from '../../application/use-cases/ForgotPasswordUseCase';
 import { ResetPasswordUseCase } from '../../application/use-cases/ResetPasswordUseCase';
+import { LinkGoogleAccountUseCase } from '../../application/use-cases/LinkGoogleAccountUseCase';
+import { UnlinkGoogleAccountUseCase } from '../../application/use-cases/UnlinkGoogleAccountUseCase';
+import { GetAuthProvidersUseCase } from '../../application/use-cases/GetAuthProvidersUseCase';
+import { LogoutAllUseCase } from '../../application/use-cases/LogoutUseCases';
+import { GetSessionsUseCase } from '../../application/use-cases/QueryUseCases';
 import { ApiResponse } from '../../../../shared/infrastructure/http/responses/ApiResponse';
 import { CookieHelper } from '../../../../shared/infrastructure/http/utils/CookieHelper';
 import { ApiErrorCode } from '../../../../shared/infrastructure/http/responses/ApiErrorCode';
@@ -24,7 +29,12 @@ export class AuthController {
     private readonly verifyEmailUseCase: VerifyEmailUseCase,
     private readonly resendVerificationUseCase: ResendVerificationUseCase,
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
-    private readonly resetPasswordUseCase: ResetPasswordUseCase
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly linkGoogleAccountUseCase: LinkGoogleAccountUseCase,
+    private readonly unlinkGoogleAccountUseCase: UnlinkGoogleAccountUseCase,
+    private readonly getAuthProvidersUseCase: GetAuthProvidersUseCase,
+    private readonly logoutAllUseCase: LogoutAllUseCase,
+    private readonly getSessionsUseCase: GetSessionsUseCase
   ) {}
 
   private getDeviceInfo(req: Request) {
@@ -38,6 +48,39 @@ export class AuthController {
     };
   }
 
+  private handleUseCaseError(res: Response, error: string, defaultCode: ApiErrorCode, defaultStatus: number): void {
+    if (error === 'Email already in use') {
+      ApiResponse.error(res, error, ApiErrorCode.EMAIL_ALREADY_EXISTS, 409);
+      return;
+    }
+    if (error === 'Invalid email or password') {
+      ApiResponse.error(res, error, ApiErrorCode.INVALID_CREDENTIALS, 401);
+      return;
+    }
+    if (error === 'Account not found') {
+      ApiResponse.error(res, error, ApiErrorCode.NOT_FOUND, 404);
+      return;
+    }
+    if (error === 'Account has been suspended by an administrator') {
+      ApiResponse.error(res, error, ApiErrorCode.ACCOUNT_DISABLED, 403);
+      return;
+    }
+    if (error === 'Account has been banned by an administrator') {
+      ApiResponse.error(res, error, ApiErrorCode.ACCOUNT_BANNED, 403);
+      return;
+    }
+    if (error === 'Please verify your email address to log in.') {
+      ApiResponse.error(res, error, ApiErrorCode.EMAIL_NOT_VERIFIED, 403);
+      return;
+    }
+    if (error.includes('No account associated')) {
+      ApiResponse.error(res, error, ApiErrorCode.GOOGLE_ACCOUNT_NOT_FOUND, 404);
+      return;
+    }
+
+    ApiResponse.error(res, error, defaultCode, defaultStatus);
+  }
+
   public register = async (req: Request, res: Response): Promise<void> => {
     const result = await this.registerUserUseCase.execute({
       fullName: req.body.fullName,
@@ -47,7 +90,7 @@ export class AuthController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.REGISTRATION_FAILED, 400);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.REGISTRATION_FAILED, 400);
       return;
     }
 
@@ -63,7 +106,7 @@ export class AuthController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.INVALID_CREDENTIALS, 401);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.INVALID_CREDENTIALS, 401);
       return;
     }
 
@@ -90,7 +133,7 @@ export class AuthController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.UNAUTHORIZED, 401);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.UNAUTHORIZED, 401);
       return;
     }
 
@@ -116,7 +159,7 @@ export class AuthController {
 
     if (result.isFailure) {
       CookieHelper.clearRefreshToken(res);
-      ApiResponse.error(res, result.error as string, ApiErrorCode.UNAUTHORIZED, 401);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.UNAUTHORIZED, 401);
       return;
     }
 
@@ -146,7 +189,7 @@ export class AuthController {
   public checkEmail = async (req: Request, res: Response): Promise<void> => {
     const result = await this.checkEmailUseCase.execute(req.body.email);
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
       return;
     }
     ApiResponse.ok(res, result.getValue());
@@ -155,7 +198,7 @@ export class AuthController {
   public verifyEmail = async (req: Request, res: Response): Promise<void> => {
     const result = await this.verifyEmailUseCase.execute({ token: req.body.token });
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
       return;
     }
     ApiResponse.ok(res, { success: true, message: 'Email verified successfully' });
@@ -164,7 +207,7 @@ export class AuthController {
   public resendVerification = async (req: Request, res: Response): Promise<void> => {
     const result = await this.resendVerificationUseCase.execute({ email: req.body.email });
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
       return;
     }
     ApiResponse.ok(res, { success: true, message: 'Verification email resent if account exists' });
@@ -173,7 +216,7 @@ export class AuthController {
   public forgotPassword = async (req: Request, res: Response): Promise<void> => {
     const result = await this.forgotPasswordUseCase.execute({ email: req.body.email });
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
       return;
     }
     ApiResponse.ok(res, { success: true, message: 'Password reset link sent if account exists' });
@@ -185,9 +228,98 @@ export class AuthController {
       newPlaintextPassword: req.body.newPassword
     });
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
       return;
     }
     ApiResponse.ok(res, { success: true, message: 'Password reset successfully' });
+  };
+
+  public linkGoogle = async (req: Request, res: Response): Promise<void> => {
+    const userId = (req as unknown as { user?: { id: string } }).user?.id;
+    if (!userId) {
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const result = await this.linkGoogleAccountUseCase.execute({
+      userId,
+      idToken: req.body.idToken
+    });
+
+    if (result.isFailure) {
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      return;
+    }
+
+    ApiResponse.ok(res, { success: true, message: 'Google account linked successfully' });
+  };
+
+  public unlinkGoogle = async (req: Request, res: Response): Promise<void> => {
+    const userId = (req as unknown as { user?: { id: string } }).user?.id;
+    if (!userId) {
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const result = await this.unlinkGoogleAccountUseCase.execute({ userId });
+
+    if (result.isFailure) {
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      return;
+    }
+
+    ApiResponse.ok(res, { success: true, message: 'Google account unlinked successfully' });
+  };
+
+  public getAuthProviders = async (req: Request, res: Response): Promise<void> => {
+    const userId = (req as unknown as { user?: { id: string } }).user?.id;
+    if (!userId) {
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const result = await this.getAuthProvidersUseCase.execute({ userId });
+
+    if (result.isFailure) {
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      return;
+    }
+
+    ApiResponse.ok(res, result.getValue());
+  };
+
+  public logoutAll = async (req: Request, res: Response): Promise<void> => {
+    const userId = (req as unknown as { user?: { id: string } }).user?.id;
+    if (!userId) {
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const result = await this.logoutAllUseCase.execute({ userId });
+
+    if (result.isFailure) {
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      return;
+    }
+
+    CookieHelper.clearRefreshToken(res);
+    ApiResponse.noContent(res);
+  };
+
+  public getSessions = async (req: Request, res: Response): Promise<void> => {
+    const userId = (req as unknown as { user?: { id: string } }).user?.id;
+    if (!userId) {
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const result = await this.getSessionsUseCase.execute({ userId });
+
+    if (result.isFailure) {
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.BAD_REQUEST, 400);
+      return;
+    }
+
+    ApiResponse.ok(res, result.getValue());
   };
 }

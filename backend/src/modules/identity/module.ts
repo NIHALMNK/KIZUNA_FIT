@@ -34,9 +34,13 @@ import { GoogleIdentityProvider } from './infrastructure/adapters/security/Googl
 import { RegisterUserUseCase } from './application/use-cases/RegisterUserUseCase';
 import { LoginUseCase } from './application/use-cases/LoginUseCase';
 import { GoogleLoginUseCase } from './application/use-cases/GoogleLoginUseCase';
+import { LinkGoogleAccountUseCase } from './application/use-cases/LinkGoogleAccountUseCase';
+import { UnlinkGoogleAccountUseCase } from './application/use-cases/UnlinkGoogleAccountUseCase';
+import { GetAuthProvidersUseCase } from './application/use-cases/GetAuthProvidersUseCase';
 import { RefreshTokenUseCase } from './application/use-cases/RefreshTokenUseCase';
-import { LogoutUseCase } from './application/use-cases/LogoutUseCases';
+import { LogoutUseCase, LogoutAllUseCase } from './application/use-cases/LogoutUseCases';
 import { CheckEmailUseCase } from './application/use-cases/CheckEmailUseCase';
+import { GetSessionsUseCase } from './application/use-cases/QueryUseCases';
 import { VerifyEmailUseCase } from './application/use-cases/VerifyEmailUseCase';
 import { ResendVerificationUseCase } from './application/use-cases/ResendVerificationUseCase';
 import { ForgotPasswordUseCase } from './application/use-cases/ForgotPasswordUseCase';
@@ -102,9 +106,14 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
     registerUserUseCase: asClass(RegisterUserUseCase).scoped(),
     loginUseCase: asClass(LoginUseCase).scoped(),
     googleLoginUseCase: asClass(GoogleLoginUseCase).scoped(),
+    linkGoogleAccountUseCase: asClass(LinkGoogleAccountUseCase).scoped(),
+    unlinkGoogleAccountUseCase: asClass(UnlinkGoogleAccountUseCase).scoped(),
+    getAuthProvidersUseCase: asClass(GetAuthProvidersUseCase).scoped(),
     refreshTokenUseCase: asClass(RefreshTokenUseCase).scoped(),
     logoutUseCase: asClass(LogoutUseCase).scoped(),
+    logoutAllUseCase: asClass(LogoutAllUseCase).scoped(),
     checkEmailUseCase: asClass(CheckEmailUseCase).scoped(),
+    getSessionsUseCase: asClass(GetSessionsUseCase).scoped(),
     verifyEmailUseCase: asClass(VerifyEmailUseCase).scoped(),
     resendVerificationUseCase: asClass(ResendVerificationUseCase).scoped(),
     forgotPasswordUseCase: asClass(ForgotPasswordUseCase).scoped(),

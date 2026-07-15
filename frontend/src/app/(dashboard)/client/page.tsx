@@ -1,0 +1,19 @@
+'use client';
+
+import { useAuthStore } from '../../../modules/identity/application/store/authStore';
+import { IdentityControls } from '../../../modules/identity/presentation/components/IdentityControls';
+
+export default function ClientDashboard() {
+  const { user } = useAuthStore();
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4">Client Dashboard</h1>
+      <div className="bg-white p-6 rounded-lg shadow-sm border mb-6">
+        <h2 className="text-xl font-semibold mb-2">Welcome, {user?.email}</h2>
+        <p className="text-gray-600">Role: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{user?.role}</span></p>
+      </div>
+      <IdentityControls />
+    </div>
+  );
+}

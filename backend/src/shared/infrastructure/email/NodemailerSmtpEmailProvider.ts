@@ -39,7 +39,7 @@ export class NodemailerSmtpEmailProvider implements IEmailProvider {
 
     const { html, text } = this.compileTemplate(payload.template, payload.context);
 
-    const info = await this.transporter.sendMail({
+    await this.transporter.sendMail({
       from: env.SMTP_FROM || '"KIZUNAFIT" <noreply@kizunafit.com>',
       to: payload.to,
       subject: payload.subject,
@@ -47,7 +47,7 @@ export class NodemailerSmtpEmailProvider implements IEmailProvider {
       html: html,
     });
 
-    const previewUrl = nodemailer.getTestMessageUrl(info);
+    
 
     console.log(`\n=======================================================`);
     console.log(`EMAIL SENT`);

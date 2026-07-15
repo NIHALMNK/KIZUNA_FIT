@@ -38,7 +38,7 @@ export const errorHandler = (
       path: e.path.join('.'),
       message: e.message,
     }));
-    ApiResponse.error(res, 'Validation failed', ApiErrorCode.VALIDATION_ERROR, 400, details);
+    ApiResponse.error(res, 'Validation failed', ApiErrorCode.VALIDATION_ERROR, 422, details);
     return;
   }
 

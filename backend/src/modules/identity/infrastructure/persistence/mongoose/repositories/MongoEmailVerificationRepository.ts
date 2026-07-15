@@ -9,10 +9,10 @@ export class MongoEmailVerificationRepository implements IEmailVerificationRepos
   public async save(verification: EmailVerification, mongoSession?: ClientSession): Promise<void> {
     const persistenceData = EmailVerificationMapper.toPersistence(verification);
     
-    await EmailVerificationModel.findOneAndUpdate(
+    await EmailVerificationModel.updateOne(
       { _id: persistenceData._id },
       { $set: persistenceData },
-      { upsert: true, new: true, session: mongoSession }
+      { upsert: true, session: mongoSession }
     ).exec();
   }
 

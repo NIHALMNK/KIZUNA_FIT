@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { notFoundHandler } from '../../shared/infrastructure/http/middleware/notFoundHandler';
 import { errorHandler } from '../../shared/infrastructure/http/middleware/errorHandler';
 import { AwilixContainer } from 'awilix';
+import { env } from '../../config/env.config';
 import { identityRouter } from '../../modules/identity/presentation/routes/identity.routes';
 
 export function createApp(container: AwilixContainer): express.Application {
@@ -17,7 +18,10 @@ export function createApp(container: AwilixContainer): express.Application {
   });
 
   app.use(helmet());
-  app.use(cors());
+  app.use(cors({
+    origin: env.CORS_ORIGIN,
+    credentials: true,
+  }));
   app.use(express.json());
   app.use(cookieParser());
   

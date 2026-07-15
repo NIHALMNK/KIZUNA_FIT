@@ -11,10 +11,10 @@ export class MongoUserRepository implements IUserRepository {
     const persistenceData = UserMapper.toPersistence(user);
     
     // We use findOneAndUpdate with upsert to handle both creation and updates safely
-    await UserModel.findOneAndUpdate(
+    await UserModel.updateOne(
       { _id: persistenceData._id },
       { $set: persistenceData },
-      { upsert: true, new: true, session }
+      { upsert: true, session }
     ).exec();
   }
 

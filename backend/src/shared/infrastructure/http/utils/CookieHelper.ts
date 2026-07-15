@@ -9,7 +9,7 @@ export class CookieHelper {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/api/v1/identity/refresh',
+      path: '/api/v1/identity',
       maxAge: maxAgeMs,
     });
   }
@@ -19,7 +19,7 @@ export class CookieHelper {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/api/v1/identity/refresh',
+      path: '/api/v1/identity',
       maxAge: 0,
     });
   }

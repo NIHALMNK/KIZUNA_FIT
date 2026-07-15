@@ -71,7 +71,11 @@ export class User extends AggregateRoot<UserProps> {
   }
 
   public linkExternalIdentity(provider: AuthProvider): Result<void> {
-    if (this.status === UserStatus.Deleted || this.status === UserStatus.Suspended || this.status === UserStatus.Banned) {
+    if (
+      this.status === UserStatus.Deleted ||
+      this.status === UserStatus.Suspended ||
+      this.status === UserStatus.Banned
+    ) {
       return Result.fail<void>('Cannot link identity to deleted, suspended, or banned account');
     }
 
@@ -83,9 +87,16 @@ export class User extends AggregateRoot<UserProps> {
     return Result.ok<void>();
   }
 
-  public removeExternalIdentity(provider: AuthProvider, isForceRevoke: boolean = false): Result<void> {
+  public removeExternalIdentity(
+    provider: AuthProvider,
+    isForceRevoke: boolean = false,
+  ): Result<void> {
     if (this.status === UserStatus.Deleted) {
       return Result.fail<void>('Cannot modify deleted account');
+    }
+
+    if (provider === AuthProvider.LOCAL) {
+      return Result.fail<void>('Cannot remove LOCAL authentication provider');
     }
 
     const isLastMethod = !this.hasLocalCredentials() && this.authProviders.length === 1;
@@ -93,7 +104,7 @@ export class User extends AggregateRoot<UserProps> {
       return Result.fail<void>('Cannot remove the final authentication method');
     }
 
-    this.props.authProviders = this.props.authProviders.filter(p => p !== provider);
+    this.props.authProviders = this.props.authProviders.filter((p) => p !== provider);
 
     if (isLastMethod && isForceRevoke) {
       this.props.status = UserStatus.Suspended;
@@ -113,11 +124,13 @@ export class User extends AggregateRoot<UserProps> {
     if (isNew) {
       const userIdResult = UserId.create(user.id);
       if (userIdResult.isSuccess) {
-        user.addDomainEvent(new UserRegisteredEvent({ 
-          id: userIdResult.getValue(), 
-          email: user.email,
-          provider: props.authProviders[0] 
-        }));
+        user.addDomainEvent(
+          new UserRegisteredEvent({
+            id: userIdResult.getValue(),
+            email: user.email,
+            provider: props.authProviders[0],
+          }),
+        );
       }
     }
 
@@ -128,7 +141,7 @@ export class User extends AggregateRoot<UserProps> {
     if (this.status === UserStatus.Deleted) {
       return Result.fail<void>('Cannot verify deleted user');
     }
-    
+
     this.props.emailVerified = true;
 
     const userIdResult = UserId.create(this.id);
@@ -150,7 +163,7 @@ export class User extends AggregateRoot<UserProps> {
     if (userIdResult.isSuccess) {
       this.addDomainEvent(new PasswordChangedEvent({ id: userIdResult.getValue() }));
     }
-    
+
     return Result.ok<void>();
   }
 
@@ -163,7 +176,7 @@ export class User extends AggregateRoot<UserProps> {
     if (this.status === UserStatus.Deleted) return;
 
     this.props.status = UserStatus.Deleted;
-    
+
     const userIdResult = UserId.create(this.id);
     if (userIdResult.isSuccess) {
       this.addDomainEvent(new AccountDeletedEvent({ id: userIdResult.getValue() }));

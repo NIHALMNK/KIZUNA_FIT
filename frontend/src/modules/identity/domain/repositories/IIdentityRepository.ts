@@ -1,4 +1,4 @@
-import { RegisterRequest, LoginRequest, GoogleLoginRequest, VerifyEmailRequest, ResetPasswordRequest } from '../../application/dto/AuthDtos';
+import { RegisterRequest, LoginRequest, GoogleLoginRequest, VerifyEmailRequest, ResetPasswordRequest, ChangePasswordRequest } from '../../application/dto/AuthDtos';
 import { AuthResponse } from '../types/User';
 
 export interface IIdentityRepository {
@@ -11,6 +11,7 @@ export interface IIdentityRepository {
   resendVerification(email: string): Promise<void>;
   forgotPassword(email: string): Promise<void>;
   resetPassword(data: ResetPasswordRequest): Promise<void>;
+  changePassword(data: ChangePasswordRequest): Promise<void>;
   linkGoogle(idToken: string): Promise<void>;
   unlinkGoogle(): Promise<void>;
   getAuthProviders(): Promise<{ providers: any[] }>;

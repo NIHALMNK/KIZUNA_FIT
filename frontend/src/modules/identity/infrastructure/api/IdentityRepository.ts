@@ -1,6 +1,6 @@
 import { httpClient } from '../../../../infrastructure/api/HttpClient';
 import { IIdentityRepository } from '../../domain/repositories/IIdentityRepository';
-import { RegisterRequest, LoginRequest, GoogleLoginRequest, VerifyEmailRequest, ResetPasswordRequest } from '../../application/dto/AuthDtos';
+import { RegisterRequest, LoginRequest, GoogleLoginRequest, VerifyEmailRequest, ResetPasswordRequest, ChangePasswordRequest } from '../../application/dto/AuthDtos';
 import { AuthResponse } from '../../domain/types/User';
 
 class IdentityRepository implements IIdentityRepository {
@@ -40,6 +40,10 @@ class IdentityRepository implements IIdentityRepository {
 
   async resetPassword(data: ResetPasswordRequest): Promise<void> {
     await httpClient.post('/identity/password/reset', data);
+  }
+
+  async changePassword(data: ChangePasswordRequest): Promise<void> {
+    await httpClient.put('/identity/password/change', data);
   }
 
   async linkGoogle(idToken: string): Promise<void> {

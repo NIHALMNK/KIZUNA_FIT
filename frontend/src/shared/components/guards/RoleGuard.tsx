@@ -23,6 +23,10 @@ export function RoleGuard({ children, allowedRole }: { children: React.ReactNode
     }
   }, [status, user, allowedRole, router]);
 
+  if (status === 'loading') {
+    return <>{children}</>;
+  }
+
   if (status !== 'authenticated' || user?.role !== allowedRole) {
     return null; // Return nothing while redirecting
   }

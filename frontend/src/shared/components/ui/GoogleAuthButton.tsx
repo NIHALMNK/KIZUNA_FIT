@@ -40,7 +40,7 @@ export const GoogleAuthButton: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full flex justify-center">
+    <div className="w-full flex justify-center" onClickCapture={() => console.log('1. Google button clicked')}>
       <div ref={containerRef}></div>
     </div>
   );

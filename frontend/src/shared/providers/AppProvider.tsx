@@ -12,7 +12,6 @@ interface AppProviderProps {
 }
 
 export const AppProvider = ({ children }: AppProviderProps) => {
-  console.log('next_public_google_client_id', process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'dummy-client-id'}>
       <QueryProvider>

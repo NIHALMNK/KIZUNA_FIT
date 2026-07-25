@@ -99,10 +99,10 @@ function VerifyEmailContent() {
         <h2 className="text-xl font-bold text-red-600 mb-2">Link Expired</h2>
         <p className="text-gray-500 mb-4">Your verification link has expired. Enter your email to resend.</p>
         <div className="flex flex-col gap-2 mb-4">
-          <Input 
-            placeholder="Enter your email" 
-            value={email} 
-            onChange={e => setEmail(e.target.value)} 
+          <Input
+            placeholder="Enter your email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
           />
           <Button onClick={handleResend} isLoading={resendMutation.isPending} className="w-full">
             Resend Verification

@@ -18,6 +18,10 @@ export function GuestGuard({ children }: { children: React.ReactNode }) {
     }
   }, [status, user, router]);
 
+  if (status === 'loading') {
+    return <>{children}</>;
+  }
+
   if (status === 'authenticated') {
     return null; // Return nothing while redirecting
   }

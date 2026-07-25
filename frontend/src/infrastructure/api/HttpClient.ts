@@ -64,9 +64,11 @@ class HttpClient {
         }
 
         const { status, data } = error.response;
-        const errorData = data as Record<string, unknown>;
-        const message = (errorData?.message as string) || 'An error occurred while communicating with the server.';
-        const code = (errorData?.code as string) || 'UNKNOWN_ERROR';
+        const errorData = data as { error?: { message?: string, code?: string, details?: Record<string, string[]> } };
+        const backendError = errorData?.error;
+        const message = backendError?.message || (errorData as Record<string, unknown>)?.message as string || 'An error occurred while communicating with the server.';
+        const code = backendError?.code || (errorData as Record<string, unknown>)?.code as string || 'UNKNOWN_ERROR';
+        const details = backendError?.details || (errorData as Record<string, unknown>)?.details as Record<string, unknown> || undefined;
 
         if (status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== '/identity/refresh' && originalRequest.url !== '/identity/login') {
           originalRequest._retry = true;
@@ -118,7 +120,7 @@ class HttpClient {
             );
           });
         }
-        return Promise.reject(new ApiError(message, status, code, errorData, errorData?.details));
+        return Promise.reject(new ApiError(message, status, code, errorData, details));
       }
     );
   }
@@ -135,6 +137,8 @@ class HttpClient {
   }
 
   public post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    console.log('7. HttpClient called');
+    console.log('8. network request sent', url);
     return this.api.post(url, data, config).then(res => this.unwrapResponse<T>(res));
   }
 

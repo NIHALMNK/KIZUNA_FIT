@@ -49,35 +49,136 @@ export class AuthController {
   }
 
   private handleUseCaseError(res: Response, error: string, defaultCode: ApiErrorCode, defaultStatus: number): void {
-    if (error === 'Email already in use') {
-      ApiResponse.error(res, error, ApiErrorCode.EMAIL_ALREADY_EXISTS, 409);
-      return;
-    }
-    if (error === 'Invalid email or password') {
-      ApiResponse.error(res, error, ApiErrorCode.INVALID_CREDENTIALS, 401);
-      return;
-    }
-    if (error === 'Account not found') {
+    console.log('==================================================');
+    console.log('4. AuthController.handleUseCaseError()');
+    console.log('==================================================');
+    console.log('Incoming error string:', error);
+
+    // 404 NOT_FOUND
+    if (error === 'User not found' || error === 'Account not found') {
+      console.log('Matched condition: 404 Not Found (User/Account)');
+      console.log('Returned HTTP status:', 404);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.NOT_FOUND);
       ApiResponse.error(res, error, ApiErrorCode.NOT_FOUND, 404);
       return;
     }
-    if (error === 'Account has been suspended by an administrator') {
-      ApiResponse.error(res, error, ApiErrorCode.ACCOUNT_DISABLED, 403);
-      return;
-    }
-    if (error === 'Account has been banned by an administrator') {
-      ApiResponse.error(res, error, ApiErrorCode.ACCOUNT_BANNED, 403);
-      return;
-    }
-    if (error === 'Please verify your email address to log in.') {
-      ApiResponse.error(res, error, ApiErrorCode.EMAIL_NOT_VERIFIED, 403);
-      return;
-    }
-    if (error.includes('No account associated')) {
+    if (error === 'GOOGLE_ACCOUNT_NOT_FOUND' || error.includes('No account associated')) {
+      console.log('Matched condition: 404 GOOGLE_ACCOUNT_NOT_FOUND');
+      console.log('Returned HTTP status:', 404);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.GOOGLE_ACCOUNT_NOT_FOUND);
       ApiResponse.error(res, error, ApiErrorCode.GOOGLE_ACCOUNT_NOT_FOUND, 404);
       return;
     }
 
+    // 401 UNAUTHORIZED / INVALID_CREDENTIALS
+    if (error === 'Invalid email or password' || error === 'Invalid current password' || error === 'Invalid confirmation password') {
+      console.log('Matched condition: 401 INVALID_CREDENTIALS');
+      console.log('Returned HTTP status:', 401);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.INVALID_CREDENTIALS);
+      ApiResponse.error(res, error, ApiErrorCode.INVALID_CREDENTIALS, 401);
+      return;
+    }
+    if (error === 'Invalid Google Token' || error === 'Unauthorized' || error.includes('Session revoked')) {
+      console.log('Matched condition: 401 UNAUTHORIZED');
+      console.log('Returned HTTP status:', 401);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.UNAUTHORIZED);
+      ApiResponse.error(res, error, ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+    if (error === 'Invalid refresh token') {
+      console.log('Matched condition: 401 INVALID_TOKEN');
+      console.log('Returned HTTP status:', 401);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.INVALID_TOKEN);
+      ApiResponse.error(res, error, ApiErrorCode.INVALID_TOKEN, 401);
+      return;
+    }
+
+    // 403 FORBIDDEN / ACCOUNT_DISABLED / ACCOUNT_BANNED / ETC
+    if (error.includes('Account has been suspended') || error === 'Account is suspended.') {
+      console.log('Matched condition: 403 ACCOUNT_DISABLED');
+      console.log('Returned HTTP status:', 403);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.ACCOUNT_DISABLED);
+      ApiResponse.error(res, error, ApiErrorCode.ACCOUNT_DISABLED, 403);
+      return;
+    }
+    if (error.includes('Account has been banned') || error === 'Account is banned.') {
+      console.log('Matched condition: 403 ACCOUNT_BANNED');
+      console.log('Returned HTTP status:', 403);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.ACCOUNT_BANNED);
+      ApiResponse.error(res, error, ApiErrorCode.ACCOUNT_BANNED, 403);
+      return;
+    }
+    if (error === 'Account is deleted.') {
+      console.log('Matched condition: 403 ACCOUNT_DELETED');
+      console.log('Returned HTTP status:', 403);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.ACCOUNT_DELETED);
+      ApiResponse.error(res, error, ApiErrorCode.ACCOUNT_DELETED, 403);
+      return;
+    }
+    if (error === 'Please verify your email address to log in.') {
+      console.log('Matched condition: 403 EMAIL_NOT_VERIFIED');
+      console.log('Returned HTTP status:', 403);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.EMAIL_NOT_VERIFIED);
+      ApiResponse.error(res, error, ApiErrorCode.EMAIL_NOT_VERIFIED, 403);
+      return;
+    }
+    if (error === 'GOOGLE_ACCOUNT_NOT_LINKED') {
+      console.log('Matched condition: 403 GOOGLE_ACCOUNT_NOT_LINKED');
+      console.log('Returned HTTP status:', 403);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.GOOGLE_ACCOUNT_NOT_LINKED);
+      ApiResponse.error(res, error, ApiErrorCode.GOOGLE_ACCOUNT_NOT_LINKED, 403);
+      return;
+    }
+
+    // 409 CONFLICT
+    if (error === 'Email already in use') {
+      console.log('Matched condition: 409 EMAIL_ALREADY_EXISTS');
+      console.log('Returned HTTP status:', 409);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.EMAIL_ALREADY_EXISTS);
+      ApiResponse.error(res, error, ApiErrorCode.EMAIL_ALREADY_EXISTS, 409);
+      return;
+    }
+    if (error === 'Google account email does not match your registered email') {
+      console.log('Matched condition: 409 CONFLICT');
+      console.log('Returned HTTP status:', 409);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.CONFLICT);
+      ApiResponse.error(res, error, ApiErrorCode.CONFLICT, 409);
+      return;
+    }
+
+    // 400 BAD_REQUEST
+    if (error === 'Invalid verification token') {
+      console.log('Matched condition: 400 VERIFICATION_FAILED');
+      console.log('Returned HTTP status:', 400);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.VERIFICATION_FAILED);
+      ApiResponse.error(res, error, ApiErrorCode.VERIFICATION_FAILED, 400);
+      return;
+    }
+    if (error === 'Invalid reset token') {
+      console.log('Matched condition: 400 RESET_PASSWORD_FAILED');
+      console.log('Returned HTTP status:', 400);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.RESET_PASSWORD_FAILED);
+      ApiResponse.error(res, error, ApiErrorCode.RESET_PASSWORD_FAILED, 400);
+      return;
+    }
+    if (
+      error === 'Invalid email from Google' ||
+      error === 'New password is required' ||
+      error === 'Passwords required' ||
+      error === 'Account has no password (OAuth)' ||
+      error === 'Invalid email'
+    ) {
+      console.log('Matched condition: 400 BAD_REQUEST');
+      console.log('Returned HTTP status:', 400);
+      console.log('Returned ApiErrorCode:', ApiErrorCode.BAD_REQUEST);
+      ApiResponse.error(res, error, ApiErrorCode.BAD_REQUEST, 400);
+      return;
+    }
+
+    // Default Fallback
+    console.log('Matched condition: Default Fallback');
+    console.log('Returned HTTP status:', defaultStatus);
+    console.log('Returned ApiErrorCode:', defaultCode);
     ApiResponse.error(res, error, defaultCode, defaultStatus);
   }
 
@@ -119,13 +220,21 @@ export class AuthController {
   };
 
   public googleLogin = async (req: Request, res: Response): Promise<void> => {
+    console.log('==================================================');
+    console.log('1. AuthController.googleLogin()');
+    console.log('==================================================');
+    console.log('Request received');
+    
     const { idToken } = req.body;
+    console.log('idToken exists?', !!idToken);
+    console.log('idToken length:', idToken ? idToken.length : 0);
 
     if (!idToken) {
       ApiResponse.error(res, 'idToken is required', ApiErrorCode.BAD_REQUEST, 400);
       return;
     }
 
+    console.log('Calling GoogleLoginUseCase');
     const result = await this.googleLoginUseCase.execute({
       idToken,
       ipAddress: req.ip || '0.0.0.0',
@@ -133,6 +242,8 @@ export class AuthController {
     });
 
     if (result.isFailure) {
+      console.log('❌ AuthController: result.isFailure triggered.');
+      console.log('   -> Exact Result.fail() reason:', result.error);
       this.handleUseCaseError(res, result.error as string, ApiErrorCode.UNAUTHORIZED, 401);
       return;
     }

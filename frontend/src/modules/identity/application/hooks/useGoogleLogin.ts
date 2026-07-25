@@ -10,7 +10,10 @@ export const useGoogleLogin = () => {
   const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
 
   return useMutation({
-    mutationFn: (idToken: string) => identityRepository.googleLogin({ idToken }),
+    mutationFn: (idToken: string) => {
+      console.log('5. mutation called');
+      return identityRepository.googleLogin({ idToken });
+    },
     onSuccess: (data: AuthResponse) => {
       tokenStorage.setAccessToken(data.accessToken);
       

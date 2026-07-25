@@ -46,9 +46,22 @@ export class GoogleLoginUseCase {
   ) {}
 
   public async execute(request: Request): Promise<Result<Response>> {
+    console.log('==================================================');
+    console.log('2. GoogleLoginUseCase.execute()');
+    console.log('==================================================');
+    console.log('Entering execute()');
+    
+    console.log('STEP 1');
+    console.log('Calling googleIdentityProvider.verifyIdToken()');
     const payloadResult = await this.googleIdentityProvider.verifyIdToken(request.idToken);
 
+    console.log('STEP 2');
+    console.log('verifyIdToken returned:');
+    console.log('- success/failure:', payloadResult.isSuccess ? 'success' : 'failure');
+    console.log('- complete Result object:', payloadResult);
+
     if (payloadResult.isFailure) {
+      console.log('Result.error:', payloadResult.error);
       const reason = payloadResult.error || 'Invalid Google Token';
       try {
         await this.eventBus.publish([
@@ -61,10 +74,13 @@ export class GoogleLoginUseCase {
     }
 
     const payload = payloadResult.getValue();
+    console.log('payload:', payload);
 
     await this.unitOfWork.start();
 
     try {
+      console.log('STEP 3');
+      console.log('EmailAddress.create()');
       const emailResult = EmailAddress.create(payload.email);
       if (emailResult.isFailure) {
         await this.unitOfWork.rollback();
@@ -85,10 +101,15 @@ export class GoogleLoginUseCase {
       }
 
       const email = emailResult.getValue();
+      
+      console.log('STEP 4');
+      console.log('findByEmail()');
       const userByEmail = await this.userRepository.findByEmail(email.value);
 
       let user: User;
 
+      console.log('STEP 5');
+      console.log('Business rule checks');
       if (userByEmail) {
         user = userByEmail;
         if (
@@ -165,10 +186,14 @@ export class GoogleLoginUseCase {
         return Result.fail<Response>(deviceInfoResult.error);
       }
 
+      console.log('STEP 6');
+      console.log('Generate Refresh Token');
       const { token: rawRefreshToken, hash: refreshTokenHash } =
         await this.tokenProvider.generateRefreshToken();
       const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
+      console.log('STEP 7');
+      console.log('Create Session');
       const sessionResult = RefreshTokenSession.create(
         userId,
         refreshTokenHash,
@@ -205,6 +230,8 @@ export class GoogleLoginUseCase {
 
       await this.unitOfWork.commit();
 
+      console.log('STEP 8');
+      console.log('Generate Access Token');
       const accessToken = await this.tokenProvider.generateAccessToken(user);
 
       try {
@@ -218,6 +245,8 @@ export class GoogleLoginUseCase {
         console.error('Audit Event publication failed (best-effort policy)', err);
       }
 
+      console.log('STEP 9');
+      console.log('Return Result.ok()');
       return Result.ok<Response>({
         accessToken,
         refreshToken: rawRefreshToken,

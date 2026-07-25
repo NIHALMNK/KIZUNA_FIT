@@ -13,6 +13,7 @@ export function GoogleAuthInitializer() {
 
   const handleCredentialResponse = useCallback(
     (credentialResponse: CredentialResponse) => {
+      console.log('3. callback invoked');
       if (!credentialResponse.credential) {
         toast.error('Google login failed: No credential received.');
         return;
@@ -29,6 +30,7 @@ export function GoogleAuthInitializer() {
         });
       } else {
         // User is not logged in, this is a Login action
+        console.log('4. credential received');
         mutate(credentialResponse.credential, {
           onSuccess: () => {
             toast.success('Google login successful!');
@@ -65,10 +67,7 @@ export function GoogleAuthInitializer() {
         if (w.google && w.google.accounts && w.google.accounts.id) {
           const origin = window.location.origin;
           const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'dummy-client-id';
-          console.log('[GoogleAuthInitializer] Initializing Google Accounts API');
-          console.log(`[GoogleAuthInitializer] Origin: ${origin}`);
-          console.log(`[GoogleAuthInitializer] Client ID: ${clientId}`);
-
+          console.log('2. initialize() executed');
           w.google.accounts.id.initialize({
             client_id: clientId,
             callback: handleCredentialResponse,

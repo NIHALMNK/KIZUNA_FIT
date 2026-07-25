@@ -13,6 +13,7 @@ class IdentityRepository implements IIdentityRepository {
   }
 
   async googleLogin(data: GoogleLoginRequest): Promise<AuthResponse> {
+    console.log('6. repository called');
     return httpClient.post<AuthResponse>('/identity/google', data);
   }
 

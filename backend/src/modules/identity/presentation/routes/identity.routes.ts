@@ -41,6 +41,10 @@ export const identityRouter = (): Router => {
   router.post(
     '/google',
     validateRequest(GoogleLoginSchema),
+    (req, res, next) => {
+      console.log('✔ Execution reached Route -> identity.routes.ts POST /google');
+      next();
+    },
     asyncHandler((req: Request, res: Response) => resolveAuth(req).googleLogin(req, res))
   );
 

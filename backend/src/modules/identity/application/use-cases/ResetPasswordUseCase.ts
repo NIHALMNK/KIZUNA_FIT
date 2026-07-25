@@ -1,5 +1,6 @@
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IPasswordResetRepository } from '../../domain/repositories/IPasswordResetRepository';
+import { IRefreshTokenSessionRepository } from '../../domain/repositories/IRefreshTokenSessionRepository';
 import { IPasswordHasher } from '../ports/IPasswordHasher';
 import { IUnitOfWork } from '../ports/IUnitOfWork';
 import { IEventBus } from '../ports/IEventBus';
@@ -7,6 +8,7 @@ import { IClock } from '../ports/IClock';
 import { ResetPasswordCommand } from '../commands/ResetPasswordCommand';
 import { Result } from '../../../../shared/result/Result';
 import { PasswordHash } from '../../domain/value-objects/PasswordHash';
+import { UserId } from '../../domain/value-objects/UserId';
 import crypto from 'crypto';
 import { PasswordStrengthPolicy } from '../../domain/policies/PasswordStrengthPolicy';
 
@@ -14,6 +16,7 @@ export class ResetPasswordUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly passwordResetRepo: IPasswordResetRepository,
+    private readonly sessionRepository: IRefreshTokenSessionRepository,
     private readonly passwordHasher: IPasswordHasher,
     private readonly unitOfWork: IUnitOfWork,
     private readonly eventBus: IEventBus,
@@ -41,6 +44,16 @@ export class ResetPasswordUseCase {
     const strengthResult = PasswordStrengthPolicy.validate(command.newPlaintextPassword);
     if (strengthResult.isFailure) return strengthResult;
 
+    if (user.passwordHash) {
+      const isCurrentPassword = await this.passwordHasher.compare(
+        command.newPlaintextPassword,
+        user.passwordHash.value
+      );
+      if (isCurrentPassword) {
+        return Result.fail<void>('New password cannot be the same as your current password');
+      }
+    }
+
     const useTokenResult = passwordReset.markAsUsed(this.clock.now());
     if (useTokenResult.isFailure) {
       return useTokenResult;
@@ -58,6 +71,8 @@ export class ResetPasswordUseCase {
     try {
       await this.userRepository.save(user, this.unitOfWork.session);
       await this.passwordResetRepo.save(passwordReset, this.unitOfWork.session);
+      await this.passwordResetRepo.invalidateExistingByUserId(user.id, this.unitOfWork.session);
+      await this.sessionRepository.revokeAllForUser(UserId.create(user.id).getValue(), this.unitOfWork.session);
       
       const events = [...user.domainEvents, ...passwordReset.domainEvents];
       user.clearEvents();

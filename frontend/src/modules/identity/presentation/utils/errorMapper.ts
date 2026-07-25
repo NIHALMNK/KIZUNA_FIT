@@ -10,6 +10,11 @@ export const ERROR_MESSAGES: Record<string, string> = {
   GOOGLE_ACCOUNT_NOT_FOUND: "No account associated with this Google login.",
   INVALID_TOKEN: "The token provided is invalid or has expired.",
   TOKEN_EXPIRED: "The token provided is invalid or has expired.",
+  INVALID_RESET_TOKEN: "This password reset link is invalid or has expired.",
+  RESET_TOKEN_EXPIRED: "This password reset link has expired. Please request a new one.",
+  RESET_TOKEN_ALREADY_USED: "This password reset link has already been used.",
+  PASSWORD_MATCHES_CURRENT: "The new password cannot be the same as your current password.",
+  USER_NOT_FOUND: "No account was found associated with this request.",
   NETWORK_ERROR: "Unable to communicate with the server. Please try again later.",
   TIMEOUT: "Unable to communicate with the server. Please try again later.",
 };

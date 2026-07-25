@@ -4,6 +4,48 @@ dist/
 coverage/
 .env
 .env.*.local
+backend/.env
+frontend/.env.local
+!*.example
 .DS_Store
 *.log
 
+# Ignore docs folders
+docs/
+**/docs/
+
+# ==========================================
+# Generated Documentation
+# ==========================================
+
+# Project documentation output
+docs/generated/
+docs/reports/
+docs/compliance/
+docs/audit/
+docs/manual-tests/
+docs/postman/
+docs/openapi/generated/
+
+# Antigravity / Gemini generated artifacts
+.gemini/
+.antigravity/
+brain/
+
+# QA & Compliance Reports
+**/*compliance_report*.md
+**/*audit*.md
+**/*scorecard*.md
+**/*manual_acceptance*.md
+**/*acceptance_test*.md
+**/*behavioral*.md
+**/*reconciliation*.md
+**/*validation*.md
+
+# Generated API docs
+backend/docs/generated/
+backend/docs/openapi-generated/
+
+# Generated Postman collections
+*.postman_collection.json
+*.postman_environment.json

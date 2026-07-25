@@ -1,8 +1,4 @@
-interface ValueObjectProps {
-  [index: string]: unknown;
-}
-
-export abstract class ValueObject<T extends ValueObjectProps> {
+export abstract class ValueObject<T extends object> {
   public readonly props: T;
 
   constructor(props: T) {

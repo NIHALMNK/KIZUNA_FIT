@@ -31,13 +31,14 @@ export class ChangePasswordUseCase {
       return Result.fail<void>('Account not found');
     }
 
-    if (!user.passwordHash) {
-      return Result.fail<void>('Account has no password (OAuth)');
-    }
-
-    const isValid = await this.passwordHasher.compare(command.currentPlaintextPassword, user.passwordHash.value);
+    const isValid = await this.passwordHasher.compare(command.currentPlaintextPassword, user.passwordHash!.value);
     if (!isValid) {
       return Result.fail<void>('Invalid current password');
+    }
+
+    const isSamePassword = await this.passwordHasher.compare(command.newPlaintextPassword, user.passwordHash!.value);
+    if (isSamePassword) {
+      return Result.fail<void>('New password cannot be the same as your current password');
     }
 
     const newHashStr = await this.passwordHasher.hash(command.newPlaintextPassword);

@@ -13,6 +13,22 @@ export class UserController {
 
 
 
+  private handleUseCaseError(res: Response, error: string, defaultCode: ApiErrorCode, defaultStatus: number): void {
+    if (error === 'Invalid current password') {
+      ApiResponse.error(res, error, ApiErrorCode.INVALID_CREDENTIALS, 401);
+      return;
+    }
+    if (error === 'New password cannot be the same as your current password') {
+      ApiResponse.error(res, error, ApiErrorCode.PASSWORD_MATCHES_CURRENT, 400);
+      return;
+    }
+    if (error === 'User not found' || error === 'Account not found') {
+      ApiResponse.error(res, error, ApiErrorCode.USER_NOT_FOUND, 404);
+      return;
+    }
+    ApiResponse.error(res, error, defaultCode, defaultStatus);
+  }
+
   public changePassword = async (req: Request, res: Response): Promise<void> => {
     if (!req.auth) {
       ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
@@ -26,7 +42,7 @@ export class UserController {
     });
 
     if (result.isFailure) {
-      ApiResponse.error(res, result.error as string, ApiErrorCode.CHANGE_PASSWORD_FAILED, 400);
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.CHANGE_PASSWORD_FAILED, 400);
       return;
     }
 

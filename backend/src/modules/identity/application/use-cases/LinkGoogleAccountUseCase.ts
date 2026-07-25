@@ -14,12 +14,12 @@ export class LinkGoogleAccountUseCase {
   constructor(
     private readonly googleIdentityProvider: IGoogleIdentityProvider,
     private readonly userRepository: IUserRepository,
-    private readonly unitOfWork: IUnitOfWork
+    private readonly unitOfWork: IUnitOfWork,
   ) {}
 
   public async execute(request: Request): Promise<Result<void>> {
     const payloadResult = await this.googleIdentityProvider.verifyIdToken(request.idToken);
-    
+
     if (payloadResult.isFailure) {
       return Result.fail<void>(payloadResult.error || 'Invalid Google Token');
     }
@@ -54,10 +54,9 @@ export class LinkGoogleAccountUseCase {
       }
 
       await this.userRepository.save(user, this.unitOfWork.session);
-      
 
       await this.unitOfWork.commit();
-      
+
       return Result.ok<void>();
     } catch (error: unknown) {
       await this.unitOfWork.rollback();

@@ -4,6 +4,9 @@ dist/
 coverage/
 .env
 .env.*.local
+backend/.env
+frontend/.env.local
+!*.example
 .DS_Store
 *.log
 

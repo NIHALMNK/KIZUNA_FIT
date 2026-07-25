@@ -1,12 +1,4 @@
-import { z } from 'zod';
-
-const jwtConfigSchema = z.object({
-  JWT_ACCESS_SECRET: z.string().min(16, 'JWT_ACCESS_SECRET must be at least 16 characters long for secure HS256 signing.'),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-  JWT_ISSUER: z.string().default('kizunafit-api'),
-  JWT_AUDIENCE: z.string().default('kizunafit-client'),
-});
+import { env } from './env.config';
 
 export class JwtConfiguration {
   public readonly secret: string;
@@ -16,16 +8,10 @@ export class JwtConfiguration {
   public readonly audience: string;
 
   constructor() {
-    const parsed = jwtConfigSchema.safeParse(process.env);
-    
-    if (!parsed.success) {
-      throw new Error(`Fatal configuration error: Invalid JWT environment variables. ${parsed.error.message}`);
-    }
-
-    this.secret = parsed.data.JWT_ACCESS_SECRET;
-    this.accessExpiresIn = parsed.data.JWT_ACCESS_EXPIRES_IN;
-    this.refreshExpiresIn = parsed.data.JWT_REFRESH_EXPIRES_IN;
-    this.issuer = parsed.data.JWT_ISSUER;
-    this.audience = parsed.data.JWT_AUDIENCE;
+    this.secret = env.JWT_ACCESS_SECRET;
+    this.accessExpiresIn = env.JWT_ACCESS_EXPIRES_IN;
+    this.refreshExpiresIn = env.JWT_REFRESH_EXPIRES_IN;
+    this.issuer = env.JWT_ISSUER;
+    this.audience = env.JWT_AUDIENCE;
   }
 }

@@ -1,12 +1,13 @@
 import winston from 'winston';
 import { ILogger } from '../../shared/contracts/ILogger';
+import { env } from '../../config/env.config';
 
 export class WinstonLogger implements ILogger {
   private logger: winston.Logger;
 
   constructor() {
     this.logger = winston.createLogger({
-      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+      level: env.LOG_LEVEL || (env.NODE_ENV === 'production' ? 'info' : 'debug'),
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()

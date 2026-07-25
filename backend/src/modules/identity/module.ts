@@ -59,8 +59,8 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
   // Shared Infrastructure (Singletons)
   container.register({
     eventBus: asClass(InMemoryEventBus).singleton(),
-    emailProvider: env.EMAIL_PROVIDER === 'mock' 
-      ? asClass(MockEmailProvider).singleton() 
+    emailProvider: env.EMAIL_PROVIDER === 'mock'
+      ? asClass(MockEmailProvider).singleton()
       : asClass(NodemailerSmtpEmailProvider).singleton(),
     emailDispatcher: env.EMAIL_DISPATCH_MODE === 'queue'
       ? asClass(BullMQEmailDispatcher).singleton()
@@ -83,7 +83,7 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
     clock: asClass(SystemClock).singleton(),
     passwordHasher: asClass(Argon2PasswordHasher).singleton(),
     tokenProvider: asClass(JwtTokenProvider).singleton(),
-    googleIdentityProvider: asValue(new GoogleIdentityProvider(process.env.GOOGLE_CLIENT_ID || 'fallback_client_id')),
+    googleIdentityProvider: asValue(new GoogleIdentityProvider(env.GOOGLE_CLIENT_ID)),
   });
 
   // Persistence (Scoped to share transactions if needed, but for now we can just use scoped)
@@ -93,7 +93,7 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
     refreshTokenSessionModel: asValue(RefreshTokenSessionModel),
     emailVerificationModel: asValue(EmailVerificationModel),
     passwordResetModel: asValue(PasswordResetModel),
-    
+
     unitOfWork: asClass(MongooseUnitOfWork).scoped(),
     userRepository: asClass(MongoUserRepository).scoped(),
     sessionRepository: asClass(MongoRefreshTokenSessionRepository).scoped(),

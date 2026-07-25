@@ -2,23 +2,21 @@ import { z } from 'zod';
 import path from 'node:path';
 import dotenv from 'dotenv';
 
-// Use find-up or simple heuristic. process.cwd() might be root or backend dir depending on how it's launched.
-const envPath = process.cwd().endsWith('backend') 
-  ? path.resolve(process.cwd(), '../.env')
-  : path.resolve(process.cwd(), '.env');
-
-dotenv.config({ path: envPath });
+dotenv.config();
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().transform(Number).default('3000'),
   API_PREFIX: z.string().default('/api/v1'),
+  GOOGLE_CLIENT_ID: z.string().min(1),
   MONGODB_URI: z.string().url(),
   REDIS_URL: z.string().url(),
   JWT_ACCESS_SECRET: z.string().min(16),
   JWT_REFRESH_SECRET: z.string().min(16),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  JWT_ISSUER: z.string().default('kizunafit-api'),
+  JWT_AUDIENCE: z.string().default('kizunafit-client'),
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),

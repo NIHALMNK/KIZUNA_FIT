@@ -18,6 +18,7 @@ export class GoogleIdentityProvider implements IGoogleIdentityProvider {
 
   public async verifyIdToken(idToken: string): Promise<Result<VerifiedExternalIdentity>> {
     try {
+
       const ticket = await this.client.verifyIdToken({
         idToken,
         audience: this.clientId,

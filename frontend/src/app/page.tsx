@@ -27,12 +27,21 @@ export default function Home() {
         The ultimate platform connecting clients with elite personal trainers. Achieve your fitness goals today.
       </p>
       
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4 justify-center">
         <Link href="/login">
           <Button variant="outline" size="lg">Login</Button>
         </Link>
         <Link href="/register">
           <Button size="lg">Get Started</Button>
+        </Link>
+        <Link href="/profile/client">
+          <Button variant="secondary" size="lg">Client Profile</Button>
+        </Link>
+        <Link href="/profile/trainer">
+          <Button variant="secondary" size="lg">Trainer Profile</Button>
+        </Link>
+        <Link href="/trainers">
+          <Button variant="outline" size="lg">Find Trainers</Button>
         </Link>
       </div>
     </div>

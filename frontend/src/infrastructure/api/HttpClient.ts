@@ -146,6 +146,10 @@ class HttpClient {
     return this.api.put(url, data, config).then(res => this.unwrapResponse<T>(res));
   }
 
+  public patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    return this.api.patch(url, data, config).then(res => this.unwrapResponse<T>(res));
+  }
+
   public delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return this.api.delete(url, config).then(res => this.unwrapResponse<T>(res));
   }

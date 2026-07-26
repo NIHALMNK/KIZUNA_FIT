@@ -1,0 +1,85 @@
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  OTHER = 'OTHER',
+  PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
+}
+
+export enum WeightUnit {
+  KG = 'KG',
+  LBS = 'LBS',
+}
+
+export enum HeightUnit {
+  CM = 'CM',
+  INCHES = 'INCHES',
+  FT_IN = 'FT_IN',
+}
+
+export enum DietaryPreference {
+  VEGETARIAN = 'VEGETARIAN',
+  VEGAN = 'VEGAN',
+  KETO = 'KETO',
+  PALEO = 'PALEO',
+  PESCATARIAN = 'PESCATARIAN',
+  HALAL = 'HALAL',
+  KOSHER = 'KOSHER',
+  NONE = 'NONE',
+}
+
+export enum FitnessGoal {
+  WEIGHT_LOSS = 'WEIGHT_LOSS',
+  MUSCLE_GAIN = 'MUSCLE_GAIN',
+  ENDURANCE = 'ENDURANCE',
+  FLEXIBILITY = 'FLEXIBILITY',
+  GENERAL_FITNESS = 'GENERAL_FITNESS',
+  STRENGTH = 'STRENGTH',
+  REHABILITATION = 'REHABILITATION',
+}
+
+export enum ExperienceLevel {
+  BEGINNER = 'BEGINNER',
+  INTERMEDIATE = 'INTERMEDIATE',
+  ADVANCED = 'ADVANCED',
+}
+
+export enum ActivityLevel {
+  SEDENTARY = 'SEDENTARY',
+  LIGHTLY_ACTIVE = 'LIGHTLY_ACTIVE',
+  MODERATELY_ACTIVE = 'MODERATELY_ACTIVE',
+  VERY_ACTIVE = 'VERY_ACTIVE',
+  EXTRA_ACTIVE = 'EXTRA_ACTIVE',
+}
+
+export enum TrainerAvailabilityStatus {
+  AVAILABLE = 'AVAILABLE',
+  BUSY = 'BUSY',
+  OFFLINE = 'OFFLINE',
+}
+
+export enum TrainerSpecialization {
+  WEIGHT_LOSS = 'WEIGHT_LOSS',
+  MUSCLE_BUILDING = 'MUSCLE_BUILDING',
+  STRENGTH_TRAINING = 'STRENGTH_TRAINING',
+  YOGA = 'YOGA',
+  PILATES = 'PILATES',
+  HIIT = 'HIIT',
+  CALISTHENICS = 'CALISTHENICS',
+  NUTRITION = 'NUTRITION',
+  SPORTS_PERFORMANCE = 'SPORTS_PERFORMANCE',
+  REHABILITATION = 'REHABILITATION',
+}
+
+export enum ShowcaseType {
+  CERTIFICATE = 'CERTIFICATE',
+  TRANSFORMATION = 'TRANSFORMATION',
+  VIDEO = 'VIDEO',
+  AWARD = 'AWARD',
+  OTHER = 'OTHER',
+}
+
+export enum CertificationStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}

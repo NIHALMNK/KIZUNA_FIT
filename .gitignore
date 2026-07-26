@@ -49,3 +49,7 @@ backend/docs/openapi-generated/
 # Generated Postman collections
 *.postman_collection.json
 *.postman_environment.json
+
+
+# domain architecture
+/domain architecture

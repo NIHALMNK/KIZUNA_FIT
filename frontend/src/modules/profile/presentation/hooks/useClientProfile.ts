@@ -21,6 +21,7 @@ export function useCreateClientProfile() {
     mutationFn: (dto: CreateClientProfileDTO) => clientProfileUseCases.createProfile(dto),
     onSuccess: (data) => {
       queryClient.setQueryData(CLIENT_PROFILE_QUERY_KEY, data);
+      queryClient.invalidateQueries({ queryKey: CLIENT_PROFILE_QUERY_KEY });
       toast.success('Client profile created successfully!');
     },
     onError: (error: any) => {

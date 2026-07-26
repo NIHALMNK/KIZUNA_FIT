@@ -21,6 +21,7 @@ export function useCreateTrainerProfile() {
     mutationFn: (dto: CreateTrainerProfileDTO) => trainerProfileUseCases.createProfile(dto),
     onSuccess: (data) => {
       queryClient.setQueryData(TRAINER_PROFILE_QUERY_KEY, data);
+      queryClient.invalidateQueries({ queryKey: TRAINER_PROFILE_QUERY_KEY });
       toast.success('Trainer profile created successfully!');
     },
     onError: (error: any) => {

@@ -24,18 +24,11 @@ export const trainerProfileRouter = (): Router => {
   const resolveController = (req: Request): TrainerProfileController =>
     req.scope.resolve<TrainerProfileController>('trainerProfileController');
 
-  // --- Public Routes ---
+  // --- Public Search Route ---
   router.get(
     '/',
     validateRequest(SearchTrainerQuerySchema),
     asyncHandler((req: Request, res: Response) => resolveController(req).searchTrainers(req, res)),
-  );
-
-  router.get(
-    '/:trainerId',
-    asyncHandler((req: Request, res: Response) =>
-      resolveController(req).getPublicProfile(req, res),
-    ),
   );
 
   // --- Authenticated Trainer Profile Routes ---
@@ -161,6 +154,14 @@ export const trainerProfileRouter = (): Router => {
     requireRole(['TRAINER']),
     asyncHandler((req: Request, res: Response) =>
       resolveController(req).deleteShowcaseItem(req, res),
+    ),
+  );
+
+  // --- Public Single Profile Route (Must come AFTER fixed /me routes to prevent wildcard shadowing) ---
+  router.get(
+    '/:trainerId',
+    asyncHandler((req: Request, res: Response) =>
+      resolveController(req).getPublicProfile(req, res),
     ),
   );
 

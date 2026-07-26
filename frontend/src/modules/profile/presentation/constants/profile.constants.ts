@@ -70,18 +70,20 @@ export const AVAILABILITY_STATUS_OPTIONS = [
   { label: 'Offline', value: TrainerAvailabilityStatus.OFFLINE },
 ];
 
-export const SPECIALIZATION_OPTIONS = [
-  { label: 'Weight Loss', value: TrainerSpecialization.WEIGHT_LOSS },
-  { label: 'Muscle Building', value: TrainerSpecialization.MUSCLE_BUILDING },
-  { label: 'Strength Training', value: TrainerSpecialization.STRENGTH_TRAINING },
-  { label: 'Yoga', value: TrainerSpecialization.YOGA },
-  { label: 'Pilates', value: TrainerSpecialization.PILATES },
-  { label: 'HIIT', value: TrainerSpecialization.HIIT },
-  { label: 'Calisthenics', value: TrainerSpecialization.CALISTHENICS },
-  { label: 'Nutrition', value: TrainerSpecialization.NUTRITION },
-  { label: 'Sports Performance', value: TrainerSpecialization.SPORTS_PERFORMANCE },
-  { label: 'Rehabilitation', value: TrainerSpecialization.REHABILITATION },
-];
+export const formatSpecializationLabel = (spec: string): string => {
+  return spec
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    .replace('Crossfit', 'CrossFit');
+};
+
+export const SPECIALIZATION_OPTIONS: { label: string; value: TrainerSpecialization }[] = Object.values(
+  TrainerSpecialization,
+).map((value) => ({
+  value,
+  label: formatSpecializationLabel(value),
+}));
 
 export const SHOWCASE_TYPE_OPTIONS = [
   { label: 'Certificate', value: ShowcaseType.CERTIFICATE },

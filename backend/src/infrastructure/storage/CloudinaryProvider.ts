@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
 import { IStorageProvider } from '../../shared/contracts/IStorageProvider';
 import { env } from '../../config/env.config';
 
@@ -8,17 +9,28 @@ export class CloudinaryProvider implements IStorageProvider {
       cloudinary.config({
         cloud_name: env.CLOUDINARY_CLOUD_NAME,
         api_key: env.CLOUDINARY_API_KEY,
-        api_secret: env.CLOUDINARY_API_SECRET
+        api_secret: env.CLOUDINARY_API_SECRET,
       });
     }
   }
 
   async uploadFile(fileBuffer: Buffer, folder: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ folder }, (error: Error | undefined, result: unknown) => {
-        if (error) return reject(error);
-        resolve((result as Record<string, unknown>).secure_url as string);
-      }).end(fileBuffer);
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder },
+        (error: Error | undefined, result: unknown) => {
+          if (error) {
+            return reject(error);
+          }
+          const secureUrl = (result as Record<string, unknown> | undefined)?.secure_url;
+          if (typeof secureUrl !== 'string') {
+            return reject(new Error('Cloudinary upload failed: No secure_url returned in response'));
+          }
+          resolve(secureUrl);
+        },
+      );
+
+      Readable.from(fileBuffer).pipe(uploadStream);
     });
   }
 

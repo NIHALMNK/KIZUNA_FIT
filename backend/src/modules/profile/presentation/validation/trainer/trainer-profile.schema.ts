@@ -2,6 +2,12 @@ import { z } from 'zod';
 import { TrainerAvailabilityStatus } from '../../../domain/enums/TrainerAvailabilityStatus';
 import { TrainerSpecialization } from '../../../domain/enums/TrainerSpecialization';
 import { ShowcaseType } from '../../../domain/enums/TrainerEnums';
+import {
+  dateFromHtmlInput,
+  optionalDateFromHtmlInput,
+  optionalUrlFromHtmlInput,
+  optionalString,
+} from '../../../../../shared/infrastructure/http/validation/dateValidators';
 
 export const CreateTrainerProfileSchema = z.object({
   body: z.object({
@@ -15,27 +21,27 @@ export const CreateTrainerProfileSchema = z.object({
     city: z.string().min(1, 'City is required'),
     state: z.string().min(1, 'State is required'),
     country: z.string().min(1, 'Country is required'),
-    timezone: z.string().optional(),
+    timezone: optionalString(),
   }),
 });
 
 export const UpdateTrainerProfileSchema = z.object({
   body: z.object({
-    headline: z.string().min(1).max(150).optional(),
-    bio: z.string().min(1).max(2000).optional(),
+    headline: optionalString(),
+    bio: optionalString(),
     yearsOfExperience: z.number().min(0).optional(),
     languages: z.array(z.string()).optional(),
     specializations: z.array(z.nativeEnum(TrainerSpecialization)).optional(),
-    city: z.string().optional(),
-    state: z.string().optional(),
-    country: z.string().optional(),
+    city: optionalString(),
+    state: optionalString(),
+    country: optionalString(),
   }),
 });
 
 export const UpdateAvailabilitySchema = z.object({
   body: z.object({
     status: z.nativeEnum(TrainerAvailabilityStatus),
-    timezone: z.string().optional(),
+    timezone: optionalString(),
     weeklySchedule: z.array(
       z.object({
         dayOfWeek: z.number().min(0).max(6),
@@ -54,9 +60,9 @@ export const AddCertificationSchema = z.object({
   body: z.object({
     title: z.string().min(1, 'Title is required'),
     organization: z.string().min(1, 'Organization is required'),
-    issuedAt: z.string().datetime('Issued date must be ISO string'),
-    expiresAt: z.string().datetime().optional(),
-    certificateUrl: z.string().url().optional(),
+    issuedAt: dateFromHtmlInput('Issued date'),
+    expiresAt: optionalDateFromHtmlInput('Expiration date'),
+    certificateUrl: optionalUrlFromHtmlInput(),
   }),
 });
 
@@ -67,11 +73,11 @@ export const UpdateCertificationSchema = z.object({
     })
     .optional(),
   body: z.object({
-    title: z.string().optional(),
-    organization: z.string().optional(),
-    issuedAt: z.string().datetime().optional(),
-    expiresAt: z.string().datetime().optional(),
-    certificateUrl: z.string().url().optional(),
+    title: optionalString(),
+    organization: optionalString(),
+    issuedAt: optionalDateFromHtmlInput('Issued date'),
+    expiresAt: optionalDateFromHtmlInput('Expiration date'),
+    certificateUrl: optionalUrlFromHtmlInput(),
   }),
 });
 
@@ -80,9 +86,9 @@ export const AddShowcaseItemSchema = z.object({
     type: z.nativeEnum(ShowcaseType),
     title: z.string().min(1, 'Title is required'),
     description: z.string().min(1, 'Description is required'),
-    issuedBy: z.string().optional(),
-    achievedAt: z.string().datetime().optional(),
-    mediaUrl: z.string().url().optional(),
+    issuedBy: optionalString(),
+    achievedAt: optionalDateFromHtmlInput('Achievement date'),
+    mediaUrl: optionalUrlFromHtmlInput(),
   }),
 });
 
@@ -94,19 +100,19 @@ export const UpdateShowcaseItemSchema = z.object({
     .optional(),
   body: z.object({
     type: z.nativeEnum(ShowcaseType).optional(),
-    title: z.string().optional(),
-    description: z.string().optional(),
-    issuedBy: z.string().optional(),
-    achievedAt: z.string().datetime().optional(),
-    mediaUrl: z.string().url().optional(),
+    title: optionalString(),
+    description: optionalString(),
+    issuedBy: optionalString(),
+    achievedAt: optionalDateFromHtmlInput('Achievement date'),
+    mediaUrl: optionalUrlFromHtmlInput(),
   }),
 });
 
 export const SearchTrainerQuerySchema = z.object({
   query: z.object({
-    search: z.string().optional(),
+    search: optionalString(),
     specialization: z.nativeEnum(TrainerSpecialization).optional(),
-    experienceLevel: z.string().optional(),
+    experienceLevel: optionalString(),
     minRating: z.coerce.number().min(0).max(5).optional(),
     availability: z.nativeEnum(TrainerAvailabilityStatus).optional(),
     verifiedOnly: z.coerce.boolean().optional(),

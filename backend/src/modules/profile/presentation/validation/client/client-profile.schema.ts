@@ -4,6 +4,10 @@ import { WeightUnit, HeightUnit } from '../../../domain/enums/Units';
 import { DietaryPreference } from '../../../domain/enums/DietaryPreference';
 import { FitnessGoal } from '../../../domain/enums/FitnessGoal';
 import { ExperienceLevel, ActivityLevel } from '../../../domain/enums/ClientLevels';
+import {
+  optionalDateFromHtmlInput,
+  optionalString,
+} from '../../../../../shared/infrastructure/http/validation/dateValidators';
 
 export const CreateClientProfileSchema = z.object({
   body: z.object({
@@ -13,14 +17,14 @@ export const CreateClientProfileSchema = z.object({
 
 export const UpdateClientProfileSchema = z.object({
   body: z.object({
-    fullName: z.string().min(1).max(100).optional(),
+    fullName: optionalString(),
     gender: z.nativeEnum(Gender).optional(),
-    dateOfBirth: z.string().datetime().optional(),
-    phoneNumber: z.string().optional(),
-    country: z.string().optional(),
-    state: z.string().optional(),
-    city: z.string().optional(),
-    timezone: z.string().optional(),
+    dateOfBirth: optionalDateFromHtmlInput('Date of birth'),
+    phoneNumber: optionalString(),
+    country: optionalString(),
+    state: optionalString(),
+    city: optionalString(),
+    timezone: optionalString(),
     weight: z
       .object({
         value: z.number().positive(),
@@ -33,7 +37,7 @@ export const UpdateClientProfileSchema = z.object({
         unit: z.nativeEnum(HeightUnit),
       })
       .optional(),
-    medicalNotes: z.string().max(1000).optional(),
+    medicalNotes: optionalString(),
     dietaryPreferences: z.array(z.nativeEnum(DietaryPreference)).optional(),
     fitnessGoals: z.array(z.nativeEnum(FitnessGoal)).optional(),
     experienceLevel: z.nativeEnum(ExperienceLevel).optional(),

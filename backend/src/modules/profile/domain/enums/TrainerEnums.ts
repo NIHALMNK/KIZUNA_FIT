@@ -1,0 +1,14 @@
+export enum ShowcaseType {
+  CERTIFICATE = 'CERTIFICATE',
+  TRANSFORMATION = 'TRANSFORMATION',
+  WORKSHOP = 'WORKSHOP',
+  AWARD = 'AWARD',
+  EVENT = 'EVENT',
+  OTHER = 'OTHER',
+}
+
+export enum CertificationStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}

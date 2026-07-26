@@ -115,7 +115,12 @@ export const SearchTrainerQuerySchema = z.object({
     experienceLevel: optionalString(),
     minRating: z.coerce.number().min(0).max(5).optional(),
     availability: z.nativeEnum(TrainerAvailabilityStatus).optional(),
-    verifiedOnly: z.coerce.boolean().optional(),
+    verifiedOnly: z
+      .preprocess((val) => {
+        if (val === 'true' || val === true) return true;
+        if (val === 'false' || val === false) return false;
+        return undefined;
+      }, z.boolean().optional()),
     sortBy: z.enum(['rating', 'experience', 'newest']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
     page: z.coerce.number().min(1).default(1),

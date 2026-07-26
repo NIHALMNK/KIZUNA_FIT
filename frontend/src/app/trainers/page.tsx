@@ -23,7 +23,7 @@ export default function PublicTrainersSearchPage() {
     specialization: (searchParams.get('specialization') as TrainerSpecialization) || undefined,
     availability: (searchParams.get('availability') as TrainerAvailabilityStatus) || undefined,
     minRating: searchParams.get('minRating') ? Number(searchParams.get('minRating')) : undefined,
-    verifiedOnly: searchParams.get('verifiedOnly') === 'true',
+    verifiedOnly: searchParams.get('verifiedOnly') === 'true' ? true : undefined,
     sortBy: (searchParams.get('sortBy') as any) || 'rating',
     sortOrder: (searchParams.get('sortOrder') as any) || 'desc',
     page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
@@ -78,7 +78,7 @@ export default function PublicTrainersSearchPage() {
       specialization: undefined,
       availability: undefined,
       minRating: undefined,
-      verifiedOnly: false,
+      verifiedOnly: undefined,
       sortBy: 'rating',
       sortOrder: 'desc',
       page: 1,
@@ -156,7 +156,7 @@ export default function PublicTrainersSearchPage() {
                 <input
                   type="checkbox"
                   checked={!!filters.verifiedOnly}
-                  onChange={(e) => updateFilters({ verifiedOnly: e.target.checked })}
+                  onChange={(e) => updateFilters({ verifiedOnly: e.target.checked ? true : undefined })}
                   className="rounded text-emerald-600 focus:ring-emerald-500"
                 />
                 <span>Verified Certifications Only</span>

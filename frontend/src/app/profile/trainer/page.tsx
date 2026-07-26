@@ -2,19 +2,24 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { AuthGuard } from '@/shared/components/guards/AuthGuard';
+import { RoleGuard } from '@/shared/components/guards/RoleGuard';
+import { Permission } from '@/shared/components/navigation/permissions';
+import { ROUTES } from '@/shared/constants/routes';
 import { useGetTrainerProfile, useUploadTrainerAvatar, useDeleteTrainerAvatar } from '@/modules/profile/presentation/hooks/useTrainerProfile';
 import { PageHeader } from '@/modules/profile/presentation/components/PageHeader';
 import { SectionCard } from '@/modules/profile/presentation/components/SectionCard';
 import { InfoCard } from '@/modules/profile/presentation/components/InfoCard';
 import { AvatarUploader } from '@/modules/profile/presentation/components/AvatarUploader';
 import { ProfileCompletionCard } from '@/modules/profile/presentation/components/ProfileCompletionCard';
-import { LoadingState } from '@/modules/profile/presentation/components/LoadingState';
-import { ErrorState } from '@/modules/profile/presentation/components/ErrorState';
-import { EmptyState } from '@/modules/profile/presentation/components/EmptyState';
+import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { ErrorState } from '@/shared/components/feedback/ErrorState';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { CertificationCard } from '@/modules/profile/presentation/components/CertificationCard';
 import { ShowcaseCard } from '@/modules/profile/presentation/components/ShowcaseCard';
+import { mapApiError } from '@/shared/utils/errorMapper';
 
-export default function TrainerProfilePage() {
+function TrainerProfileContent() {
   const { data: profile, isLoading, isError, error, refetch } = useGetTrainerProfile();
   const uploadAvatarMutation = useUploadTrainerAvatar();
   const deleteAvatarMutation = useDeleteTrainerAvatar();
@@ -30,24 +35,37 @@ export default function TrainerProfilePage() {
     );
   }
 
+  // Differentiate 404 (Not Created) from 500/Connection Error
   if (isError) {
+    const mapped = mapApiError(error);
+
+    if (mapped.isNotFound) {
+      return (
+        <div className="min-h-screen bg-gray-50 pb-12">
+          <PageHeader title="Trainer Profile" role="TRAINER" />
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <EmptyState
+              title="You haven't created your trainer profile yet"
+              description="Set up your professional bio, certifications, and availability to start receiving client matches."
+              action={
+                <Link
+                  href={ROUTES.TRAINER_PROFILE_CREATE}
+                  className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md"
+                >
+                  Create Trainer Profile
+                </Link>
+              }
+            />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-gray-50 pb-12">
         <PageHeader title="Trainer Profile" role="TRAINER" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <ErrorState
-            title="Trainer Profile Not Found"
-            message={(error as any)?.message || 'Trainer profile does not exist yet.'}
-            onRetry={refetch}
-          />
-          <div className="text-center mt-4">
-            <Link
-              href="/profile/trainer/create"
-              className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md"
-            >
-              Create Trainer Profile
-            </Link>
-          </div>
+          <ErrorState error={error} onRetry={refetch} />
         </div>
       </div>
     );
@@ -59,14 +77,14 @@ export default function TrainerProfilePage() {
         <PageHeader title="Trainer Profile" role="TRAINER" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <EmptyState
-            title="No Trainer Profile Created"
-            description="You have not set up your professional trainer profile yet."
+            title="You haven't created your trainer profile yet"
+            description="Set up your trainer profile to unlock client features."
             action={
               <Link
-                href="/profile/trainer/create"
+                href={ROUTES.TRAINER_PROFILE_CREATE}
                 className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md"
               >
-                Create Profile Now
+                Create Trainer Profile
               </Link>
             }
           />
@@ -84,13 +102,13 @@ export default function TrainerProfilePage() {
         action={
           <div className="flex items-center gap-2">
             <Link
-              href={`/trainers/${profile.userId}`}
+              href={ROUTES.PUBLIC_TRAINER_DETAILS(profile.userId)}
               className="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md"
             >
               View Public Page
             </Link>
             <Link
-              href="/profile/trainer/edit"
+              href={ROUTES.TRAINER_PROFILE_EDIT}
               className="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md"
             >
               Edit Details
@@ -160,7 +178,7 @@ export default function TrainerProfilePage() {
           subtitle={`Status: ${profile.availability.status} (${profile.availability.timezone})`}
           action={
             <Link
-              href="/profile/trainer/availability"
+              href={ROUTES.TRAINER_AVAILABILITY}
               className="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md"
             >
               Manage Schedule
@@ -181,7 +199,7 @@ export default function TrainerProfilePage() {
           subtitle={`Total verified: ${profile.certifications.filter((c) => c.status === 'APPROVED').length}`}
           action={
             <Link
-              href="/profile/trainer/certifications"
+              href={ROUTES.TRAINER_CERTIFICATIONS}
               className="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md"
             >
               Manage Certifications
@@ -204,7 +222,7 @@ export default function TrainerProfilePage() {
           subtitle={`Total items: ${profile.showcase.length}`}
           action={
             <Link
-              href="/profile/trainer/showcase"
+              href={ROUTES.TRAINER_SHOWCASE}
               className="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md"
             >
               Manage Showcase
@@ -223,5 +241,15 @@ export default function TrainerProfilePage() {
         </SectionCard>
       </div>
     </div>
+  );
+}
+
+export default function TrainerProfilePage() {
+  return (
+    <AuthGuard>
+      <RoleGuard permission={Permission.TRAINER_PROFILE}>
+        <TrainerProfileContent />
+      </RoleGuard>
+    </AuthGuard>
   );
 }

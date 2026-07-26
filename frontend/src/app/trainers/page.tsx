@@ -1,19 +1,92 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSearchTrainers } from '@/modules/profile/presentation/hooks/usePublicTrainers';
-import { useProfileUiStore } from '@/modules/profile/presentation/store/profileUiStore';
 import { PageHeader } from '@/modules/profile/presentation/components/PageHeader';
-import { LoadingState } from '@/modules/profile/presentation/components/LoadingState';
-import { ErrorState } from '@/modules/profile/presentation/components/ErrorState';
-import { EmptyState } from '@/modules/profile/presentation/components/EmptyState';
+import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { ErrorState } from '@/shared/components/feedback/ErrorState';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { SPECIALIZATION_OPTIONS, AVAILABILITY_STATUS_OPTIONS } from '@/modules/profile/presentation/constants/profile.constants';
 import { TrainerSpecialization, TrainerAvailabilityStatus } from '@/modules/profile/domain/enums/profile.enums';
+import { ROUTES } from '@/shared/constants/routes';
+import { SearchTrainerParams } from '@/modules/profile/domain/types/profile.types';
 
 export default function PublicTrainersSearchPage() {
-  const { searchFilters, setSearchFilters, resetSearchFilters } = useProfileUiStore();
-  const { data, isLoading, isError, error, refetch } = useSearchTrainers(searchFilters);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize filters from URL query parameters so refresh & link sharing preserve state
+  const initialFilters: SearchTrainerParams = {
+    search: searchParams.get('search') || undefined,
+    specialization: (searchParams.get('specialization') as TrainerSpecialization) || undefined,
+    availability: (searchParams.get('availability') as TrainerAvailabilityStatus) || undefined,
+    minRating: searchParams.get('minRating') ? Number(searchParams.get('minRating')) : undefined,
+    verifiedOnly: searchParams.get('verifiedOnly') === 'true',
+    sortBy: (searchParams.get('sortBy') as any) || 'rating',
+    sortOrder: (searchParams.get('sortOrder') as any) || 'desc',
+    page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
+    limit: 10,
+  };
+
+  const [filters, setFilters] = useState<SearchTrainerParams>(initialFilters);
+  const [searchInput, setSearchInput] = useState<string>(initialFilters.search || '');
+
+  // 300ms Debounce effect for search keyword typing
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
+  // Sync state changes to URL search params
+  const syncUrlParams = useCallback(
+    (updated: SearchTrainerParams) => {
+      const params = new URLSearchParams();
+      if (updated.search) params.set('search', updated.search);
+      if (updated.specialization) params.set('specialization', updated.specialization);
+      if (updated.availability) params.set('availability', updated.availability);
+      if (updated.minRating) params.set('minRating', String(updated.minRating));
+      if (updated.verifiedOnly) params.set('verifiedOnly', 'true');
+      if (updated.sortBy) params.set('sortBy', updated.sortBy);
+      if (updated.page && updated.page > 1) params.set('page', String(updated.page));
+
+      const queryStr = params.toString();
+      const url = queryStr ? `${ROUTES.PUBLIC_TRAINERS}?${queryStr}` : ROUTES.PUBLIC_TRAINERS;
+      router.replace(url, { scroll: false });
+    },
+    [router],
+  );
+
+  useEffect(() => {
+    syncUrlParams(filters);
+  }, [filters, syncUrlParams]);
+
+  // Data fetching hook using TanStack Query
+  const { data, isLoading, isError, error, refetch } = useSearchTrainers(filters);
+
+  const updateFilters = (newFields: Partial<SearchTrainerParams>) => {
+    setFilters((prev) => ({ ...prev, ...newFields, page: newFields.page ?? 1 }));
+  };
+
+  const handleReset = () => {
+    setSearchInput('');
+    const resetValues: SearchTrainerParams = {
+      search: undefined,
+      specialization: undefined,
+      availability: undefined,
+      minRating: undefined,
+      verifiedOnly: false,
+      sortBy: 'rating',
+      sortOrder: 'desc',
+      page: 1,
+      limit: 10,
+    };
+    setFilters(resetValues);
+    router.replace(ROUTES.PUBLIC_TRAINERS);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
@@ -33,9 +106,9 @@ export default function PublicTrainersSearchPage() {
               </label>
               <input
                 type="text"
-                value={searchFilters.search || ''}
-                onChange={(e) => setSearchFilters({ search: e.target.value })}
-                placeholder="Search by name, headline, or keyword..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search by trainer name, headline, or keyword..."
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
@@ -45,8 +118,8 @@ export default function PublicTrainersSearchPage() {
                 Specialization
               </label>
               <select
-                value={searchFilters.specialization || ''}
-                onChange={(e) => setSearchFilters({ specialization: (e.target.value as TrainerSpecialization) || undefined })}
+                value={filters.specialization || ''}
+                onChange={(e) => updateFilters({ specialization: (e.target.value as TrainerSpecialization) || undefined })}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="">All Specializations</option>
@@ -60,11 +133,11 @@ export default function PublicTrainersSearchPage() {
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                Availability
+                Availability Status
               </label>
               <select
-                value={searchFilters.availability || ''}
-                onChange={(e) => setSearchFilters({ availability: (e.target.value as TrainerAvailabilityStatus) || undefined })}
+                value={filters.availability || ''}
+                onChange={(e) => updateFilters({ availability: (e.target.value as TrainerAvailabilityStatus) || undefined })}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="">Any Status</option>
@@ -82,17 +155,17 @@ export default function PublicTrainersSearchPage() {
               <label className="flex items-center space-x-2 text-xs font-medium text-gray-700 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={!!searchFilters.verifiedOnly}
-                  onChange={(e) => setSearchFilters({ verifiedOnly: e.target.checked })}
+                  checked={!!filters.verifiedOnly}
+                  onChange={(e) => updateFilters({ verifiedOnly: e.target.checked })}
                   className="rounded text-emerald-600 focus:ring-emerald-500"
                 />
                 <span>Verified Certifications Only</span>
               </label>
 
               <select
-                value={searchFilters.sortBy || 'rating'}
-                onChange={(e) => setSearchFilters({ sortBy: e.target.value as any })}
-                className="px-2 py-1 text-xs border border-gray-300 rounded"
+                value={filters.sortBy || 'rating'}
+                onChange={(e) => updateFilters({ sortBy: e.target.value as any })}
+                className="px-2 py-1 text-xs border border-gray-300 rounded focus:ring-emerald-500"
               >
                 <option value="rating">Sort by Rating</option>
                 <option value="experience">Sort by Experience</option>
@@ -101,36 +174,36 @@ export default function PublicTrainersSearchPage() {
             </div>
 
             <button
-              onClick={resetSearchFilters}
-              className="text-xs font-medium text-gray-500 hover:text-gray-700"
+              onClick={handleReset}
+              className="text-xs font-semibold text-gray-500 hover:text-gray-700 underline"
             >
               Reset Filters
             </button>
           </div>
         </div>
 
-        {/* Results Section */}
+        {/* Standardized Page Rendering Lifecycle: Loading -> Error -> Empty -> Success */}
         {isLoading && <LoadingState message="Searching for fitness trainers..." count={4} />}
-        {isError && <ErrorState message={(error as any)?.message || 'Failed to fetch trainers list'} onRetry={refetch} />}
+        {isError && <ErrorState error={error} onRetry={refetch} />}
 
         {data && (
           <>
             <div className="flex items-center justify-between mb-4">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Showing {data.data.length} of {data.total} Trainers
+                Showing {data.data.length} of {data.total} Trainers Found
               </p>
             </div>
 
             {data.data.length === 0 ? (
               <EmptyState
-                title="No Trainers Found"
-                description="Try relaxing your search terms or filter preferences."
+                title="No trainers match your filters"
+                description="Try broadening your search keywords or resetting your specialization filters."
                 action={
                   <button
-                    onClick={resetSearchFilters}
+                    onClick={handleReset}
                     className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md"
                   >
-                    Clear Search Filters
+                    Reset Search Filters
                   </button>
                 }
               />
@@ -189,7 +262,7 @@ export default function PublicTrainersSearchPage() {
                         {trainer.certifications.length} Verified Certifications
                       </span>
                       <Link
-                        href={`/trainers/${trainer.userId}`}
+                        href={ROUTES.PUBLIC_TRAINER_DETAILS(trainer.userId)}
                         className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md"
                       >
                         View Full Profile
@@ -205,7 +278,7 @@ export default function PublicTrainersSearchPage() {
               <div className="flex items-center justify-center gap-3 pt-6 border-t border-gray-200">
                 <button
                   disabled={data.page <= 1}
-                  onClick={() => setSearchFilters({ page: data.page - 1 })}
+                  onClick={() => updateFilters({ page: data.page - 1 })}
                   className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
                 >
                   Previous
@@ -215,7 +288,7 @@ export default function PublicTrainersSearchPage() {
                 </span>
                 <button
                   disabled={data.page >= data.totalPages}
-                  onClick={() => setSearchFilters({ page: data.page + 1 })}
+                  onClick={() => updateFilters({ page: data.page + 1 })}
                   className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
                 >
                   Next

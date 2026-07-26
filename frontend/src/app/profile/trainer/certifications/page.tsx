@@ -2,6 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { AuthGuard } from '@/shared/components/guards/AuthGuard';
+import { RoleGuard } from '@/shared/components/guards/RoleGuard';
+import { Permission } from '@/shared/components/navigation/permissions';
+import { ROUTES } from '@/shared/constants/routes';
 import { useGetTrainerProfile } from '@/modules/profile/presentation/hooks/useTrainerProfile';
 import {
   useAddCertification,
@@ -14,12 +18,12 @@ import { SectionCard } from '@/modules/profile/presentation/components/SectionCa
 import { CertificationCard } from '@/modules/profile/presentation/components/CertificationCard';
 import { CertificationForm } from '@/modules/profile/presentation/components/CertificationForm';
 import { ConfirmationModal } from '@/modules/profile/presentation/components/ConfirmationModal';
-import { LoadingState } from '@/modules/profile/presentation/components/LoadingState';
-import { ErrorState } from '@/modules/profile/presentation/components/ErrorState';
-import { EmptyState } from '@/modules/profile/presentation/components/EmptyState';
+import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { ErrorState } from '@/shared/components/feedback/ErrorState';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { TrainerCertification } from '@/modules/profile/domain/types/profile.types';
 
-export default function TrainerCertificationsPage() {
+function TrainerCertificationsContent() {
   const { data: profile, isLoading, isError, error, refetch } = useGetTrainerProfile();
   const addMutation = useAddCertification();
   const updateMutation = useUpdateCertification();
@@ -62,7 +66,7 @@ export default function TrainerCertificationsPage() {
         action={
           <div className="flex items-center gap-3">
             <Link
-              href="/profile/trainer"
+              href={ROUTES.TRAINER_PROFILE}
               className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
             >
               ← Back to Profile
@@ -79,7 +83,7 @@ export default function TrainerCertificationsPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {isLoading && <LoadingState message="Loading certifications..." />}
-        {isError && <ErrorState message={(error as any)?.message || 'Failed to load certifications'} onRetry={refetch} />}
+        {isError && <ErrorState error={error} onRetry={refetch} />}
 
         {profile && (
           <SectionCard title="Your Certifications" subtitle="Approved certifications display a green status badge on your public profile">
@@ -140,5 +144,15 @@ export default function TrainerCertificationsPage() {
         isLoading={deleteMutation.isPending}
       />
     </div>
+  );
+}
+
+export default function TrainerCertificationsPage() {
+  return (
+    <AuthGuard>
+      <RoleGuard permission={Permission.TRAINER_CERTIFICATIONS}>
+        <TrainerCertificationsContent />
+      </RoleGuard>
+    </AuthGuard>
   );
 }

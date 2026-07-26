@@ -2,17 +2,22 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { AuthGuard } from '@/shared/components/guards/AuthGuard';
+import { RoleGuard } from '@/shared/components/guards/RoleGuard';
+import { Permission } from '@/shared/components/navigation/permissions';
+import { ROUTES } from '@/shared/constants/routes';
 import { useGetClientProfile, useUploadClientAvatar, useDeleteClientAvatar } from '@/modules/profile/presentation/hooks/useClientProfile';
 import { PageHeader } from '@/modules/profile/presentation/components/PageHeader';
 import { SectionCard } from '@/modules/profile/presentation/components/SectionCard';
 import { InfoCard } from '@/modules/profile/presentation/components/InfoCard';
 import { AvatarUploader } from '@/modules/profile/presentation/components/AvatarUploader';
 import { ProfileCompletionCard } from '@/modules/profile/presentation/components/ProfileCompletionCard';
-import { LoadingState } from '@/modules/profile/presentation/components/LoadingState';
-import { ErrorState } from '@/modules/profile/presentation/components/ErrorState';
-import { EmptyState } from '@/modules/profile/presentation/components/EmptyState';
+import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { ErrorState } from '@/shared/components/feedback/ErrorState';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
+import { mapApiError } from '@/shared/utils/errorMapper';
 
-export default function ClientProfilePage() {
+function ClientProfileContent() {
   const { data: profile, isLoading, isError, error, refetch } = useGetClientProfile();
   const uploadAvatarMutation = useUploadClientAvatar();
   const deleteAvatarMutation = useDeleteClientAvatar();
@@ -28,24 +33,37 @@ export default function ClientProfilePage() {
     );
   }
 
+  // Differentiate 404 (Not Created) from 500/Connection Error
   if (isError) {
+    const mapped = mapApiError(error);
+
+    if (mapped.isNotFound) {
+      return (
+        <div className="min-h-screen bg-gray-50 pb-12">
+          <PageHeader title="Client Profile" role="CLIENT" />
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <EmptyState
+              title="You haven't created your client profile yet"
+              description="Set up your physical details, health metrics, and fitness preferences to get matched with coaches."
+              action={
+                <Link
+                  href={ROUTES.CLIENT_PROFILE_CREATE}
+                  className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+                >
+                  Create Client Profile
+                </Link>
+              }
+            />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-gray-50 pb-12">
         <PageHeader title="Client Profile" role="CLIENT" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <ErrorState
-            title="Profile Not Found"
-            message={(error as any)?.message || 'Client profile does not exist yet.'}
-            onRetry={refetch}
-          />
-          <div className="text-center mt-4">
-            <Link
-              href="/profile/client/create"
-              className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-            >
-              Create Client Profile
-            </Link>
-          </div>
+          <ErrorState error={error} onRetry={refetch} />
         </div>
       </div>
     );
@@ -57,14 +75,14 @@ export default function ClientProfilePage() {
         <PageHeader title="Client Profile" role="CLIENT" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <EmptyState
-            title="No Client Profile Created"
-            description="You have not set up your client profile yet."
+            title="You haven't created your client profile yet"
+            description="Set up your client details to unlock fitness features."
             action={
               <Link
-                href="/profile/client/create"
+                href={ROUTES.CLIENT_PROFILE_CREATE}
                 className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md"
               >
-                Create Profile Now
+                Create Client Profile
               </Link>
             }
           />
@@ -81,7 +99,7 @@ export default function ClientProfilePage() {
         role="CLIENT"
         action={
           <Link
-            href="/profile/client/edit"
+            href={ROUTES.CLIENT_PROFILE_EDIT}
             className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md"
           >
             Edit Profile
@@ -173,5 +191,15 @@ export default function ClientProfilePage() {
         </SectionCard>
       </div>
     </div>
+  );
+}
+
+export default function ClientProfilePage() {
+  return (
+    <AuthGuard>
+      <RoleGuard permission={Permission.CLIENT_PROFILE}>
+        <ClientProfileContent />
+      </RoleGuard>
+    </AuthGuard>
   );
 }

@@ -2,14 +2,18 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { AuthGuard } from '@/shared/components/guards/AuthGuard';
+import { RoleGuard } from '@/shared/components/guards/RoleGuard';
+import { Permission } from '@/shared/components/navigation/permissions';
+import { ROUTES } from '@/shared/constants/routes';
 import { useGetTrainerAvailability, useUpdateTrainerAvailability } from '@/modules/profile/presentation/hooks/useTrainerAvailability';
 import { PageHeader } from '@/modules/profile/presentation/components/PageHeader';
 import { SectionCard } from '@/modules/profile/presentation/components/SectionCard';
 import { AvailabilityEditor } from '@/modules/profile/presentation/components/AvailabilityEditor';
-import { LoadingState } from '@/modules/profile/presentation/components/LoadingState';
-import { ErrorState } from '@/modules/profile/presentation/components/ErrorState';
+import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { ErrorState } from '@/shared/components/feedback/ErrorState';
 
-export default function TrainerAvailabilityPage() {
+function TrainerAvailabilityContent() {
   const { data: availability, isLoading, isError, error, refetch } = useGetTrainerAvailability();
   const updateMutation = useUpdateTrainerAvailability();
 
@@ -21,7 +25,7 @@ export default function TrainerAvailabilityPage() {
         role="TRAINER"
         action={
           <Link
-            href="/profile/trainer"
+            href={ROUTES.TRAINER_PROFILE}
             className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
           >
             ← Back to Profile
@@ -31,7 +35,7 @@ export default function TrainerAvailabilityPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {isLoading && <LoadingState message="Loading availability schedule..." />}
-        {isError && <ErrorState message={(error as any)?.message || 'Failed to load availability'} onRetry={refetch} />}
+        {isError && <ErrorState error={error} onRetry={refetch} />}
         {availability && (
           <SectionCard title="Weekly Recurring Schedule">
             <AvailabilityEditor
@@ -45,5 +49,15 @@ export default function TrainerAvailabilityPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function TrainerAvailabilityPage() {
+  return (
+    <AuthGuard>
+      <RoleGuard permission={Permission.TRAINER_AVAILABILITY}>
+        <TrainerAvailabilityContent />
+      </RoleGuard>
+    </AuthGuard>
   );
 }

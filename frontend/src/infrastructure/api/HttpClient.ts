@@ -99,7 +99,8 @@ class HttpClient {
               
               // Only redirect if we are in the browser
               if (typeof window !== 'undefined') {
-                window.location.href = '/login';
+                const currentPath = window.location.pathname;
+                window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
               }
               return Promise.reject(apiError);
             }

@@ -2,6 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { AuthGuard } from '@/shared/components/guards/AuthGuard';
+import { RoleGuard } from '@/shared/components/guards/RoleGuard';
+import { Permission } from '@/shared/components/navigation/permissions';
+import { ROUTES } from '@/shared/constants/routes';
 import { useGetTrainerProfile } from '@/modules/profile/presentation/hooks/useTrainerProfile';
 import {
   useAddShowcaseItem,
@@ -14,12 +18,12 @@ import { SectionCard } from '@/modules/profile/presentation/components/SectionCa
 import { ShowcaseCard } from '@/modules/profile/presentation/components/ShowcaseCard';
 import { ShowcaseForm } from '@/modules/profile/presentation/components/ShowcaseForm';
 import { ConfirmationModal } from '@/modules/profile/presentation/components/ConfirmationModal';
-import { LoadingState } from '@/modules/profile/presentation/components/LoadingState';
-import { ErrorState } from '@/modules/profile/presentation/components/ErrorState';
-import { EmptyState } from '@/modules/profile/presentation/components/EmptyState';
+import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { ErrorState } from '@/shared/components/feedback/ErrorState';
+import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { TrainerShowcase } from '@/modules/profile/domain/types/profile.types';
 
-export default function TrainerShowcasePage() {
+function TrainerShowcaseContent() {
   const { data: profile, isLoading, isError, error, refetch } = useGetTrainerProfile();
   const addMutation = useAddShowcaseItem();
   const updateMutation = useUpdateShowcaseItem();
@@ -62,7 +66,7 @@ export default function TrainerShowcasePage() {
         action={
           <div className="flex items-center gap-3">
             <Link
-              href="/profile/trainer"
+              href={ROUTES.TRAINER_PROFILE}
               className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
             >
               ← Back to Profile
@@ -79,7 +83,7 @@ export default function TrainerShowcasePage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {isLoading && <LoadingState message="Loading showcase items..." />}
-        {isError && <ErrorState message={(error as any)?.message || 'Failed to load showcase items'} onRetry={refetch} />}
+        {isError && <ErrorState error={error} onRetry={refetch} />}
 
         {profile && (
           <SectionCard title="Showcase Portfolio" subtitle="Showcase items are displayed prominently on your public profile">
@@ -140,5 +144,15 @@ export default function TrainerShowcasePage() {
         isLoading={deleteMutation.isPending}
       />
     </div>
+  );
+}
+
+export default function TrainerShowcasePage() {
+  return (
+    <AuthGuard>
+      <RoleGuard permission={Permission.TRAINER_SHOWCASE}>
+        <TrainerShowcaseContent />
+      </RoleGuard>
+    </AuthGuard>
   );
 }

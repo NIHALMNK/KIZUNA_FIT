@@ -1,3 +1,4 @@
+import { PipelineStage } from 'mongoose';
 import { ITrainerProfileRepository } from '../../domain/repositories/ITrainerProfileRepository';
 import { TrainerProfile } from '../../domain/aggregates/TrainerProfile';
 import { SearchTrainerQuery } from '../../application/dto/public/search-trainer.query';
@@ -31,32 +32,40 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
     }).exec();
   }
 
+  public async delete(id: string): Promise<void> {
+    await TrainerProfileModel.findByIdAndDelete(id).exec();
+  }
+
   public async searchTrainers(
     query: SearchTrainerQuery,
   ): Promise<{ profiles: TrainerProfile[]; total: number }> {
-    const filter: Record<string, unknown> = {
+    const matchStage: Record<string, unknown> = {
       profileCompleted: true,
     };
 
-    if (query.search && query.search.trim()) {
-      const searchRegex = new RegExp(query.search.trim(), 'i');
-      filter.$or = [{ headline: searchRegex }, { bio: searchRegex }];
-    }
-
     if (query.specialization) {
-      filter.specializations = query.specialization;
+      matchStage.specializations = query.specialization;
     }
 
     if (query.availability) {
-      filter['availability.status'] = query.availability;
+      matchStage['availability.status'] = query.availability;
     }
 
     if (query.minRating !== undefined && query.minRating > 0) {
-      filter.averageRating = { $gte: query.minRating };
+      matchStage.averageRating = { $gte: query.minRating };
     }
 
     if (query.verifiedOnly) {
-      filter['certifications.status'] = 'APPROVED';
+      matchStage['certifications.status'] = 'APPROVED';
+    }
+
+    if (query.search && query.search.trim()) {
+      const searchRegex = new RegExp(query.search.trim(), 'i');
+      matchStage.$or = [
+        { 'user.fullName': searchRegex },
+        { headline: searchRegex },
+        { bio: searchRegex },
+      ];
     }
 
     const sortOptions: Record<string, 1 | -1> = {};
@@ -72,17 +81,59 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
 
     const skip = (query.page - 1) * query.limit;
 
-    const [docs, total] = await Promise.all([
-      TrainerProfileModel.find(filter).sort(sortOptions).skip(skip).limit(query.limit).exec(),
-      TrainerProfileModel.countDocuments(filter).exec(),
+    const pipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'users',
+          let: { trainerUserId: '$userId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ['$_id', '$$trainerUserId'] },
+                    { $eq: [{ $toString: '$_id' }, '$$trainerUserId'] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'user',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: matchStage,
+      },
+    ];
+
+    const countPipeline: PipelineStage[] = [...pipeline, { $count: 'total' }];
+    const dataPipeline: PipelineStage[] = [
+      ...pipeline,
+      { $sort: sortOptions },
+      { $skip: skip },
+      { $limit: query.limit },
+    ];
+
+    const [dataResult, countResult] = await Promise.all([
+      TrainerProfileModel.aggregate(dataPipeline).exec(),
+      TrainerProfileModel.aggregate(countPipeline).exec(),
     ]);
 
-    const profiles = docs.map((d) => TrainerProfilePersistenceMapper.toDomain(d));
+    const total = countResult.length > 0 ? (countResult[0] as { total: number }).total : 0;
+    const profiles = dataResult.map((doc) => {
+      const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
+      if (doc.user && doc.user.fullName) {
+        (domainProfile as unknown as Record<string, unknown>).fullName = doc.user.fullName;
+      }
+      return domainProfile;
+    });
 
     return { profiles, total };
-  }
-
-  public async delete(id: string): Promise<void> {
-    await TrainerProfileModel.findByIdAndDelete(id).exec();
   }
 }

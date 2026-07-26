@@ -59,6 +59,7 @@ export class TrainerProfileMapper {
     return {
       id: profile.id,
       userId: profile.userId,
+      fullName: (profile as any).fullName || null,
       headline: profile.headline,
       bio: profile.bio,
       avatarUrl: profile.avatarUrl || null,

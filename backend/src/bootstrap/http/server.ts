@@ -1,6 +1,7 @@
 import { createApp } from './app';
 import { configureContainer } from '../dependency-injection/container';
 import { registerIdentityModule } from '../../modules/identity/module';
+import { registerProfileModule } from '../../modules/profile/module';
 import { env } from '../../config/env.config';
 import http from 'http';
 import { ILogger } from '../../shared/contracts/ILogger';
@@ -25,13 +26,16 @@ async function bootstrap() {
   registerIdentityModule(container);
   logger.info('✅ Identity Module Registered');
 
+  registerProfileModule(container);
+  logger.info('✅ Profile Module Registered');
+
   // Resolve managers
   const dbManager = container.resolve<DatabaseManager>('dbManager');
   const redisManager = container.resolve<RedisManager>('redisManager');
   const jobManager = container.resolve<BackgroundJobManager>('jobManager');
   const socketIOManager = container.resolve<SocketIOManager>('socketIOManager');
   const webRTCSignaling = container.resolve<WebRTCSignaling>('webRTCSignaling');
-  
+
   // Resolve providers that don't need to be kept around
   container.resolve<CloudinaryProvider>('cloudinaryProvider');
   container.resolve<MockEmailProvider>('emailProvider');
@@ -81,7 +85,7 @@ async function bootstrap() {
     // 15. Register Graceful Shutdown
     const shutdown = async (signal: string) => {
       logger.info(`🛑 Received ${signal}. Shutting down gracefully...`);
-      
+
       const timeout = setTimeout(() => {
         logger.error('❌ Graceful shutdown exceeded 30s timeout. Forcing termination.');
         process.exit(1);
@@ -124,7 +128,6 @@ async function bootstrap() {
 
     process.on('SIGINT', () => shutdown('SIGINT'));
     process.on('SIGTERM', () => shutdown('SIGTERM'));
-
   } catch (error) {
     logger.error('❌ Fatal bootstrap error, terminating application', { error });
     process.exit(1);

@@ -7,6 +7,8 @@ import { errorHandler } from '../../shared/infrastructure/http/middleware/errorH
 import { AwilixContainer } from 'awilix';
 import { env } from '../../config/env.config';
 import { identityRouter } from '../../modules/identity/presentation/routes/identity.routes';
+import { clientProfileRouter } from '../../modules/profile/presentation/routes/clientProfile.routes';
+import { trainerProfileRouter } from '../../modules/profile/presentation/routes/trainerProfile.routes';
 
 export function createApp(container: AwilixContainer): express.Application {
   const app = express();
@@ -18,13 +20,15 @@ export function createApp(container: AwilixContainer): express.Application {
   });
 
   app.use(helmet());
-  app.use(cors({
-    origin: env.CORS_ORIGIN,
-    credentials: true,
-  }));
+  app.use(
+    cors({
+      origin: env.CORS_ORIGIN,
+      credentials: true,
+    }),
+  );
   app.use(express.json());
   app.use(cookieParser());
-  
+
   app.get('/api/v1/health', (req, res) => {
     const dbManager = req.scope.resolve('dbManager');
     const redisManager = req.scope.resolve('redisManager');
@@ -38,12 +42,14 @@ export function createApp(container: AwilixContainer): express.Application {
       bullmq: jobManager.getStatus(),
       socketio: socketIOManager.getStatus(),
       uptime: process.uptime(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 
   // Mount routers
   app.use('/api/v1/identity', identityRouter());
+  app.use('/api/v1/client-profiles', clientProfileRouter());
+  app.use('/api/v1/trainer-profiles', trainerProfileRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

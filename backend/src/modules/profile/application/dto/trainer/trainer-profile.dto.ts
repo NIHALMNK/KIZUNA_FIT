@@ -88,6 +88,7 @@ export interface PublicTrainerProfileResponseDTO {
   id: string;
   userId: string;
   fullName?: string | null;
+  trainerName?: string | null;
   headline: string;
   bio: string;
   avatarUrl?: string | null;

@@ -185,6 +185,9 @@ export interface UpdateTrainerProfileDTO {
 export interface PublicTrainerProfile {
   id: string;
   userId: string;
+  trainerName?: string | null;
+  name?: string;
+  fullName?: string;
   headline: string;
   bio: string;
   avatarUrl?: string | null;

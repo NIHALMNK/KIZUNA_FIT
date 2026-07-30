@@ -4,18 +4,33 @@ import { TrainerProfile } from '../../domain/aggregates/TrainerProfile';
 import { SearchTrainerQuery } from '../../application/dto/public/search-trainer.query';
 import { TrainerProfileModel } from '../persistence/mongoose/models/TrainerProfileModel';
 import { TrainerProfilePersistenceMapper } from '../persistence/mongoose/mappers/TrainerProfilePersistenceMapper';
+import { UserModel } from '../../../identity/infrastructure/persistence/mongoose/models/UserModel';
 
 export class MongoTrainerProfileRepository implements ITrainerProfileRepository {
   public async findById(id: string): Promise<TrainerProfile | null> {
     const doc = await TrainerProfileModel.findById(id).exec();
     if (!doc) return null;
-    return TrainerProfilePersistenceMapper.toDomain(doc);
+    const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
+    if (doc.userId) {
+      const userDoc = await UserModel.findById(doc.userId).exec();
+      if (userDoc && (userDoc as any).fullName) {
+        (domainProfile as any).fullName = (userDoc as any).fullName;
+        (domainProfile as any).trainerName = (userDoc as any).fullName;
+      }
+    }
+    return domainProfile;
   }
 
   public async findByUserId(userId: string): Promise<TrainerProfile | null> {
     const doc = await TrainerProfileModel.findOne({ userId }).exec();
     if (!doc) return null;
-    return TrainerProfilePersistenceMapper.toDomain(doc);
+    const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
+    const userDoc = await UserModel.findById(userId).exec();
+    if (userDoc && (userDoc as any).fullName) {
+      (domainProfile as any).fullName = (userDoc as any).fullName;
+      (domainProfile as any).trainerName = (userDoc as any).fullName;
+    }
+    return domainProfile;
   }
 
   public async existsByUserId(userId: string): Promise<boolean> {
@@ -130,6 +145,7 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
       const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
       if (doc.user && doc.user.fullName) {
         (domainProfile as unknown as Record<string, unknown>).fullName = doc.user.fullName;
+        (domainProfile as unknown as Record<string, unknown>).trainerName = doc.user.fullName;
       }
       return domainProfile;
     });

@@ -1,18 +1,15 @@
 import React, { Suspense } from 'react';
 import { ResetPasswordForm } from '../../../modules/identity/presentation/components/ResetPasswordForm';
-import { Card } from '../../../shared/components/ui/Card';
-import { Spinner } from '../../../shared/components/ui/Spinner';
+
+export const metadata = {
+  title: 'Reset Password | KIZUNAFIT',
+  description: 'Update your KIZUNAFIT account password.',
+};
 
 export default function ResetPasswordPage() {
   return (
-    <Card className="p-8 shadow-lg rounded-xl">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold">Set New Password</h1>
-        <p className="text-gray-500 mt-2 text-sm">Please choose a secure new password</p>
-      </div>
-      <Suspense fallback={<div className="flex justify-center"><Spinner /></div>}>
-        <ResetPasswordForm />
-      </Suspense>
-    </Card>
+    <Suspense fallback={<div className="text-center text-slate-400 p-8">Loading password reset...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

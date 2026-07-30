@@ -1,0 +1,75 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - TYPOGRAPHY TOKENS
+ * ==============================================================================
+ * Defines standard font scales, weights, sizes, line heights, and letter spacings.
+ * ==============================================================================
+ */
+
+:root {
+  /* --- Font Families --- */
+  --font-family-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+  /* --- Font Weights --- */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* --- Font Sizes --- */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-5xl: 3rem;      /* 48px */
+
+  /* --- Line Heights --- */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* --- Letter Spacing --- */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+
+  /* --- Heading Scale Token Composites --- */
+  --heading-h1-size: var(--font-size-4xl);
+  --heading-h1-weight: var(--font-weight-extrabold);
+  --heading-h1-leading: var(--line-height-tight);
+
+  --heading-h2-size: var(--font-size-3xl);
+  --heading-h2-weight: var(--font-weight-bold);
+  --heading-h2-leading: var(--line-height-tight);
+
+  --heading-h3-size: var(--font-size-2xl);
+  --heading-h3-weight: var(--font-weight-bold);
+  --heading-h3-leading: var(--line-height-snug);
+
+  --heading-h4-size: var(--font-size-xl);
+  --heading-h4-weight: var(--font-weight-semibold);
+  --heading-h4-leading: var(--line-height-snug);
+
+  /* --- Body & Caption Scale Tokens --- */
+  --body-lg-size: var(--font-size-lg);
+  --body-lg-leading: var(--line-height-relaxed);
+
+  --body-base-size: var(--font-size-base);
+  --body-base-leading: var(--line-height-normal);
+
+  --body-sm-size: var(--font-size-sm);
+  --body-sm-leading: var(--line-height-normal);
+
+  --caption-size: var(--font-size-xs);
+  --caption-leading: var(--line-height-normal);
+}

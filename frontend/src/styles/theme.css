@@ -1,0 +1,9 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT GLOBAL DESIGN TOKENS & COLOR SYSTEM ENTRY POINT
+ * ==============================================================================
+ * Central entry point importing the modular enterprise token architecture.
+ * ==============================================================================
+ */
+
+@import './tokens/tokens.css';

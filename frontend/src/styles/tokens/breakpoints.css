@@ -1,0 +1,25 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - BREAKPOINTS & CONTAINER TOKENS
+ * ==============================================================================
+ * Responsive media query reference values and max-width layout containers.
+ * ==============================================================================
+ */
+
+:root {
+  /* --- Breakpoint Reference Values --- */
+  --breakpoint-mobile: 320px;
+  --breakpoint-tablet: 640px;
+  --breakpoint-laptop: 1024px;
+  --breakpoint-desktop: 1280px;
+  --breakpoint-wide: 1536px;
+  --breakpoint-ultrawide: 1920px;
+
+  /* --- Container Max-Width Bounds --- */
+  --container-form: 480px;         /* Login, Register, Password Reset forms */
+  --container-modal: 560px;        /* Confirmation & Form Modals */
+  --container-drawer: 420px;       /* Slide-over Drawers */
+  --container-content: 896px;      /* Standard readable article / text content */
+  --container-dashboard: 1280px;    /* Workspace Dashboard Grid */
+  --container-marketing: 1440px;    /* Landing Page Hero Container */
+}

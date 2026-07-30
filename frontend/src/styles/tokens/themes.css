@@ -1,0 +1,171 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - ROLE THEMES & DARK MODE OVERRIDES
+ * ==============================================================================
+ * Scoped workspace theme classes that override semantic tokens ONLY.
+ * Never override primitive scales.
+ * ==============================================================================
+ */
+
+/* --- Public Experience Theme --- */
+.theme-public {
+  --color-primary: var(--primitive-blue-600);
+  --color-primary-hover: var(--primitive-blue-700);
+  --color-primary-active: var(--primitive-blue-800);
+
+  --color-secondary: var(--primitive-blue-50);
+  --color-secondary-hover: var(--primitive-blue-100);
+  --color-accent: var(--primitive-indigo-600);
+
+  --color-background: #ffffff;
+  --color-surface: var(--primitive-slate-50);
+  --color-surface-alt: var(--primitive-blue-50);
+  --color-card: #ffffff;
+  --color-card-hover: var(--primitive-slate-50);
+
+  --color-navbar: #ffffff;
+  --color-footer: var(--primitive-slate-900);
+  --gradient-primary: linear-gradient(135deg, var(--primitive-blue-600) 0%, var(--primitive-indigo-600) 100%);
+}
+
+/* --- Client Workspace Theme (Progress, Wellness, Clarity, Motivation, Trust) --- */
+.theme-client {
+  --color-primary: var(--primitive-cyan-600);
+  --color-primary-hover: var(--primitive-cyan-700);
+  --color-primary-active: var(--primitive-cyan-800);
+
+  --color-secondary: var(--primitive-cyan-50);
+  --color-secondary-hover: var(--primitive-cyan-100);
+  --color-accent: var(--primitive-emerald-600);
+
+  --color-background: var(--primitive-slate-50);
+  --color-surface: #ffffff;
+  --color-surface-alt: var(--primitive-cyan-50);
+  --color-card: #ffffff;
+  --color-card-hover: var(--primitive-cyan-50);
+
+  --color-heading: var(--primitive-cyan-950);
+  --color-link: var(--primitive-cyan-600);
+  --color-link-hover: var(--primitive-cyan-700);
+
+  --color-button-primary: var(--primitive-cyan-600);
+  --color-button-primary-hover: var(--primitive-cyan-700);
+  --color-tag: var(--primitive-cyan-100);
+  --color-tag-text: var(--primitive-cyan-900);
+
+  --gradient-primary: linear-gradient(135deg, var(--primitive-cyan-600) 0%, var(--primitive-emerald-600) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--primitive-cyan-50) 0%, var(--primitive-emerald-50) 100%);
+}
+
+/* --- Trainer Workspace Theme (Professionalism, Authority, Performance, Business) --- */
+.theme-trainer {
+  --color-primary: var(--primitive-emerald-600);
+  --color-primary-hover: var(--primitive-emerald-700);
+  --color-primary-active: var(--primitive-emerald-800);
+
+  --color-secondary: var(--primitive-emerald-50);
+  --color-secondary-hover: var(--primitive-emerald-100);
+  --color-accent: var(--primitive-amber-500);
+
+  --color-background: var(--primitive-stone-50);
+  --color-surface: #ffffff;
+  --color-surface-alt: var(--primitive-emerald-50);
+  --color-card: #ffffff;
+  --color-card-hover: var(--primitive-emerald-50);
+
+  --color-heading: var(--primitive-emerald-950);
+  --color-link: var(--primitive-emerald-600);
+  --color-link-hover: var(--primitive-emerald-700);
+
+  --color-button-primary: var(--primitive-emerald-600);
+  --color-button-primary-hover: var(--primitive-emerald-700);
+  --color-tag: var(--primitive-emerald-100);
+  --color-tag-text: var(--primitive-emerald-900);
+
+  --gradient-primary: linear-gradient(135deg, var(--primitive-emerald-600) 0%, var(--primitive-blue-600) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--primitive-emerald-50) 0%, var(--primitive-blue-50) 100%);
+}
+
+/* --- Admin Workspace Theme (Governance, Control, Auditing, Security) --- */
+.theme-admin {
+  --color-primary: var(--primitive-indigo-600);
+  --color-primary-hover: var(--primitive-indigo-700);
+  --color-primary-active: var(--primitive-indigo-800);
+
+  --color-secondary: var(--primitive-indigo-50);
+  --color-secondary-hover: var(--primitive-indigo-100);
+  --color-accent: var(--primitive-rose-500);
+
+  --color-background: var(--primitive-slate-100);
+  --color-surface: #ffffff;
+  --color-surface-alt: var(--primitive-indigo-50);
+  --color-card: #ffffff;
+  --color-card-hover: var(--primitive-indigo-50);
+
+  --color-heading: var(--primitive-indigo-950);
+  --color-link: var(--primitive-indigo-600);
+  --color-link-hover: var(--primitive-indigo-700);
+
+  --color-button-primary: var(--primitive-indigo-600);
+  --color-button-primary-hover: var(--primitive-indigo-700);
+  --color-tag: var(--primitive-indigo-100);
+  --color-tag-text: var(--primitive-indigo-900);
+
+  --gradient-primary: linear-gradient(135deg, var(--primitive-indigo-600) 0%, var(--primitive-rose-600) 100%);
+}
+
+/* --- Calibrated Dark Mode Overrides (.dark) --- */
+.dark {
+  --color-background: var(--primitive-slate-900);
+  --color-surface: var(--primitive-slate-950);
+  --color-surface-alt: var(--primitive-slate-800);
+  --color-card: var(--primitive-slate-900);
+  --color-card-hover: var(--primitive-slate-800);
+
+  --color-border: var(--primitive-slate-800);
+  --color-border-strong: var(--primitive-slate-700);
+
+  --color-text-primary: var(--primitive-slate-100);
+  --color-text-secondary: var(--primitive-slate-300);
+  --color-text-muted: var(--primitive-slate-400);
+  --color-heading: #ffffff;
+
+  --color-navbar: var(--primitive-slate-900);
+  --color-sidebar: var(--primitive-slate-950);
+  --color-footer: var(--primitive-slate-950);
+
+  --color-input: var(--primitive-slate-800);
+  --color-overlay: rgba(0, 0, 0, 0.8);
+  --color-backdrop: rgba(2, 6, 23, 0.9);
+
+  --color-tag: var(--primitive-slate-800);
+  --color-tag-text: var(--primitive-slate-200);
+  --color-chip: var(--primitive-slate-800);
+}
+
+.dark.theme-public {
+  --color-primary: var(--primitive-blue-500);
+  --color-primary-hover: var(--primitive-blue-400);
+  --color-secondary: var(--primitive-slate-800);
+}
+
+.dark.theme-client {
+  --color-primary: var(--primitive-cyan-400);
+  --color-primary-hover: var(--primitive-cyan-300);
+  --color-secondary: var(--primitive-slate-800);
+  --color-heading: var(--primitive-cyan-100);
+}
+
+.dark.theme-trainer {
+  --color-primary: var(--primitive-emerald-400);
+  --color-primary-hover: var(--primitive-emerald-300);
+  --color-secondary: var(--primitive-slate-800);
+  --color-heading: var(--primitive-emerald-100);
+}
+
+.dark.theme-admin {
+  --color-primary: var(--primitive-indigo-400);
+  --color-primary-hover: var(--primitive-indigo-300);
+  --color-secondary: var(--primitive-slate-800);
+  --color-heading: var(--primitive-indigo-100);
+}

@@ -1,0 +1,154 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - PRIMITIVE COLOR PALETTES
+ * ==============================================================================
+ * Immutable raw color scales (50 to 950).
+ * Primitive colors carry NO semantic or UI meaning and should NEVER be consumed
+ * directly by UI components. They are mapped into semantic tokens.
+ * ==============================================================================
+ */
+
+:root {
+  /* --- Slate (Neutral Dark / Slate Surfaces) --- */
+  --primitive-slate-50: #f8fafc;
+  --primitive-slate-100: #f1f5f9;
+  --primitive-slate-200: #e2e8f0;
+  --primitive-slate-300: #cbd5e1;
+  --primitive-slate-400: #94a3b8;
+  --primitive-slate-500: #64748b;
+  --primitive-slate-600: #475569;
+  --primitive-slate-700: #334155;
+  --primitive-slate-800: #1e293b;
+  --primitive-slate-900: #0f172a;
+  --primitive-slate-950: #020617;
+
+  /* --- Neutral (Pure Neutral Grays) --- */
+  --primitive-neutral-50: #fafafa;
+  --primitive-neutral-100: #f5f5f5;
+  --primitive-neutral-200: #e5e5e5;
+  --primitive-neutral-300: #d4d4d4;
+  --primitive-neutral-400: #a3a3a3;
+  --primitive-neutral-500: #737373;
+  --primitive-neutral-600: #525252;
+  --primitive-neutral-700: #404040;
+  --primitive-neutral-800: #262626;
+  --primitive-neutral-900: #171717;
+  --primitive-neutral-950: #0a0a0a;
+
+  /* --- Gray (Cool Grays) --- */
+  --primitive-gray-50: #f9fafb;
+  --primitive-gray-100: #f3f4f6;
+  --primitive-gray-200: #e5e7eb;
+  --primitive-gray-300: #d1d5db;
+  --primitive-gray-400: #9ca3af;
+  --primitive-gray-500: #6b7280;
+  --primitive-gray-600: #4b5563;
+  --primitive-gray-700: #374151;
+  --primitive-gray-800: #1f2937;
+  --primitive-gray-900: #111827;
+  --primitive-gray-950: #030712;
+
+  /* --- Stone (Warm Grays) --- */
+  --primitive-stone-50: #fafaf9;
+  --primitive-stone-100: #f5f5f4;
+  --primitive-stone-200: #e7e5e4;
+  --primitive-stone-300: #d6d3d1;
+  --primitive-stone-400: #a8a29e;
+  --primitive-stone-500: #78716c;
+  --primitive-stone-600: #57534e;
+  --primitive-stone-700: #44403c;
+  --primitive-stone-800: #292524;
+  --primitive-stone-900: #1c1917;
+  --primitive-stone-950: #0c0a09;
+
+  /* --- Blue (Public Brand & Primary Action) --- */
+  --primitive-blue-50: #eff6ff;
+  --primitive-blue-100: #dbeafe;
+  --primitive-blue-200: #bfdbfe;
+  --primitive-blue-300: #93c5fd;
+  --primitive-blue-400: #60a5fa;
+  --primitive-blue-500: #3b82f6;
+  --primitive-blue-600: #2563eb;
+  --primitive-blue-700: #1d4ed8;
+  --primitive-blue-800: #1e40af;
+  --primitive-blue-900: #1e3a8a;
+  --primitive-blue-950: #172554;
+
+  /* --- Cyan (Client Workspace - Progress & Motivation) --- */
+  --primitive-cyan-50: #ecfeff;
+  --primitive-cyan-100: #cffafe;
+  --primitive-cyan-200: #a5f3fc;
+  --primitive-cyan-300: #67e8f9;
+  --primitive-cyan-400: #22d3ee;
+  --primitive-cyan-500: #06b6d4;
+  --primitive-cyan-600: #0891b2;
+  --primitive-cyan-700: #0e7490;
+  --primitive-cyan-800: #155e75;
+  --primitive-cyan-900: #164e63;
+  --primitive-cyan-950: #083344;
+
+  /* --- Emerald (Trainer Workspace - Performance & Authority) --- */
+  --primitive-emerald-50: #ecfdf5;
+  --primitive-emerald-100: #d1fae5;
+  --primitive-emerald-200: #a7f3d0;
+  --primitive-emerald-300: #6ee7b7;
+  --primitive-emerald-400: #34d399;
+  --primitive-emerald-500: #10b981;
+  --primitive-emerald-600: #059669;
+  --primitive-emerald-700: #047857;
+  --primitive-emerald-800: #065f46;
+  --primitive-emerald-900: #064e3b;
+  --primitive-emerald-950: #022c22;
+
+  /* --- Indigo (Admin & System Oversight) --- */
+  --primitive-indigo-50: #eef2ff;
+  --primitive-indigo-100: #e0e7ff;
+  --primitive-indigo-200: #c7d2fe;
+  --primitive-indigo-300: #a5b4fc;
+  --primitive-indigo-400: #818cf8;
+  --primitive-indigo-500: #6366f1;
+  --primitive-indigo-600: #4f46e5;
+  --primitive-indigo-700: #4338ca;
+  --primitive-indigo-800: #3730a3;
+  --primitive-indigo-900: #312e81;
+  --primitive-indigo-950: #1e1b4b;
+
+  /* --- Amber (Warnings, Pending & Verification Gold) --- */
+  --primitive-amber-50: #fffbeb;
+  --primitive-amber-100: #fef3c7;
+  --primitive-amber-200: #fde68a;
+  --primitive-amber-300: #fcd34d;
+  --primitive-amber-400: #fbbf24;
+  --primitive-amber-500: #f59e0b;
+  --primitive-amber-600: #d97706;
+  --primitive-amber-700: #b45309;
+  --primitive-amber-800: #92400e;
+  --primitive-amber-900: #78350f;
+  --primitive-amber-950: #451a03;
+
+  /* --- Red (Errors, Danger & Rejections) --- */
+  --primitive-red-50: #fef2f2;
+  --primitive-red-100: #fee2e2;
+  --primitive-red-200: #fecaca;
+  --primitive-red-300: #fca5a5;
+  --primitive-red-400: #f87171;
+  --primitive-red-500: #ef4444;
+  --primitive-red-600: #dc2626;
+  --primitive-red-700: #b91c1c;
+  --primitive-red-800: #991b1b;
+  --primitive-red-900: #7f1d1d;
+  --primitive-red-950: #450a0a;
+
+  /* --- Rose (Notifications & Highlights) --- */
+  --primitive-rose-50: #fff1f2;
+  --primitive-rose-100: #ffe4e6;
+  --primitive-rose-200: #fecdd3;
+  --primitive-rose-300: #fda4af;
+  --primitive-rose-400: #fb7185;
+  --primitive-rose-500: #f43f5e;
+  --primitive-rose-600: #e11d48;
+  --primitive-rose-700: #be123c;
+  --primitive-rose-800: #9f1239;
+  --primitive-rose-900: #881337;
+  --primitive-rose-950: #4c0519;
+}

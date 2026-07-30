@@ -4,6 +4,7 @@ import '../styles/globals.css';
 import { siteConfig } from '../config/site.config';
 import { AppProvider } from '../shared/providers/AppProvider';
 import { Navbar } from '../shared/components/layout/Navbar';
+import { Footer } from '../shared/components/layout/Footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -26,12 +27,10 @@ export default function RootLayout({
         <AppProvider>
           <div className="flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 flex flex-col">
               {children}
             </main>
-            <footer className="border-t p-4 text-center text-sm text-gray-500">
-              © {new Date().getFullYear()} KIZUNAFIT. All rights reserved.
-            </footer>
+            <Footer />
           </div>
         </AppProvider>
       </body>

@@ -1,0 +1,76 @@
+/* KIZUNAFIT Public Marketing Theme Layer */
+
+.theme-public {
+  --color-public-bg: #020617;
+  --color-public-surface: rgba(15, 23, 42, 0.7);
+  --color-public-surface-hover: rgba(30, 41, 59, 0.8);
+  --color-public-border: rgba(51, 65, 85, 0.7);
+  --color-public-border-highlight: rgba(6, 182, 212, 0.3);
+  
+  --color-public-accent-cyan: #06b6d4;
+  --color-public-accent-blue: #2563eb;
+  --color-public-accent-teal: #14b8a6;
+  --color-public-accent-emerald: #10b981;
+  
+  --color-public-text-primary: #f8fafc;
+  --color-public-text-secondary: #94a3b8;
+  --color-public-text-muted: #64748b;
+  
+  --glass-blur-nav: blur(20px);
+  --glass-blur-card: blur(24px);
+  --glass-border: 1px solid rgba(51, 65, 85, 0.6);
+  --glass-shadow: 0 20px 50px -10px rgba(2, 6, 23, 0.8);
+}
+
+/* Floating Glass Navbar Utilities */
+.public-glass-nav {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: var(--glass-blur-nav);
+  -webkit-backdrop-filter: var(--glass-blur-nav);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.public-glass-nav-scrolled {
+  background: rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(51, 65, 85, 0.9);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
+}
+
+/* Primary Cyan-Blue Pill Button Gradient */
+.btn-public-primary {
+  background: linear-gradient(135deg, #06b6d4 0%, #0d9488 50%, #2563eb 100%);
+  color: #ffffff;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-public-primary:hover {
+  background: linear-gradient(135deg, #22d3ee 0%, #14b8a6 50%, #3b82f6 100%);
+  transform: translateY(-1.5px) scale(1.02);
+  box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.4);
+}
+
+.btn-public-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Secondary Glass Button */
+.btn-public-secondary {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  color: #f1f5f9;
+  backdrop-filter: blur(12px);
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-public-secondary:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(100, 116, 139, 0.9);
+  color: #ffffff;
+}
+
+.btn-public-secondary:active {
+  transform: scale(0.98);
+}

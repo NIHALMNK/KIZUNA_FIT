@@ -1,61 +1,57 @@
 import { cva } from 'class-variance-authority';
 
 /**
- * CVA Variant Engine for the 2026 World-Class SaaS Button Primitive.
- * Features refined tactile 60fps micro-interactions: 2px hover elevation, subtle scale, gentle press, and clean focus rings.
+ * CVA Variant Engine for KIZUNAFIT Reusable Button Primitive.
+ * Strictly uses semantic CSS token variables for multi-theme compatibility.
  */
 export const buttonVariants = cva(
   [
-    'relative inline-flex items-center justify-center font-bold text-sm tracking-wide select-none cursor-pointer overflow-hidden',
-    'transition-all duration-200 ease-out border border-transparent',
-    'rounded-[14px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
-    'disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none',
-    'active:translate-y-0.5 active:scale-[0.985]',
+    'relative inline-flex items-center justify-center font-medium text-sm tracking-wide select-none cursor-pointer overflow-hidden',
+    'transition-all duration-150 ease-in-out border border-transparent rounded-lg',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]',
+    'disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none',
+    'active:scale-[0.98]',
   ],
   {
     variants: {
       variant: {
         primary: [
-          'bg-gradient-to-r from-cyan-500 via-teal-500 to-blue-600 hover:from-cyan-400 hover:via-teal-400 hover:to-blue-500 text-white',
-          'shadow-md shadow-cyan-950/40 border border-white/15',
-          'hover:-translate-y-[2px] hover:scale-[1.008] hover:shadow-lg hover:shadow-cyan-950/60 hover:border-white/25',
+          'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white border-transparent',
+          'shadow-sm hover:shadow transition-colors',
         ],
         secondary: [
-          'bg-slate-900/90 hover:bg-slate-850 text-slate-100 border border-slate-700/80 hover:border-slate-600',
-          'shadow-sm hover:shadow-md hover:-translate-y-[2px] backdrop-blur-md',
+          'bg-[var(--color-surface-alt)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)] border border-[var(--color-border)]',
+          'shadow-sm transition-colors',
         ],
         outline: [
-          'border border-slate-800 bg-slate-950/50 hover:bg-slate-900 text-slate-200 hover:text-white hover:border-slate-700',
-          'backdrop-blur-md hover:-translate-y-[2px] shadow-sm',
+          'bg-transparent hover:bg-[var(--color-surface-alt)] text-[var(--color-text-primary)] border border-[var(--color-border)]',
+          'transition-colors',
         ],
         ghost: [
-          'bg-transparent hover:bg-slate-900/60 text-slate-300 hover:text-white border-transparent',
-          'hover:-translate-y-[2px]',
+          'bg-transparent hover:bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border-transparent',
+          'transition-colors',
         ],
         danger: [
-          'bg-gradient-to-r from-rose-600 via-red-600 to-pink-600 text-white',
-          'shadow-md shadow-rose-950/40 border border-white/15',
-          'hover:-translate-y-[2px] hover:scale-[1.008] hover:shadow-lg hover:border-white/25',
+          'bg-[var(--color-danger)] hover:opacity-90 text-white border-transparent',
+          'shadow-sm transition-colors',
         ],
         success: [
-          'bg-gradient-to-r from-emerald-500 via-teal-500 to-green-600 text-white',
-          'shadow-md shadow-emerald-950/40 border border-white/15',
-          'hover:-translate-y-[2px] hover:scale-[1.008] hover:shadow-lg hover:border-white/25',
+          'bg-[var(--color-success)] hover:opacity-90 text-white border-transparent',
+          'shadow-sm transition-colors',
         ],
         warning: [
-          'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 font-extrabold',
-          'shadow-md shadow-amber-950/40 border border-white/20',
-          'hover:-translate-y-[2px] hover:scale-[1.008] hover:shadow-lg',
+          'bg-[var(--color-warning)] hover:opacity-90 text-white border-transparent',
+          'shadow-sm transition-colors',
         ],
         icon: [
-          'bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white',
-          'aspect-square p-0 justify-center hover:-translate-y-[2px] shadow-sm',
+          'bg-[var(--color-surface)] hover:bg-[var(--color-surface-alt)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]',
+          'aspect-square p-0 justify-center transition-colors',
         ],
       },
       size: {
-        sm: 'h-10 px-4 text-xs gap-2',
-        md: 'h-12 px-6 text-sm gap-2.5',
-        lg: 'h-14 px-8 text-base gap-3 rounded-2xl',
+        sm: 'h-8 px-3 text-xs gap-1.5',
+        md: 'h-10 px-4 text-sm gap-2',
+        lg: 'h-12 px-6 text-base gap-2.5 rounded-xl',
       },
       fullWidth: {
         true: 'w-full',
@@ -66,17 +62,17 @@ export const buttonVariants = cva(
       {
         variant: 'icon',
         size: 'sm',
-        className: 'h-10 w-10 px-0',
+        className: 'h-8 w-8 px-0',
       },
       {
         variant: 'icon',
         size: 'md',
-        className: 'h-12 w-12 px-0',
+        className: 'h-10 w-10 px-0',
       },
       {
         variant: 'icon',
         size: 'lg',
-        className: 'h-14 w-14 px-0',
+        className: 'h-12 w-12 px-0',
       },
     ],
     defaultVariants: {
@@ -86,3 +82,4 @@ export const buttonVariants = cva(
     },
   }
 );
+

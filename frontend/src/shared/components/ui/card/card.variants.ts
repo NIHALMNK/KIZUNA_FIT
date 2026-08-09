@@ -1,44 +1,39 @@
 import { cva } from 'class-variance-authority';
 
 /**
- * CVA Variant Engine for the 2026 World-Class SaaS Card Container Primitive.
- * Features frosted glassmorphism, subtle top edge light beam, and realistic depth shadows.
+ * CVA Variant Engine for KIZUNAFIT Card Container Primitive.
+ * Uses semantic CSS tokens for multi-theme compatibility.
  */
 export const cardVariants = cva(
   [
-    'flex flex-col relative transition-all duration-300 ease-out',
-    'overflow-hidden backdrop-blur-2xl',
-    'before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-cyan-400/30 before:to-transparent before:z-20',
+    'flex flex-col relative transition-all duration-200 ease-in-out',
+    'overflow-hidden rounded-xl',
   ],
   {
     variants: {
       variant: {
         default: [
-          'bg-slate-900/70 text-slate-100 border border-slate-800/80',
-          'shadow-[0_20px_60px_-15px_rgba(2,6,23,0.9),0_0_1px_rgba(255,255,255,0.1)]',
-          'hover:border-slate-700/80',
+          'bg-[var(--color-card)] text-[var(--color-text-primary)] border border-[var(--color-border)]',
+          'shadow-sm hover:border-[var(--color-border-strong)]',
         ],
         outlined: [
-          'bg-slate-950/50 text-slate-100 border-2 border-slate-800',
-          'shadow-lg shadow-black/40',
+          'bg-[var(--color-card)] text-[var(--color-text-primary)] border-2 border-[var(--color-border-strong)]',
         ],
         filled: [
-          'bg-slate-900/90 text-slate-100 border border-slate-800/60',
-          'shadow-md',
+          'bg-[var(--color-surface-alt)] text-[var(--color-text-primary)] border border-[var(--color-border)]',
         ],
         elevated: [
-          'bg-slate-900/80 text-slate-100 border border-slate-700/60',
-          'shadow-[0_25px_70px_-10px_rgba(2,6,23,0.95)]',
-          'hover:-translate-y-[2px]',
+          'bg-[var(--color-card)] text-[var(--color-text-primary)] border border-[var(--color-border)]',
+          'shadow-md hover:-translate-y-0.5 hover:shadow-lg',
         ],
         ghost: [
-          'bg-transparent text-slate-100 border border-transparent',
+          'bg-transparent text-[var(--color-text-primary)] border border-transparent',
         ],
       },
       size: {
-        sm: 'rounded-xl p-4 text-xs gap-3',
-        md: 'rounded-2xl p-6 text-sm gap-4',
-        lg: 'rounded-2xl sm:rounded-3xl p-6 sm:p-10 text-base gap-6',
+        sm: 'p-3 text-xs gap-2 rounded-lg',
+        md: 'p-5 text-sm gap-3 rounded-xl',
+        lg: 'p-6 sm:p-8 text-base gap-4 rounded-2xl',
       },
     },
     defaultVariants: {
@@ -47,3 +42,4 @@ export const cardVariants = cva(
     },
   }
 );
+

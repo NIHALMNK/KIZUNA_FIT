@@ -1,33 +1,33 @@
 import { cva } from 'class-variance-authority';
 
 /**
- * CVA Variant Engine for the 2026 World-Class SaaS Input Primitive.
- * Features comfortable height scales (h-12), softer glass borders, and subtle cyan focus rings.
+ * CVA Variant Engine for KIZUNAFIT Input Primitive.
+ * Uses semantic CSS tokens for multi-theme compatibility.
  */
 export const inputContainerVariants = cva(
   [
-    'group relative flex items-center w-full transition-all duration-200 ease-out',
-    'rounded-[14px] focus-within:ring-2 focus-within:ring-cyan-500/20 focus-within:border-cyan-500/50 focus-within:shadow-sm',
-    'disabled:pointer-events-none disabled:opacity-40 select-none overflow-hidden',
+    'group relative flex items-center w-full transition-all duration-150 ease-in-out',
+    'rounded-lg focus-within:ring-2 focus-within:ring-[var(--color-ring)] focus-within:border-[var(--color-ring)]',
+    'disabled:pointer-events-none disabled:opacity-50 select-none overflow-hidden',
   ],
   {
     variants: {
       variant: {
-        default: 'border border-slate-800/80 bg-slate-950/60 backdrop-blur-xl hover:border-slate-700/80',
-        filled: 'border border-transparent bg-slate-900/90 hover:bg-slate-900 focus-within:bg-slate-950/80 focus-within:border-cyan-500/50',
-        outline: 'border-2 border-slate-800 bg-slate-950/60 backdrop-blur-xl hover:border-slate-700',
-        ghost: 'border border-transparent bg-transparent hover:bg-slate-900/40 focus-within:bg-slate-950/80 focus-within:border-cyan-500/50',
+        default: 'border border-[var(--color-border)] bg-[var(--color-input)] hover:border-[var(--color-border-strong)]',
+        filled: 'border border-transparent bg-[var(--color-surface-alt)] hover:bg-[var(--color-border)]',
+        outline: 'border-2 border-[var(--color-border)] bg-[var(--color-input)] hover:border-[var(--color-border-strong)]',
+        ghost: 'border border-transparent bg-transparent hover:bg-[var(--color-surface-alt)]',
       },
       size: {
-        sm: 'h-10 text-xs',
-        md: 'h-12 text-sm',
-        lg: 'h-14 text-base rounded-2xl',
+        sm: 'h-9 text-xs',
+        md: 'h-10 text-sm',
+        lg: 'h-12 text-base rounded-xl',
       },
       status: {
         default: '',
-        error: 'border-rose-500/80 focus-within:border-rose-500 focus-within:ring-rose-500/20 text-rose-200',
-        success: 'border-emerald-500/80 focus-within:border-emerald-500 focus-within:ring-emerald-500/20',
-        warning: 'border-amber-500/80 focus-within:border-amber-500 focus-within:ring-amber-500/20',
+        error: 'border-[var(--color-danger)] focus-within:border-[var(--color-danger)] focus-within:ring-[var(--color-danger)]',
+        success: 'border-[var(--color-success)] focus-within:border-[var(--color-success)] focus-within:ring-[var(--color-success)]',
+        warning: 'border-[var(--color-warning)] focus-within:border-[var(--color-warning)] focus-within:ring-[var(--color-warning)]',
       },
       fullWidth: {
         true: 'w-full',
@@ -45,7 +45,7 @@ export const inputContainerVariants = cva(
 
 export const inputElementVariants = cva(
   [
-    'w-full bg-transparent font-medium text-slate-100 placeholder:text-slate-500 tracking-wide',
+    'w-full bg-transparent font-normal text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] tracking-wide',
     'focus:outline-none disabled:cursor-not-allowed read-only:cursor-default',
     'file:border-0 file:bg-transparent file:text-sm file:font-medium',
   ],
@@ -53,8 +53,8 @@ export const inputElementVariants = cva(
     variants: {
       size: {
         sm: 'px-3 text-xs',
-        md: 'px-4 text-sm',
-        lg: 'px-5 text-base',
+        md: 'px-3.5 text-sm',
+        lg: 'px-4 text-base',
       },
     },
     defaultVariants: {
@@ -62,3 +62,4 @@ export const inputElementVariants = cva(
     },
   }
 );
+

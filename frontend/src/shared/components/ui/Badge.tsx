@@ -3,14 +3,18 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-ring)] focus:ring-offset-2',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
-        secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
-        outline: 'text-foreground',
+        default: 'border-transparent bg-[var(--color-surface-alt)] text-[var(--color-text-primary)]',
+        primary: 'border-transparent bg-[var(--color-primary)] text-white',
+        secondary: 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)]',
+        success: 'border-transparent bg-[var(--color-success-bg)] text-[var(--color-success)]',
+        warning: 'border-transparent bg-[var(--color-warning-bg)] text-[var(--color-warning)]',
+        danger: 'border-transparent bg-[var(--color-danger-bg)] text-[var(--color-danger)]',
+        destructive: 'border-transparent bg-[var(--color-danger-bg)] text-[var(--color-danger)]',
+        outline: 'border-[var(--color-border)] text-[var(--color-text-primary)] bg-transparent',
       },
     },
     defaultVariants: {
@@ -30,3 +34,4 @@ function Badge({ className, variant, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants };
+

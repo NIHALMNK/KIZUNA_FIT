@@ -1,14 +1,14 @@
 import { cva } from 'class-variance-authority';
 
 /**
- * CVA Variant Engine for the 2026 SaaS Label Primitive.
- * Optimized for high readability, crisp typography contrast, and elegant status indicators.
+ * CVA Variant Engine for KIZUNAFIT Label Primitive.
+ * Uses semantic CSS tokens for multi-theme compatibility.
  */
 export const labelVariants = cva(
   [
-    'inline-flex items-center font-semibold text-slate-100 tracking-wide leading-none select-none cursor-pointer',
-    'transition-colors duration-200 ease-out',
-    'peer-disabled:cursor-not-allowed peer-disabled:opacity-40',
+    'inline-flex items-center font-medium text-[var(--color-text-primary)] tracking-wide leading-none select-none cursor-pointer',
+    'transition-colors duration-150 ease-in-out',
+    'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
   ],
   {
     variants: {
@@ -18,11 +18,11 @@ export const labelVariants = cva(
         lg: 'text-base gap-2.5',
       },
       status: {
-        default: 'text-slate-100',
-        error: 'text-rose-400 font-bold',
-        success: 'text-emerald-400 font-semibold',
-        warning: 'text-amber-400 font-semibold',
-        disabled: 'text-slate-500 opacity-60 cursor-not-allowed pointer-events-none',
+        default: 'text-[var(--color-text-primary)]',
+        error: 'text-[var(--color-danger)] font-semibold',
+        success: 'text-[var(--color-success)] font-semibold',
+        warning: 'text-[var(--color-warning)] font-semibold',
+        disabled: 'text-[var(--color-text-muted)] opacity-60 cursor-not-allowed pointer-events-none',
       },
     },
     defaultVariants: {
@@ -31,3 +31,4 @@ export const labelVariants = cva(
     },
   }
 );
+

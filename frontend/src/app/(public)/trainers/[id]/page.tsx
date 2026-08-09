@@ -9,6 +9,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGetPublicTrainerProfile } from '@/modules/profile/presentation/hooks/usePublicTrainers';
 import { ROUTES } from '@/shared/constants/routes';
 import { TrainerAvailabilityStatus } from '@/modules/profile/domain/enums/profile.enums';
+import { LoadingState } from '@/shared/components/feedback/LoadingState';
+import { ErrorState } from '@/shared/components/feedback/ErrorState';
+import { Avatar } from '@/shared/components/ui/Avatar';
+import { Badge } from '@/shared/components/ui/Badge';
+import { StatusBadge } from '@/shared/components/ui/StatusBadge';
+import { Button } from '@/shared/components/ui/Button';
 import { toast } from 'sonner';
 
 if (typeof window !== 'undefined') {
@@ -61,89 +67,62 @@ export default function PublicTrainerDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center py-20 px-6">
-        <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 text-center max-w-md w-full space-y-4 animate-pulse">
-          <div className="w-16 h-16 rounded-full bg-slate-800 mx-auto" />
-          <div className="h-5 bg-slate-800 rounded w-3/4 mx-auto" />
-          <div className="h-4 bg-slate-800/60 rounded w-1/2 mx-auto" />
-          <p className="text-xs text-slate-400 font-semibold pt-2">Loading trainer profile & credentials...</p>
-        </div>
+      <div className="min-h-screen bg-[var(--color-background)] py-20 px-6 max-w-4xl mx-auto">
+        <LoadingState message="Loading trainer profile & credentials..." count={4} />
       </div>
     );
   }
 
   if (isError || !trainer) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center py-20 px-6">
-        <div className="p-8 rounded-3xl bg-slate-900/70 border border-rose-500/30 text-center max-w-md w-full space-y-5">
-          <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 font-bold">
-            ✕
-          </div>
-          <h3 className="text-xl font-bold text-white">Trainer Profile Not Found</h3>
-          <p className="text-xs text-slate-400">
-            {(error as any)?.message || 'The trainer profile you requested does not exist or is currently unavailable.'}
-          </p>
-          <div className="pt-2 flex flex-col gap-3">
-            <button
-              onClick={() => refetch()}
-              className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-colors"
-            >
-              Retry Loading
-            </button>
-            <Link
-              href={ROUTES.PUBLIC_TRAINERS}
-              className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
-              ← Back to Trainers Directory
-            </Link>
-          </div>
+      <div className="min-h-screen bg-[var(--color-background)] py-20 px-6 max-w-lg mx-auto">
+        <ErrorState
+          title="Trainer Profile Not Found"
+          message={(error as any)?.message || 'The trainer profile you requested does not exist or is currently unavailable.'}
+          onRetry={() => refetch()}
+        />
+        <div className="text-center mt-4">
+          <Link href={ROUTES.PUBLIC_TRAINERS} className="text-xs font-semibold text-[var(--color-primary)] hover:underline">
+            ← Back to Trainers Directory
+          </Link>
         </div>
       </div>
     );
   }
 
   const isAvailable = trainer.availabilityStatus === TrainerAvailabilityStatus.AVAILABLE;
-  const isBusy = trainer.availabilityStatus === TrainerAvailabilityStatus.BUSY;
 
   return (
-    <div ref={profileContainerRef} className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-white font-sans antialiased overflow-x-hidden pb-32 pt-20">
-      {/* Background Ambient Orbs */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute -top-[15%] left-1/2 -translate-x-1/2 w-[1100px] h-[600px] bg-cyan-500/10 rounded-full blur-[160px] opacity-70" />
-        <div className="absolute top-[35%] -left-[15%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[160px] opacity-50" />
-        <div className="absolute top-[65%] -right-[15%] w-[700px] h-[700px] bg-emerald-500/10 rounded-full blur-[180px] opacity-40" />
-      </div>
-
-      {/* Texture Grid */}
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_right,#1e293b12_1px,transparent_1px),linear-gradient(to_bottom,#1e293b12_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_35%,#000_70%,transparent_100%)]" />
+    <div ref={profileContainerRef} className="min-h-screen bg-[var(--color-background)] text-[var(--color-text-primary)] font-sans antialiased pb-24 pt-20">
+      {/* Background Grid */}
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_right,#1e293b12_1px,transparent_1px),linear-gradient(to_bottom,#1e293b12_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
       {/* ========================================================================= */}
       {/* 1. HERO COVER & PROFILE SECTION */}
       {/* ========================================================================= */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 mb-12">
+      <section className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 mb-10">
         {/* Navigation Back Link */}
         <div className="mb-6">
           <Link
             href={ROUTES.PUBLIC_TRAINERS}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-cyan-400 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors"
           >
             <span>← Back to Trainers Marketplace</span>
           </Link>
         </div>
 
         {/* Hero Cover Card */}
-        <div className="gsap-profile-anim rounded-3xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-2xl shadow-2xl overflow-hidden relative">
+        <div className="gsap-profile-anim rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-sm overflow-hidden relative">
           {/* Top Banner Cover */}
-          <div className="h-44 sm:h-56 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border-b border-slate-800/80 relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-teal-500/10 to-blue-600/10 opacity-70" />
+          <div className="h-36 sm:h-48 bg-[var(--color-surface-alt)] border-b border-[var(--color-border)] relative">
             <div className="absolute top-4 right-4 flex items-center gap-2">
               <button
                 type="button"
                 onClick={toggleSave}
-                className={`p-2.5 rounded-full backdrop-blur-md border text-xs font-bold transition-all ${
+                className={`p-2.5 rounded-full border text-xs font-bold transition-all ${
                   isSaved
-                    ? 'bg-rose-500/20 border-rose-500/40 text-rose-400'
-                    : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:text-white'
+                    ? 'bg-[var(--color-danger-bg)] border-[var(--color-danger)]/40 text-[var(--color-danger)]'
+                    : 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
                 }`}
                 title={isSaved ? 'Remove from saved' : 'Save trainer'}
               >
@@ -152,7 +131,7 @@ export default function PublicTrainerDetailsPage() {
               <button
                 type="button"
                 onClick={handleShare}
-                className="p-2.5 rounded-full bg-slate-950/60 border border-slate-800 text-slate-300 hover:text-white backdrop-blur-md text-xs font-bold transition-all"
+                className="p-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-xs font-bold transition-all"
                 title="Share profile"
               >
                 ↗
@@ -161,81 +140,55 @@ export default function PublicTrainerDetailsPage() {
           </div>
 
           {/* Profile Header Info */}
-          <div className="px-6 sm:px-10 pb-8 relative -mt-16 sm:-mt-20 flex flex-col sm:flex-row items-center sm:items-end gap-6 text-center sm:text-left">
+          <div className="px-6 sm:px-10 pb-8 relative -mt-14 sm:-mt-16 flex flex-col sm:flex-row items-center sm:items-end gap-6 text-center sm:text-left">
             {/* Avatar Profile Box */}
             <div className="relative shrink-0">
-              {trainer.avatarUrl ? (
-                <img
-                  src={trainer.avatarUrl}
-                  alt={trainer.headline}
-                  className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl object-cover border-4 border-slate-950 shadow-2xl"
-                />
-              ) : (
-                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-tr from-cyan-500 via-teal-500 to-blue-600 p-1 shadow-2xl border-4 border-slate-950">
-                  <div className="w-full h-full rounded-2xl bg-slate-950 flex items-center justify-center font-extrabold text-white text-3xl">
-                    {trainer.headline.slice(0, 2).toUpperCase()}
-                  </div>
-                </div>
-              )}
-
-              {/* Online Status Indicator */}
-              <span
-                className={`absolute bottom-2 right-2 w-4 h-4 rounded-full border-2 border-slate-950 ${
-                  isAvailable ? 'bg-emerald-400 animate-pulse' : isBusy ? 'bg-amber-400' : 'bg-slate-600'
-                }`}
-                title={`Status: ${trainer.availabilityStatus}`}
+              <Avatar
+                src={trainer.avatarUrl || undefined}
+                fallback={trainer.headline?.slice(0, 2) || 'TR'}
+                size="xl"
+                status={isAvailable ? 'online' : 'offline'}
+                className="h-28 w-28 sm:h-32 sm:w-32 border-4 border-[var(--color-card)]"
               />
             </div>
 
             {/* Name & Headline Details */}
             <div className="flex-1 space-y-1.5">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-                  {trainer.trainerName || trainer.fullName || trainer.name || 'Coach Marcus Vance'}
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-heading)] tracking-tight">
+                  {trainer.trainerName || trainer.fullName || trainer.name || 'Certified Trainer'}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                  Verified Coach ✓
-                </span>
+                <Badge variant="primary">Verified Coach ✓</Badge>
               </div>
 
-              <p className="text-sm sm:text-base font-bold text-cyan-400/90 leading-snug">
+              <p className="text-sm font-semibold text-[var(--color-primary)] leading-snug">
                 {trainer.headline}
               </p>
 
-              <p className="text-xs sm:text-sm text-slate-300 font-medium">
-                {trainer.location.city}, {trainer.location.country} • <span className="text-cyan-400 font-bold">{trainer.yearsOfExperience}+ Years</span> Master Coach Experience
-              </p>
+              {trainer.location && (
+                <p className="text-xs sm:text-sm text-[var(--color-text-secondary)]">
+                  {trainer.location.city}, {trainer.location.country} • <span className="font-semibold text-[var(--color-text-primary)]">{trainer.yearsOfExperience}+ Years Experience</span>
+                </p>
+              )}
 
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 pt-1 text-xs font-semibold text-slate-400">
-                <div className="flex items-center gap-1.5 text-amber-400 font-bold">
-                  <span>★ {trainer.averageRating.toFixed(1)}</span>
-                  <span className="text-slate-500 font-normal">({trainer.totalReviews} reviews)</span>
-                </div>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 pt-1 text-xs font-medium text-[var(--color-text-secondary)]">
+                {trainer.averageRating !== undefined && (
+                  <div className="flex items-center gap-1.5 text-amber-500 font-semibold">
+                    <span>★ {trainer.averageRating.toFixed(1)}</span>
+                    <span className="text-[var(--color-text-muted)] font-normal">({trainer.totalReviews || 0} reviews)</span>
+                  </div>
+                )}
                 <span>•</span>
-                <span>Response Time: <span className="text-emerald-400 font-bold">Under 1 Hour</span></span>
-                <span>•</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-slate-300 text-[11px]">
-                  {trainer.availabilityStatus}
-                </span>
+                <StatusBadge status={isAvailable ? 'active' : 'suspended'} label={trainer.availabilityStatus} />
               </div>
             </div>
 
-            {/* Hero CTA Button Suite */}
+            {/* Hero CTA Button Suite (Respecting Guest Boundary per Correction 6) */}
             <div className="shrink-0 flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-2 sm:pt-0">
-              <Link
-                href={ROUTES.LOGIN}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold text-white bg-gradient-to-r from-cyan-500 via-teal-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 rounded-2xl shadow-lg shadow-cyan-950/40 hover:shadow-xl hover:-translate-y-0.5 transition-all"
-              >
-                <span>Book Consultation</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </Link>
-              <Link
-                href={ROUTES.LOGIN}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-xs font-bold text-slate-200 hover:text-white bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 rounded-2xl transition-colors"
-              >
-                <span>Send Message</span>
+              <Link href={`${ROUTES.REGISTER}?role=CLIENT`}>
+                <Button variant="primary" size="md">
+                  Interested in Coaching
+                </Button>
               </Link>
             </div>
           </div>
@@ -243,29 +196,25 @@ export default function PublicTrainerDetailsPage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. QUICK STATISTICS BAR */}
+      {/* 2. REAL METRICS BAR (Only Supported Fields per Correction 1 & 7) */}
       {/* ========================================================================= */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 mb-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
-          <div className="gsap-profile-anim p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-amber-400">★ {trainer.averageRating.toFixed(1)}</h3>
-            <p className="text-[11px] font-semibold text-slate-400">Client Rating</p>
+      <section className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="gsap-profile-anim p-4 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] space-y-1">
+            <h3 className="text-xl sm:text-2xl font-bold text-amber-500">★ {trainer.averageRating?.toFixed(1) || 'N/A'}</h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">Average Rating</p>
           </div>
-          <div className="gsap-profile-anim p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">250+</h3>
-            <p className="text-[11px] font-semibold text-slate-400 font-medium">Active Clients</p>
+          <div className="gsap-profile-anim p-4 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] space-y-1">
+            <h3 className="text-xl sm:text-2xl font-bold text-[var(--color-heading)]">{trainer.totalReviews || 0}</h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">Public Reviews</p>
           </div>
-          <div className="gsap-profile-anim p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-cyan-400">{trainer.yearsOfExperience}+ Yrs</h3>
-            <p className="text-[11px] font-semibold text-slate-400">Experience</p>
+          <div className="gsap-profile-anim p-4 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] space-y-1">
+            <h3 className="text-xl sm:text-2xl font-bold text-[var(--color-primary)]">{trainer.yearsOfExperience || 0}+ Yrs</h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">Experience</p>
           </div>
-          <div className="gsap-profile-anim p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-emerald-400">1,200+</h3>
-            <p className="text-[11px] font-semibold text-slate-400">Sessions Completed</p>
-          </div>
-          <div className="gsap-profile-anim col-span-2 md:col-span-1 p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-teal-400">98.4%</h3>
-            <p className="text-[11px] font-semibold text-slate-400">Satisfaction Rate</p>
+          <div className="gsap-profile-anim p-4 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] space-y-1">
+            <h3 className="text-xl sm:text-2xl font-bold text-[var(--color-success)]">{trainer.certifications?.length || 0}</h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">Certifications</p>
           </div>
         </div>
       </section>

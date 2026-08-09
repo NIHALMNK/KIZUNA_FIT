@@ -22,3 +22,5 @@ export * from './components/SidebarMobileDrawer';
 export * from './components/SidebarSkeleton';
 export * from './layouts/ClientDashboardLayout';
 export * from './layouts/ClientDashboardHeader';
+export * from './layouts/TrainerDashboardLayout';
+export * from './headers/TrainerDashboardHeader';

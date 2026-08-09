@@ -5,7 +5,11 @@ import { motion } from 'framer-motion';
 import { useSidebar } from '../hooks/useSidebar';
 import { labelVariants } from '../motion/sidebar.motion';
 
-export const SidebarFooter: React.FC = () => {
+interface SidebarFooterProps {
+  portalName?: string;
+}
+
+export const SidebarFooter: React.FC<SidebarFooterProps> = ({ portalName = 'client' }) => {
   const { isCollapsed } = useSidebar();
 
   return (
@@ -16,7 +20,7 @@ export const SidebarFooter: React.FC = () => {
         className="flex flex-col items-center gap-0.5 whitespace-nowrap overflow-hidden"
       >
         <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--color-primary)]">
-          CLIENT PORTAL
+          {portalName.toUpperCase()} PORTAL
         </span>
         <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
           Certified Coaching Platform
@@ -27,7 +31,10 @@ export const SidebarFooter: React.FC = () => {
       </motion.div>
 
       {isCollapsed && (
-        <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] mx-auto animate-pulse" aria-label="Portal Active" />
+        <div
+          className="w-2 h-2 rounded-full bg-[var(--color-primary)] mx-auto animate-pulse"
+          aria-label="Portal Active"
+        />
       )}
     </div>
   );

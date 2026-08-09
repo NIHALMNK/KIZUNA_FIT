@@ -6,12 +6,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../../modules/identity/application/store/authStore';
 import { useLogout } from '../../../modules/identity/application/hooks/useLogout';
 import { useGetClientProfile } from '../../../modules/profile/presentation/hooks/useClientProfile';
+import { useGetTrainerProfile } from '../../../modules/profile/presentation/hooks/useTrainerProfile';
 import { getSidebarIcon } from '../utils/iconResolver';
 import { Avatar } from '../../components/ui/Avatar';
 
 export const UserDropdown: React.FC = () => {
   const { user } = useAuthStore();
-  const { data: profile } = useGetClientProfile(user?.role === 'CLIENT');
+  const isClient = user?.role === 'CLIENT';
+  const isTrainer = user?.role === 'TRAINER';
+
+  const { data: clientProfile } = useGetClientProfile(isClient);
+  const { data: trainerProfile } = useGetTrainerProfile(isTrainer);
+
   const logoutMutation = useLogout();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -21,12 +27,16 @@ export const UserDropdown: React.FC = () => {
   const HelpIcon = getSidebarIcon('help');
   const LogOutIcon = getSidebarIcon('logout');
 
-  const rawName = profile?.fullName || user?.email?.split('@')[0] || 'Client User';
+  const rawName = isTrainer
+    ? user?.email?.split('@')[0] || 'Trainer'
+    : clientProfile?.fullName || user?.email?.split('@')[0] || 'Client User';
   const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
-  const email = user?.email || 'client@kizunafit.com';
+  const email = user?.email || (isTrainer ? 'trainer@kizunafit.com' : 'client@kizunafit.com');
   const role = user?.role || 'CLIENT';
   const initials = rawName.substring(0, 2).toUpperCase();
-  const avatarUrl = profile?.avatarUrl;
+  const avatarUrl = isTrainer ? trainerProfile?.avatarUrl : clientProfile?.avatarUrl;
+  const accountLabel = isTrainer ? 'Trainer Account' : 'Client Account';
+  const profileHref = isTrainer ? '/profile/trainer' : '/profile/client';
 
   // Close on outside click or Escape
   useEffect(() => {
@@ -74,10 +84,17 @@ export const UserDropdown: React.FC = () => {
           <span className="text-xs font-extrabold text-[var(--color-heading)] leading-tight capitalize truncate max-w-[120px]">
             {displayName}
           </span>
-          <span className="text-[10px] font-bold text-[var(--color-text-muted)]">Client Account</span>
+          <span className="text-[10px] font-bold text-[var(--color-text-muted)]">
+            {accountLabel}
+          </span>
         </div>
 
-        <svg className="w-4 h-4 text-[var(--color-text-muted)] hidden lg:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg
+          className="w-4 h-4 text-[var(--color-text-muted)] hidden lg:block"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -103,19 +120,23 @@ export const UserDropdown: React.FC = () => {
 
               <div className="flex flex-col min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-extrabold text-[var(--color-heading)] truncate capitalize">{displayName}</h4>
+                  <h4 className="text-xs font-extrabold text-[var(--color-heading)] truncate capitalize">
+                    {displayName}
+                  </h4>
                   <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-[var(--color-tag)] text-[var(--color-tag-text)] border border-[var(--color-border)]">
                     {role}
                   </span>
                 </div>
-                <p className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate">{email}</p>
+                <p className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate">
+                  {email}
+                </p>
               </div>
             </div>
 
             {/* Quick Verified Navigation Links */}
             <div className="space-y-1 py-1 border-y border-[var(--color-border)] text-xs font-semibold text-[var(--color-text-secondary)]">
               <Link
-                href="/profile/client"
+                href={profileHref}
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
               >
@@ -123,23 +144,27 @@ export const UserDropdown: React.FC = () => {
                 <span>My Profile</span>
               </Link>
 
-              <Link
-                href="/client/settings"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
-              >
-                <SettingsIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
-                <span>Settings</span>
-              </Link>
+              {!isTrainer && (
+                <>
+                  <Link
+                    href="/client/settings"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
+                  >
+                    <SettingsIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
+                    <span>Settings</span>
+                  </Link>
 
-              <Link
-                href="/client/help"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
-              >
-                <HelpIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
-                <span>Help Center</span>
-              </Link>
+                  <Link
+                    href="/client/help"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
+                  >
+                    <HelpIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
+                    <span>Help Center</span>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Logout Action */}

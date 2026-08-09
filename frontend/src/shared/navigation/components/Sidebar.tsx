@@ -18,10 +18,7 @@ export interface SidebarProps {
   isLoading?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  config,
-  isLoading = false,
-}) => {
+export const Sidebar: React.FC<SidebarProps> = ({ config, isLoading = false }) => {
   const { isCollapsed } = useSidebar();
 
   return (
@@ -39,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <SidebarHeader portalTitle={config.portalName.toUpperCase()} />
         <SidebarBody config={config} />
-        <SidebarFooter />
+        <SidebarFooter portalName={config.portalName} />
       </motion.aside>
 
       {/* Mobile Drawer */}

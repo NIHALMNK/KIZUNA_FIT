@@ -121,6 +121,7 @@
   --color-primary: #059669;
   --color-primary-hover: #047857;
   --color-primary-active: #065f46;
+  --color-primary-light: #d1fae5;
 
   --color-secondary: #0d9488;
   --color-secondary-hover: #0f766e;
@@ -128,19 +129,19 @@
   --color-accent: #d97706;
   --color-accent-hover: #b45309;
 
-  --color-background: #fafaf9;
+  --color-background: #f8fafc;
   --color-surface: #ffffff;
-  --color-surface-alt: #f5f5f4;
+  --color-surface-alt: #f1f5f9;
   --color-card: #ffffff;
-  --color-card-hover: #fafaf9;
+  --color-card-hover: #f8fafc;
 
-  --color-border: #e7e5e4;
-  --color-border-strong: #d6d3d1;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
 
-  --color-text-primary: #1c1917;
-  --color-text-secondary: #57534e;
-  --color-text-muted: #a8a29e;
-  --color-heading: #1c1917;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-heading: #0f172a;
 
   --color-link: #059669;
   --color-link-hover: #047857;
@@ -151,7 +152,7 @@
 
   --color-navbar: #ffffff;
   --color-sidebar: #ffffff;
-  --color-footer: #1c1917;
+  --color-footer: #0f172a;
 
   --color-success: #059669;
   --color-success-bg: #ecfdf5;
@@ -166,7 +167,7 @@
 
   --color-tag: #d1fae5;
   --color-tag-text: #065f46;
-  --color-chip: #e7e5e4;
+  --color-chip: #e2e8f0;
 }
 
 /* --- 4. ADMIN THEME (Light Operational CRM) --- */

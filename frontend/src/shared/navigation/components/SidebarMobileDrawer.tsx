@@ -52,7 +52,7 @@ export const SidebarMobileDrawer: React.FC<SidebarMobileDrawerProps> = ({ config
           >
             <SidebarHeader portalTitle={config.portalName.toUpperCase()} />
             <SidebarBody config={config} onItemClick={closeMobile} />
-            <SidebarFooter />
+            <SidebarFooter portalName={config.portalName} />
           </motion.div>
         </>
       )}

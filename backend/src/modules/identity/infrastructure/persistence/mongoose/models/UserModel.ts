@@ -12,24 +12,29 @@ export interface UserDocument extends Document {
   role: UserRole;
   status: UserStatus;
   emailVerified: boolean;
+  phoneNumber?: string | null;
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export const UserSchema = new Schema<UserDocument>({
-  fullName: { type: String, required: true },
-  email: { type: String, required: true, unique: true, index: true },
-  authProviders: [{ type: String, enum: Object.values(AuthProvider), required: true }],
-  passwordHash: { type: String, required: false },
-  role: { type: String, required: true, enum: Object.values(UserRole) },
-  status: { type: String, required: true, enum: Object.values(UserStatus) },
-  emailVerified: { type: Boolean, required: true, default: false },
-  lastLoginAt: { type: Date, required: false }
-}, {
-  timestamps: true,
-  versionKey: '__v'
-});
+export const UserSchema = new Schema<UserDocument>(
+  {
+    fullName: { type: String, required: true },
+    email: { type: String, required: true, unique: true, index: true },
+    authProviders: [{ type: String, enum: Object.values(AuthProvider), required: true }],
+    passwordHash: { type: String, required: false },
+    role: { type: String, required: true, enum: Object.values(UserRole) },
+    status: { type: String, required: true, enum: Object.values(UserStatus) },
+    emailVerified: { type: Boolean, required: true, default: false },
+    phoneNumber: { type: String, default: null },
+    lastLoginAt: { type: Date, required: false },
+  },
+  {
+    timestamps: true,
+    versionKey: '__v',
+  },
+);
 
 // Compound Indexes as specified in Canonical Specification
 UserSchema.index({ role: 1, status: 1 });

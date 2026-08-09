@@ -43,6 +43,8 @@ export const useUpdateUserAccount = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACCOUNT_SETTINGS_KEYS.account });
       queryClient.invalidateQueries({ queryKey: ACCOUNT_SETTINGS_KEYS.profile });
+      queryClient.invalidateQueries({ queryKey: ['trainer-profile', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['publicTrainerProfile'] });
       toast.success('Account information updated successfully!');
     },
     onError: (error: any) => {
@@ -100,7 +102,10 @@ export const useDeleteAccount = () => {
         toast.error('Cannot delete account while an active coaching relationship exists.');
       } else if (msg.includes('PENDING_PAYMENT_EXISTS')) {
         toast.error('Cannot delete account while pending payments exist.');
-      } else if (msg.includes('Invalid confirmation password') || msg.includes('INVALID_PASSWORD')) {
+      } else if (
+        msg.includes('Invalid confirmation password') ||
+        msg.includes('INVALID_PASSWORD')
+      ) {
         toast.error('Incorrect password entered.');
       } else {
         toast.error(msg || 'Failed to delete account.');

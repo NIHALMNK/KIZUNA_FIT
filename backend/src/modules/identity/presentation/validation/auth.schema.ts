@@ -65,3 +65,10 @@ export const DeleteAccountSchema = z.object({
     password: z.string().optional(),
   }),
 });
+
+export const UpdateUserSchema = z.object({
+  body: z.object({
+    fullName: z.string().min(1).optional(),
+    phoneNumber: z.string().nullable().optional(),
+  }),
+});

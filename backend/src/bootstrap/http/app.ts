@@ -7,6 +7,7 @@ import { errorHandler } from '../../shared/infrastructure/http/middleware/errorH
 import { AwilixContainer } from 'awilix';
 import { env } from '../../config/env.config';
 import { identityRouter } from '../../modules/identity/presentation/routes/identity.routes';
+import { userRouter } from '../../modules/identity/presentation/routes/user.routes';
 import { clientProfileRouter } from '../../modules/profile/presentation/routes/clientProfile.routes';
 import { trainerProfileRouter } from '../../modules/profile/presentation/routes/trainerProfile.routes';
 
@@ -48,6 +49,7 @@ export function createApp(container: AwilixContainer): express.Application {
 
   // Mount routers
   app.use('/api/v1/identity', identityRouter());
+  app.use('/api/v1/users', userRouter());
   app.use('/api/v1/client-profiles', clientProfileRouter());
   app.use('/api/v1/trainer-profiles', trainerProfileRouter());
 

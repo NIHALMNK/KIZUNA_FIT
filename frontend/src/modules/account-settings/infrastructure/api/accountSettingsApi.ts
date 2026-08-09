@@ -10,8 +10,35 @@ import {
 
 export class AccountSettingsApi {
   public async getUserAccount(): Promise<UserAccountDetails> {
+    const user = useAuthStore.getState().user;
     try {
-      const user = useAuthStore.getState().user;
+      const userRes = await httpClient.get<{
+        id: string;
+        email: string;
+        fullName?: string;
+        phoneNumber?: string | null;
+        role?: string;
+        status?: string;
+        emailVerified?: boolean;
+      }>('/users/me');
+
+      if (userRes && userRes.id) {
+        return {
+          id: userRes.id,
+          email: userRes.email || user?.email || '',
+          fullName: userRes.fullName || user?.email?.split('@')[0] || 'User',
+          phoneNumber: userRes.phoneNumber || null,
+          role: (userRes.role || user?.role || 'CLIENT') as 'CLIENT' | 'TRAINER' | 'ADMIN',
+          emailVerified: userRes.emailVerified ?? true,
+          accountStatus: (userRes.status as any) || 'ACTIVE',
+          createdAt: new Date().toISOString(),
+        };
+      }
+    } catch {
+      // Fallback to profile API if /users/me fails
+    }
+
+    try {
       if (user?.role === 'TRAINER') {
         const profile = await profileApi.getTrainerProfile();
         return {
@@ -39,7 +66,6 @@ export class AccountSettingsApi {
         updatedAt: profile.updatedAt,
       };
     } catch {
-      const user = useAuthStore.getState().user;
       return {
         id: user?.id || '',
         email: user?.email || '',
@@ -56,31 +82,39 @@ export class AccountSettingsApi {
 
   public async updateUserAccount(dto: UpdateAccountDTO): Promise<UserAccountDetails> {
     const user = useAuthStore.getState().user;
-    if (user?.role === 'TRAINER') {
-      const profile = await profileApi.getTrainerProfile();
-      return {
-        id: profile.id,
-        email: user?.email || '',
-        fullName: dto.fullName?.trim() || user?.email?.split('@')[0] || 'Trainer',
-        phoneNumber: dto.phoneNumber?.trim() || null,
-        role: 'TRAINER',
-        emailVerified: true,
-        accountStatus: 'ACTIVE',
-        createdAt: profile.createdAt || new Date().toISOString(),
-        updatedAt: profile.updatedAt,
-      };
+    const payload: Record<string, unknown> = {};
+    if (dto.fullName !== undefined) payload.fullName = dto.fullName.trim();
+    if (dto.phoneNumber !== undefined) payload.phoneNumber = dto.phoneNumber.trim() || null;
+
+    // Call PATCH /api/v1/users/me for account-level fields (fullName, phoneNumber)
+    const updatedUser = await httpClient.patch<{
+      id: string;
+      email: string;
+      fullName: string;
+      phoneNumber?: string | null;
+      role: string;
+      status: string;
+      emailVerified: boolean;
+    }>('/users/me', payload);
+
+    // If client role, also keep ClientProfile synchronized if present
+    if (user?.role === 'CLIENT') {
+      try {
+        await profileApi.updateClientProfile(dto);
+      } catch {
+        // Ignored if client profile not created yet
+      }
     }
-    const profile = await profileApi.updateClientProfile(dto);
+
     return {
-      id: profile.id,
-      email: user?.email || '',
-      fullName: profile.fullName || '',
-      phoneNumber: profile.phoneNumber || null,
-      role: 'CLIENT',
-      emailVerified: true,
-      accountStatus: 'ACTIVE',
-      createdAt: profile.createdAt || new Date().toISOString(),
-      updatedAt: profile.updatedAt,
+      id: updatedUser.id || user?.id || '',
+      email: updatedUser.email || user?.email || '',
+      fullName: updatedUser.fullName || user?.email?.split('@')[0] || 'User',
+      phoneNumber: updatedUser.phoneNumber || null,
+      role: (updatedUser.role || user?.role || 'CLIENT') as 'CLIENT' | 'TRAINER' | 'ADMIN',
+      emailVerified: updatedUser.emailVerified ?? true,
+      accountStatus: (updatedUser.status as any) || 'ACTIVE',
+      createdAt: new Date().toISOString(),
     };
   }
 

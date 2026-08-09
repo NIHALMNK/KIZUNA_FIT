@@ -287,8 +287,7 @@ export default function ClientProfilePage() {
         isOpen={isAvatarDialogOpen}
         onClose={() => setIsAvatarDialogOpen(false)}
         currentAvatarUrl={profile.avatarUrl}
-        initials={initials}
-        onUpload={async (file) => {
+        onUpload={async (file: File) => {
           await uploadAvatarMutation.mutateAsync(file);
         }}
         onDelete={async () => {

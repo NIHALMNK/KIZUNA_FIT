@@ -16,11 +16,11 @@ export const HERO_DATA = {
   },
 };
 
-export const STATS_DATA = [
-  { value: '2,400+', label: 'Clients Transformed', highlightColor: 'text-white' },
-  { value: '150+', label: 'Certified Master Trainers', highlightColor: 'text-cyan-400' },
-  { value: '98.4%', label: 'Program Completion Rate', highlightColor: 'text-emerald-400' },
-  { value: '4.9 / 5 ★', label: 'Average Client Rating', highlightColor: 'text-amber-400' },
+export const VALUE_PROPOSITIONS = [
+  { title: 'Verified Credentials', description: 'Certified coaches with validated certifications and professional experience', highlightColor: 'text-[var(--color-primary)]' },
+  { title: '1-on-1 Coaching', description: 'Direct personalized communication and individual goal tracking', highlightColor: 'text-[var(--color-accent)]' },
+  { title: 'Custom Programming', description: 'Tailored workout schedules and exercise progression curves', highlightColor: 'text-[var(--color-success)]' },
+  { title: 'Biometric Telemetry', description: 'Real-time progress logging and milestone tracking', highlightColor: 'text-[var(--color-info)]' },
 ];
 
 export const PROBLEM_SOLUTION_DATA = {

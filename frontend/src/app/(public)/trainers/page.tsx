@@ -145,40 +145,19 @@ export default function PublicTrainersSearchPage() {
       {/* ========================================================================= */}
       {/* 1. HERO SECTION */}
       {/* ========================================================================= */}
-      <section className="relative z-10 pt-12 sm:pt-16 pb-12 px-6 sm:px-8 max-w-7xl mx-auto text-center">
-        {/* Marketplace Pill Badge */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-900/90 border border-slate-800 text-cyan-400 text-xs font-extrabold tracking-wider uppercase mb-6 backdrop-blur-md shadow-inner">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span>KIZUNAFIT MARKETPLACE • CERTIFIED TRAINERS</span>
+      {/* Hero Header */}
+      <section className="relative z-10 pt-8 sm:pt-12 pb-8 px-6 sm:px-8 max-w-7xl mx-auto text-center space-y-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-primary)] text-xs font-semibold uppercase tracking-wider mb-2">
+          <span>Trainer Discovery</span>
         </div>
 
-        {/* Hero Title */}
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-tight">
-          Find Your Perfect Coach<span className="text-cyan-400">.</span>
+        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--color-heading)] max-w-3xl mx-auto">
+          Find Your Certified Coach
         </h1>
 
-        {/* Hero Description */}
-        <p className="mt-4 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed">
-          Connect 1-on-1 with verified master fitness trainers, review credentials, and start customized personal coaching.
+        <p className="text-sm sm:text-base text-[var(--color-text-secondary)] max-w-2xl mx-auto font-normal leading-relaxed">
+          Browse verified personal trainers, review certifications and specializations, and start custom 1-on-1 coaching.
         </p>
-
-        {/* Marketplace Statistics Bar */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm font-semibold text-slate-400">
-          <div className="flex items-center gap-2">
-            <span className="text-amber-400 font-bold">5.0 ★</span>
-            <span>Client Rating</span>
-          </div>
-          <div className="w-1 h-1 rounded-full bg-slate-800 hidden sm:block" />
-          <div className="flex items-center gap-2">
-            <span className="text-cyan-400 font-bold">150+</span>
-            <span>Verified Coaches</span>
-          </div>
-          <div className="w-1 h-1 rounded-full bg-slate-800 hidden sm:block" />
-          <div className="flex items-center gap-2">
-            <span className="text-emerald-400 font-bold">98.4%</span>
-            <span>Success Rate</span>
-          </div>
-        </div>
       </section>
 
       {/* ========================================================================= */}

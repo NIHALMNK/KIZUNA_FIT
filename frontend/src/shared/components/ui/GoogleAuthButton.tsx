@@ -45,8 +45,8 @@ export const GoogleAuthButton: React.FC = () => {
 
   return (
     <div className="w-full relative group">
-      {/* Premium Glass Button Wrapper */}
-      <div className="w-full flex items-center justify-center gap-3 h-11 px-5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-cyan-500/40 text-slate-200 hover:text-white font-medium text-sm transition-all duration-200 shadow-md shadow-black/20 hover:shadow-cyan-500/10 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md relative overflow-hidden">
+      {/* Google Auth Button Wrapper */}
+      <div className="w-full flex items-center justify-center gap-3 h-11 px-5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold text-sm transition-all duration-200 shadow-sm cursor-pointer relative overflow-hidden">
         {/* Animated Google SVG Logo */}
         <svg
           className="w-5 h-5 group-hover:scale-110 transition-transform duration-200 shrink-0"

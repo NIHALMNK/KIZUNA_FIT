@@ -47,88 +47,98 @@ export const ForgotPasswordForm = () => {
 
   if (isSuccess) {
     return (
-      <Card variant="default" size="lg" className="w-full max-w-md mx-auto text-center">
-        <CardContent className="pt-8 space-y-4">
-          <div className="mx-auto w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shadow-inner animate-pulse">
-            <svg className="w-8 h-8 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <CardTitle className="text-2xl font-bold text-white">Check Your Email</CardTitle>
-          <CardDescription className="text-sm text-slate-300">
-            We have dispatched a secure recovery link to{' '}
-            <span className="font-semibold text-cyan-400">{submittedEmail}</span>. Please click the link to reset your password.
-          </CardDescription>
+      <div className="w-full max-w-[440px] mx-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-7 sm:p-9 text-slate-900 text-center transition-all">
+        <div className="mx-auto w-14 h-14 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-600 flex items-center justify-center mb-4">
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Check Your Email</h1>
+        <p className="text-xs sm:text-sm text-slate-600 font-normal mt-2 leading-relaxed">
+          We dispatched a secure recovery link to{' '}
+          <span className="font-semibold text-slate-900">{submittedEmail}</span>. Please check your inbox.
+        </p>
 
-          <div className="pt-4 flex flex-col gap-3">
-            <Button
-              variant="outline"
-              size="md"
-              fullWidth
-              onClick={() => setIsSuccess(false)}
-            >
-              Didn't receive email? Resend
-            </Button>
-            <Link
-              href="/login"
-              className="text-xs font-semibold text-slate-400 hover:text-white transition-colors"
-            >
-              ← Back to Sign In
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+        <div className="pt-6 flex flex-col gap-3">
+          <Button
+            variant="outline"
+            size="md"
+            fullWidth
+            onClick={() => setIsSuccess(false)}
+            className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+          >
+            Didn't receive email? Resend
+          </Button>
+          <Link
+            href="/login"
+            className="text-xs font-bold text-cyan-600 hover:text-cyan-700 transition-colors"
+          >
+            ← Back to Sign In
+          </Link>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card variant="default" size="lg" className="w-full max-w-md mx-auto">
-      <CardHeader className="text-center pb-3 items-center">
-        <CardTitle className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-          Reset Password<span className="text-cyan-400">.</span>
-        </CardTitle>
-        <CardDescription className="text-sm text-slate-400 mt-1 font-medium">
+    <div className="w-full max-w-[440px] mx-auto bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-7 sm:p-9 text-slate-900 transition-all duration-200">
+      <div className="text-center mb-6 space-y-1.5">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+          Reset Password<span className="text-cyan-600">.</span>
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed">
           Enter your registered email address to receive password reset instructions
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
 
-      <CardContent className="space-y-4 pt-2">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-          <Input
-            label="Email Address"
-            type="email"
-            placeholder="name@example.com"
-            isRequired
-            error={errors.email?.message}
-            leftIcon={
-              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <div className="space-y-1.5">
+          <label htmlFor="forgot-email" className="block text-xs font-bold uppercase tracking-wider text-slate-800">
+            Email Address <span className="text-rose-500">*</span>
+          </label>
+          <div className="relative flex items-center">
+            <div className="absolute left-3.5 pointer-events-none text-slate-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-            }
-            {...register('email')}
-          />
+            </div>
+            <input
+              id="forgot-email"
+              type="email"
+              placeholder="name@example.com"
+              className={`w-full h-11 pl-10 pr-3.5 bg-slate-50 border rounded-xl text-slate-900 placeholder:text-slate-400 text-sm font-medium focus:outline-none focus:bg-white transition-all ${
+                errors.email
+                  ? 'border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
+                  : 'border-slate-300 hover:border-slate-400 focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600/20'
+              }`}
+              {...register('email')}
+            />
+          </div>
+          {errors.email && (
+            <p className="text-xs font-medium text-rose-600 mt-1">{errors.email.message}</p>
+          )}
+        </div>
 
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            fullWidth
-            isLoading={forgotPasswordMutation.isPending}
-            className="mt-3"
-          >
-            Send Reset Link
-          </Button>
-        </form>
-      </CardContent>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          isLoading={forgotPasswordMutation.isPending}
+          className="mt-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold h-11 rounded-xl shadow-md shadow-cyan-500/20"
+        >
+          Send Reset Link
+        </Button>
+      </form>
 
-      <CardFooter className="flex justify-center pt-4 border-t border-slate-800/60 text-sm">
+      <div className="mt-6 pt-5 border-t border-slate-200 flex justify-center text-xs sm:text-sm font-semibold">
         <Link
           href="/login"
-          className="font-semibold text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-cyan-400 rounded relative group"
+          className="text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1.5 focus:outline-none focus:underline"
         >
           <span>← Back to Sign In</span>
         </Link>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };

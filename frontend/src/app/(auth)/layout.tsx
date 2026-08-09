@@ -6,7 +6,7 @@ import Link from 'next/link';
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <GuestGuard>
-      <div className="h-screen min-h-screen relative flex flex-col items-center justify-center bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-white overflow-hidden font-sans antialiased">
+      <div className="theme-public min-h-screen relative flex flex-col items-center justify-center bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-white overflow-y-auto font-sans antialiased py-12">
         {/* Ambient Dark Background Layer 1: Soft Radial Light Orbs */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
           <div className="absolute -top-[25%] left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-cyan-500/10 rounded-full blur-[160px] opacity-60" />

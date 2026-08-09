@@ -38,7 +38,7 @@ export const SidebarMobileDrawer: React.FC<SidebarMobileDrawerProps> = ({ config
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={closeMobile}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md md:hidden"
+            className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm md:hidden"
             aria-hidden="true"
           />
 
@@ -48,7 +48,7 @@ export const SidebarMobileDrawer: React.FC<SidebarMobileDrawerProps> = ({ config
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', stiffness: 350, damping: 32 }}
-            className="fixed top-0 left-0 bottom-0 h-screen z-50 w-full max-w-[280px] bg-slate-950/95 border-r border-slate-800 shadow-2xl flex flex-col justify-between overflow-hidden md:hidden"
+            className="fixed top-0 left-0 bottom-0 h-screen z-50 w-full max-w-[280px] bg-[var(--color-sidebar)] border-r border-[var(--color-border)] shadow-2xl flex flex-col justify-between overflow-hidden text-[var(--color-text-primary)] md:hidden"
           >
             <SidebarHeader portalTitle={config.portalName.toUpperCase()} />
             <SidebarBody config={config} onItemClick={closeMobile} />

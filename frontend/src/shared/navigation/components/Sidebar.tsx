@@ -8,6 +8,7 @@ import { SidebarHeader } from './SidebarHeader';
 import { SidebarBody } from './SidebarBody';
 import { SidebarFooter } from './SidebarFooter';
 import { SidebarMobileDrawer } from './SidebarMobileDrawer';
+import { SidebarCollapseButton } from './SidebarCollapseButton';
 import { sidebarContainerVariants } from '../motion/sidebar.motion';
 
 export interface SidebarProps {
@@ -29,8 +30,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <motion.aside
         variants={sidebarContainerVariants}
         animate={isCollapsed ? 'collapsed' : 'expanded'}
-        className="hidden md:flex fixed top-0 left-0 bottom-0 h-screen z-40 bg-slate-950/85 backdrop-blur-2xl border-r border-slate-800/90 shadow-2xl shadow-black/60 flex-col justify-between overflow-hidden max-w-full"
+        className="hidden md:flex fixed top-0 left-0 bottom-0 h-screen z-40 bg-[var(--color-sidebar)] border-r border-[var(--color-border)] shadow-xs flex-col justify-between overflow-visible max-w-full text-[var(--color-text-primary)] transition-colors"
       >
+        {/* Floating Edge Collapse Control Button */}
+        <div className="absolute -right-3.5 top-[18px] z-50">
+          <SidebarCollapseButton />
+        </div>
+
         <SidebarHeader portalTitle={config.portalName.toUpperCase()} />
         <SidebarBody config={config} />
         <SidebarFooter />

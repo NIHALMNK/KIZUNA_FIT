@@ -12,24 +12,24 @@ export const getBadgeClasses = (badge?: SidebarBadgeConfig): string => {
   if (!badge) return '';
 
   if (badge.type === 'COMING_SOON') {
-    return 'bg-slate-800/80 text-slate-400 border border-slate-700/60 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
+    return 'bg-amber-50 text-amber-700 border border-amber-200/80 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
   }
 
   if (badge.type === 'NEW') {
-    return 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
+    return 'bg-[var(--color-tag)] text-[var(--color-tag-text)] border border-[var(--color-border)] text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
   }
 
   if (badge.type === 'BETA') {
-    return 'bg-purple-500/20 text-purple-400 border border-purple-500/30 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
+    return 'bg-purple-50 text-purple-700 border border-purple-200 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
   }
 
   if (badge.type === 'PREMIUM') {
-    return 'bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
+    return 'bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider';
   }
 
   if (badge.type === 'COUNT') {
-    return 'bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded-full';
+    return 'bg-[var(--color-tag)] text-[var(--color-tag-text)] font-extrabold text-[10px] px-2 py-0.5 rounded-full';
   }
 
-  return 'bg-slate-800 text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-md';
+  return 'bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] text-[10px] font-semibold px-2 py-0.5 rounded-md';
 };

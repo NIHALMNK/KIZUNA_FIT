@@ -33,22 +33,24 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({ item, onClick }) => {
       variants={itemHoverVariants}
       initial="rest"
       whileHover={isDisabled ? 'rest' : 'hover'}
-      className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm font-bold transition-all duration-150 w-full ${
+      className={`group relative flex items-center gap-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 w-full ${
+        isCollapsed ? 'px-0 justify-center' : 'px-3.5'
+      } ${
         active
-          ? 'bg-gradient-to-r from-teal-500/20 via-cyan-500/10 to-transparent text-white border-l-2 border-teal-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]'
+          ? 'bg-[var(--color-tag)] text-[var(--color-tag-text)] border-l-3 border-[var(--color-primary)] font-extrabold'
           : isDisabled
-          ? 'opacity-40 text-slate-500 cursor-not-allowed'
-          : 'text-slate-300 hover:text-white hover:bg-slate-900/80 border-l-2 border-transparent'
+          ? 'opacity-50 text-[var(--color-text-muted)] cursor-not-allowed'
+          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] border-l-3 border-transparent'
       }`}
     >
-      {/* Icon with active cyan-teal glow */}
+      {/* Icon */}
       <Icon
         className={`w-5 h-5 shrink-0 transition-colors ${
           active
-            ? 'text-teal-400 drop-shadow-[0_0_10px_rgba(20,184,166,0.6)]'
+            ? 'text-[var(--color-primary)]'
             : isDisabled
-            ? 'text-slate-600'
-            : 'text-slate-400 group-hover:text-teal-400'
+            ? 'text-[var(--color-text-muted)]'
+            : 'text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)]'
         }`}
       />
 
@@ -64,7 +66,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({ item, onClick }) => {
 
       {/* Collapsed notification dot */}
       {isCollapsed && item.badge?.type === 'COUNT' && (
-        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
       )}
     </motion.div>
   );

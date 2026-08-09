@@ -33,7 +33,7 @@ const ClientDashboardLayoutContent: React.FC<ClientDashboardLayoutContentProps> 
     : null;
 
   return (
-    <div className="theme-client min-h-screen bg-slate-950 text-slate-100 selection:bg-teal-500 selection:text-white font-sans antialiased relative">
+    <div className="theme-client min-h-screen bg-[var(--color-background)] text-[var(--color-text-primary)] font-sans antialiased relative selection:bg-[var(--color-primary)] selection:text-white">
       {/* Universal Sidebar Component Engine */}
       {isLoading ? (
         <div className="hidden md:block fixed top-0 left-0 bottom-0 z-40 w-[280px]">
@@ -53,8 +53,11 @@ const ClientDashboardLayoutContent: React.FC<ClientDashboardLayoutContentProps> 
           isCollapsed ? 'md:pl-[80px]' : 'md:pl-[280px]'
         }`}
       >
+        {/* Full-width Topbar Header */}
         <ClientDashboardHeader />
-        <main className="flex-1 p-6 sm:p-8 max-w-7xl w-full mx-auto">{children}</main>
+
+        {/* Centered Workspace Content Area */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">{children}</main>
       </div>
     </div>
   );

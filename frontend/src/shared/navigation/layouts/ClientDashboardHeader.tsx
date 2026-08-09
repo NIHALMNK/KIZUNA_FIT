@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useSidebar } from '../hooks/useSidebar';
 import { getSidebarIcon } from '../utils/iconResolver';
 import { UserDropdown } from '../components/UserDropdown';
@@ -13,22 +14,69 @@ interface ClientDashboardHeaderProps {
 }
 
 export const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
-  title = 'Overview',
-  breadcrumb = ['Dashboard', 'Overview'],
+  title,
+  breadcrumb,
 }) => {
+  const pathname = usePathname();
   const { toggleMobile } = useSidebar();
   const MenuIcon = getSidebarIcon('menu');
   const BellIcon = getSidebarIcon('notifications');
-  const SearchIcon = getSidebarIcon('search');
+
+  // Resolve dynamic title and breadcrumb if not explicitly passed
+  let computedTitle = title;
+  let computedBreadcrumb = breadcrumb;
+
+  if (!computedTitle || !computedBreadcrumb) {
+    if (pathname === '/profile/client') {
+      computedTitle = 'Profile';
+      computedBreadcrumb = ['Dashboard', 'Profile'];
+    } else if (pathname === '/profile/client/create') {
+      computedTitle = 'Create Profile';
+      computedBreadcrumb = ['Dashboard', 'Profile', 'Create'];
+    } else if (pathname === '/profile/client/edit') {
+      computedTitle = 'Edit Profile';
+      computedBreadcrumb = ['Dashboard', 'Profile', 'Edit'];
+    } else if (pathname.startsWith('/client/workouts')) {
+      computedTitle = 'Workout Programs';
+      computedBreadcrumb = ['Dashboard', 'My Coaching', 'Workouts'];
+    } else if (pathname.startsWith('/client/nutrition')) {
+      computedTitle = 'Nutrition Plans';
+      computedBreadcrumb = ['Dashboard', 'My Coaching', 'Nutrition'];
+    } else if (pathname.startsWith('/client/progress')) {
+      computedTitle = 'Progress Tracking';
+      computedBreadcrumb = ['Dashboard', 'My Coaching', 'Progress'];
+    } else if (pathname.startsWith('/client/requests')) {
+      computedTitle = 'Trainer Requests';
+      computedBreadcrumb = ['Dashboard', 'Requests'];
+    } else if (pathname.startsWith('/client/consultations')) {
+      computedTitle = 'Consultations';
+      computedBreadcrumb = ['Dashboard', 'Consultations'];
+    } else if (pathname.startsWith('/client/offers')) {
+      computedTitle = 'Coaching Offers';
+      computedBreadcrumb = ['Dashboard', 'Offers'];
+    } else if (pathname === '/client/settings/change-password') {
+      computedTitle = 'Change Password';
+      computedBreadcrumb = ['Dashboard', 'Settings', 'Change Password'];
+    } else if (pathname.startsWith('/client/settings')) {
+      computedTitle = 'Settings';
+      computedBreadcrumb = ['Dashboard', 'Settings'];
+    } else if (pathname.startsWith('/client/help')) {
+      computedTitle = 'Help & Support';
+      computedBreadcrumb = ['Dashboard', 'Account', 'Help Center'];
+    } else {
+      computedTitle = 'Client Dashboard';
+      computedBreadcrumb = ['Dashboard', 'Overview'];
+    }
+  }
 
   return (
-    <header className="sticky top-0 z-30 w-full h-16 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 px-4 sm:px-8 flex items-center justify-between">
+    <header className="sticky top-0 z-30 w-full h-16 bg-[var(--color-navbar)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 sm:px-6 lg:px-8 flex items-center justify-between shadow-xs transition-colors">
       {/* Left: Mobile Toggle, Logo & Desktop Breadcrumbs + Title */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={toggleMobile}
-          className="md:hidden p-2 rounded-xl bg-slate-900 text-slate-200 hover:text-white border border-slate-800 focus:outline-none"
+          className="md:hidden p-2 rounded-xl bg-[var(--color-surface-alt)] text-[var(--color-text-primary)] hover:bg-[var(--color-border)] border border-[var(--color-border)] focus:outline-none transition-colors"
           aria-label="Open sidebar menu"
         >
           <MenuIcon className="w-5 h-5" />
@@ -45,48 +93,34 @@ export const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               className="h-full w-full object-contain"
             />
           </div>
-          <span className="font-extrabold text-base tracking-tight text-white">KIZUNA-FIT</span>
+          <span className="font-extrabold text-base tracking-tight text-[var(--color-heading)]">KIZUNA-FIT</span>
         </Link>
 
         {/* Desktop Breadcrumbs & Page Title */}
         <div className="hidden md:flex flex-col">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
-            {breadcrumb.map((item, index) => (
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--color-text-muted)]">
+            {computedBreadcrumb.map((item, index) => (
               <React.Fragment key={item}>
-                {index > 0 && <span>/</span>}
-                <span className={index === breadcrumb.length - 1 ? 'text-teal-400 font-bold' : ''}>
+                {index > 0 && <span className="opacity-60">/</span>}
+                <span className={index === computedBreadcrumb.length - 1 ? 'text-[var(--color-primary)] font-bold' : ''}>
                   {item}
                 </span>
               </React.Fragment>
             ))}
           </nav>
-          <h1 className="text-base font-extrabold text-white tracking-tight">{title}</h1>
-        </div>
-      </div>
-
-      {/* Center: Quick Search Trigger Placeholder */}
-      <div className="hidden lg:flex items-center max-w-xs w-full">
-        <div className="w-full relative flex items-center">
-          <SearchIcon className="w-4 h-4 text-slate-500 absolute left-3 pointer-events-none" />
-          <input
-            type="text"
-            readOnly
-            placeholder="Search... Ctrl + K"
-            className="w-full bg-slate-900/60 border border-slate-800/80 rounded-2xl py-1.5 pl-9 pr-3 text-xs text-slate-400 font-medium cursor-pointer hover:border-slate-700 transition-colors focus:outline-none"
-          />
+          <h1 className="text-base sm:text-lg font-extrabold text-[var(--color-heading)] tracking-tight leading-tight">{computedTitle}</h1>
         </div>
       </div>
 
       {/* Right: Notifications & UserDropdown */}
       <div className="flex items-center gap-3">
-        {/* Notifications Icon Button */}
+        {/* Notifications Trigger Icon (Clean, no fake unread counts per Correction 4) */}
         <button
           type="button"
-          className="p-2 rounded-2xl bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800 transition-colors relative"
+          className="p-2 rounded-xl bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] border border-[var(--color-border)] transition-colors relative"
           aria-label="Notifications"
         >
           <BellIcon className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
         </button>
 
         {/* User Profile Dropdown */}

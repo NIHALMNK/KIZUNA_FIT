@@ -27,6 +27,7 @@ export interface ClientProfile {
   weight?: { value: number; unit: WeightUnit } | null;
   height?: { value: number; unit: HeightUnit } | null;
   medicalNotes?: string | null;
+  bio?: string | null;
   dietaryPreferences: DietaryPreference[];
   fitnessGoals: FitnessGoal[];
   experienceLevel?: ExperienceLevel | null;
@@ -52,6 +53,7 @@ export interface UpdateClientProfileDTO {
   weight?: { value: number; unit: WeightUnit };
   height?: { value: number; unit: HeightUnit };
   medicalNotes?: string;
+  bio?: string;
   dietaryPreferences?: DietaryPreference[];
   fitnessGoals?: FitnessGoal[];
   experienceLevel?: ExperienceLevel;

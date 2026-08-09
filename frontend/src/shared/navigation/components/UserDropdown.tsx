@@ -37,6 +37,7 @@ export const UserDropdown: React.FC = () => {
   const avatarUrl = isTrainer ? trainerProfile?.avatarUrl : clientProfile?.avatarUrl;
   const accountLabel = isTrainer ? 'Trainer Account' : 'Client Account';
   const profileHref = isTrainer ? '/profile/trainer' : '/profile/client';
+  const settingsHref = isTrainer ? '/trainer/settings' : '/client/settings';
 
   // Close on outside click or Escape
   useEffect(() => {
@@ -144,26 +145,24 @@ export const UserDropdown: React.FC = () => {
                 <span>My Profile</span>
               </Link>
 
-              {!isTrainer && (
-                <>
-                  <Link
-                    href="/client/settings"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
-                  >
-                    <SettingsIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
-                    <span>Settings</span>
-                  </Link>
+              <Link
+                href={settingsHref}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
+              >
+                <SettingsIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
+                <span>Settings</span>
+              </Link>
 
-                  <Link
-                    href="/client/help"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
-                  >
-                    <HelpIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
-                    <span>Help Center</span>
-                  </Link>
-                </>
+              {!isTrainer && (
+                <Link
+                  href="/client/help"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
+                >
+                  <HelpIcon className="w-4 h-4 text-[var(--color-text-muted)]" />
+                  <span>Help Center</span>
+                </Link>
               )}
             </div>
 

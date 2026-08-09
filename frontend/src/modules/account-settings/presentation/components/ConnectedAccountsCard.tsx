@@ -82,7 +82,9 @@ export const ConnectedAccountsCard: React.FC = () => {
 
             <div className="space-y-0.5 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-sm text-[var(--color-heading)] block">Google</span>
+                <span className="font-extrabold text-sm text-[var(--color-heading)] block">
+                  Google
+                </span>
                 {isLinked ? (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -105,7 +107,7 @@ export const ConnectedAccountsCard: React.FC = () => {
 
           <div className="shrink-0 w-full sm:w-auto">
             {isLinked ? (
-              canUnlink && (
+              canUnlink ? (
                 <Button
                   variant="outline"
                   size="sm"
@@ -114,6 +116,10 @@ export const ConnectedAccountsCard: React.FC = () => {
                 >
                   Unlink
                 </Button>
+              ) : (
+                <span className="inline-flex items-center text-[11px] font-bold text-[var(--color-text-muted)] bg-[var(--color-surface-alt)] border border-[var(--color-border)] px-3 py-1.5 rounded-xl">
+                  Managed by account security
+                </span>
               )
             ) : (
               <div className="w-full sm:w-48">

@@ -45,6 +45,12 @@ export const TrainerDashboardHeader: React.FC<TrainerDashboardHeaderProps> = ({
     } else if (pathname === '/profile/trainer/showcase') {
       computedTitle = 'Showcase';
       computedBreadcrumb = ['Dashboard', 'Showcase'];
+    } else if (pathname === '/trainer/settings/change-password') {
+      computedTitle = 'Change Password';
+      computedBreadcrumb = ['Dashboard', 'Account', 'Settings', 'Change Password'];
+    } else if (pathname.startsWith('/trainer/settings')) {
+      computedTitle = 'Settings';
+      computedBreadcrumb = ['Dashboard', 'Account', 'Settings'];
     } else {
       computedTitle = 'Overview';
       computedBreadcrumb = ['Dashboard', 'Overview'];

@@ -18,7 +18,7 @@ export const DangerZoneCard: React.FC = () => {
             Delete KIZUNAFIT Account
           </h2>
           <p className="text-xs text-[var(--color-text-secondary)] font-normal">
-            Permanently erase your client profile, preferences, and account access.
+            Permanently erase your profile data, preferences, and account access.
           </p>
         </div>
       </div>

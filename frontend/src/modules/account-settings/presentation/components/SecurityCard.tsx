@@ -3,7 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 
-export const SecurityCard: React.FC = () => {
+interface SecurityCardProps {
+  changePasswordHref?: string;
+}
+
+export const SecurityCard: React.FC<SecurityCardProps> = ({
+  changePasswordHref = '/client/settings/change-password',
+}) => {
   return (
     <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 transition-all">
       <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4">
@@ -24,12 +30,19 @@ export const SecurityCard: React.FC = () => {
         <div className="flex items-center gap-3.5">
           <div className="p-2.5 rounded-xl bg-white border border-[var(--color-border)] text-[var(--color-primary)] shrink-0 shadow-2xs">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
             </svg>
           </div>
 
           <div className="space-y-0.5">
-            <span className="font-extrabold text-sm text-[var(--color-heading)] block">Account Password</span>
+            <span className="font-extrabold text-sm text-[var(--color-heading)] block">
+              Account Password
+            </span>
             <p className="text-[11px] text-[var(--color-text-secondary)]">
               Changing your password will sign out your account on all other active devices.
             </p>
@@ -38,7 +51,7 @@ export const SecurityCard: React.FC = () => {
 
         <div className="shrink-0">
           <Link
-            href="/client/settings/change-password"
+            href={changePasswordHref}
             className="inline-flex items-center justify-center h-9 px-4 rounded-xl bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-xs font-bold transition-colors shadow-2xs w-full sm:w-auto"
           >
             Change Password

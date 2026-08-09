@@ -80,7 +80,10 @@ export const AccountInformationCard: React.FC<AccountInformationCardProps> = ({ 
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="fullName" className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-1">
+              <label
+                htmlFor="fullName"
+                className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-1"
+              >
                 Full Name
               </label>
               <Input
@@ -95,7 +98,10 @@ export const AccountInformationCard: React.FC<AccountInformationCardProps> = ({ 
             </div>
 
             <div>
-              <label htmlFor="phoneNumber" className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-1">
+              <label
+                htmlFor="phoneNumber"
+                className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-1"
+              >
                 Phone Number
               </label>
               <Input
@@ -136,7 +142,9 @@ export const AccountInformationCard: React.FC<AccountInformationCardProps> = ({ 
             <span className="text-[10px] font-bold text-[var(--color-text-secondary)] uppercase tracking-wider block">
               Full Name
             </span>
-            <p className="font-extrabold text-[var(--color-heading)] text-sm">{account.fullName || 'Client User'}</p>
+            <p className="font-extrabold text-[var(--color-heading)] text-sm">
+              {account.fullName || (account.role === 'TRAINER' ? 'Trainer' : 'Client User')}
+            </p>
           </div>
 
           <div className="p-3.5 rounded-xl bg-[var(--color-surface-alt)] border border-[var(--color-border)] space-y-1">
@@ -144,7 +152,9 @@ export const AccountInformationCard: React.FC<AccountInformationCardProps> = ({ 
               Email Address
             </span>
             <div className="flex items-center gap-1.5 min-w-0">
-              <p className="font-extrabold text-[var(--color-heading)] text-sm truncate">{account.email}</p>
+              <p className="font-extrabold text-[var(--color-heading)] text-sm truncate">
+                {account.email}
+              </p>
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                 ✓ Verified
               </span>
@@ -164,7 +174,9 @@ export const AccountInformationCard: React.FC<AccountInformationCardProps> = ({ 
             <span className="text-[10px] font-bold text-[var(--color-text-secondary)] uppercase tracking-wider block">
               Account Type
             </span>
-            <p className="font-extrabold text-[var(--color-heading)] text-sm">CLIENT</p>
+            <p className="font-extrabold text-[var(--color-heading)] text-sm">
+              {account.role || 'CLIENT'}
+            </p>
           </div>
 
           <div className="p-3.5 rounded-xl bg-[var(--color-surface-alt)] border border-[var(--color-border)] space-y-1">
@@ -181,7 +193,9 @@ export const AccountInformationCard: React.FC<AccountInformationCardProps> = ({ 
             <span className="text-[10px] font-bold text-[var(--color-text-secondary)] uppercase tracking-wider block">
               Member Since
             </span>
-            <p className="font-extrabold text-[var(--color-heading)] text-sm">{formatDate(account.createdAt)}</p>
+            <p className="font-extrabold text-[var(--color-heading)] text-sm">
+              {formatDate(account.createdAt)}
+            </p>
           </div>
         </div>
       )}

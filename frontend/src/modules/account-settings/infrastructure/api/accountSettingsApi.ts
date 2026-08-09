@@ -11,8 +11,22 @@ import {
 export class AccountSettingsApi {
   public async getUserAccount(): Promise<UserAccountDetails> {
     try {
-      const profile = await profileApi.getClientProfile();
       const user = useAuthStore.getState().user;
+      if (user?.role === 'TRAINER') {
+        const profile = await profileApi.getTrainerProfile();
+        return {
+          id: profile.id,
+          email: user?.email || '',
+          fullName: user?.email?.split('@')[0] || 'Trainer',
+          phoneNumber: null,
+          role: 'TRAINER',
+          emailVerified: true,
+          accountStatus: 'ACTIVE',
+          createdAt: profile.createdAt || new Date().toISOString(),
+          updatedAt: profile.updatedAt,
+        };
+      }
+      const profile = await profileApi.getClientProfile();
       return {
         id: profile.id,
         email: user?.email || '',
@@ -29,9 +43,10 @@ export class AccountSettingsApi {
       return {
         id: user?.id || '',
         email: user?.email || '',
-        fullName: 'Client User',
+        fullName:
+          user?.email?.split('@')[0] || (user?.role === 'TRAINER' ? 'Trainer' : 'Client User'),
         phoneNumber: null,
-        role: 'CLIENT',
+        role: (user?.role || 'CLIENT') as 'CLIENT' | 'TRAINER' | 'ADMIN',
         emailVerified: true,
         accountStatus: 'ACTIVE',
         createdAt: new Date().toISOString(),
@@ -40,8 +55,22 @@ export class AccountSettingsApi {
   }
 
   public async updateUserAccount(dto: UpdateAccountDTO): Promise<UserAccountDetails> {
-    const profile = await profileApi.updateClientProfile(dto);
     const user = useAuthStore.getState().user;
+    if (user?.role === 'TRAINER') {
+      const profile = await profileApi.getTrainerProfile();
+      return {
+        id: profile.id,
+        email: user?.email || '',
+        fullName: dto.fullName?.trim() || user?.email?.split('@')[0] || 'Trainer',
+        phoneNumber: dto.phoneNumber?.trim() || null,
+        role: 'TRAINER',
+        emailVerified: true,
+        accountStatus: 'ACTIVE',
+        createdAt: profile.createdAt || new Date().toISOString(),
+        updatedAt: profile.updatedAt,
+      };
+    }
+    const profile = await profileApi.updateClientProfile(dto);
     return {
       id: profile.id,
       email: user?.email || '',

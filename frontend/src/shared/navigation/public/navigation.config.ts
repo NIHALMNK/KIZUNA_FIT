@@ -13,9 +13,9 @@ export interface NavItem {
 
 export const PUBLIC_NAV_ITEMS: NavItem[] = [
   {
-    id: 'home',
-    label: 'Home',
-    href: PUBLIC_ROUTES.HOME,
+    id: 'find-trainers',
+    label: 'Find Trainers',
+    href: PUBLIC_ROUTES.FIND_TRAINERS,
     showInDesktop: true,
     showInMobile: true,
     prefetch: true,
@@ -24,14 +24,6 @@ export const PUBLIC_NAV_ITEMS: NavItem[] = [
     id: 'about',
     label: 'About',
     href: PUBLIC_ROUTES.ABOUT,
-    showInDesktop: true,
-    showInMobile: true,
-    prefetch: true,
-  },
-  {
-    id: 'pricing',
-    label: 'Pricing',
-    href: PUBLIC_ROUTES.PRICING,
     showInDesktop: true,
     showInMobile: true,
     prefetch: true,

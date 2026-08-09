@@ -16,27 +16,22 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     title: 'Platform',
     links: [
       { label: 'Find Trainers', href: PUBLIC_ROUTES.FIND_TRAINERS },
-      { label: 'Features', href: PUBLIC_ROUTES.FEATURES },
-      { label: 'How It Works', href: PUBLIC_ROUTES.HOW_IT_WORKS },
-      { label: 'Pricing Plans', href: PUBLIC_ROUTES.PRICING },
+      { label: 'Create Account', href: PUBLIC_ROUTES.REGISTER },
+      { label: 'Login', href: PUBLIC_ROUTES.LOGIN },
     ],
   },
   {
     title: 'Company',
     links: [
       { label: 'About KIZUNAFIT', href: PUBLIC_ROUTES.ABOUT },
-      { label: 'Success Stories', href: '/#testimonials' },
       { label: 'Contact Us', href: PUBLIC_ROUTES.CONTACT },
-      { label: 'Trainer Portal', href: PUBLIC_ROUTES.LOGIN },
     ],
   },
   {
     title: 'Legal & Security',
     links: [
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
-      { label: 'HIPAA & Biometric Compliance', href: '/security' },
-      { label: 'Cookie Settings', href: '#' },
+      { label: 'Privacy Policy', href: PUBLIC_ROUTES.PRIVACY },
+      { label: 'Terms of Service', href: PUBLIC_ROUTES.TERMS },
     ],
   },
 ];

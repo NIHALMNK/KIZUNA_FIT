@@ -19,7 +19,10 @@ export class AcceptTrainerRequestUseCase {
     dto: AcceptTrainerRequestCommandDTO,
   ): Promise<Result<TrainerRequestResponseDTO>> {
     try {
-      const pipeline = await this.pipelineRepo.findById(dto.requestId);
+      let pipeline = await this.pipelineRepo.findByRequestId(dto.requestId);
+      if (!pipeline) {
+        pipeline = await this.pipelineRepo.findById(dto.requestId);
+      }
 
       if (!pipeline) {
         throw new TrainerRequestNotFoundException(dto.requestId);

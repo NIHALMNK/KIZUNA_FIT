@@ -14,7 +14,7 @@ export class ProfileGatewayAdapter implements ProfileGateway {
       : { userId: trainerId };
 
     const doc = await TrainerProfileModel.findOne(query).exec();
-    if (!doc) {
+    if (!doc || !doc.userId) {
       return null;
     }
 
@@ -29,7 +29,7 @@ export class ProfileGatewayAdapter implements ProfileGateway {
         availabilityStatus,
       },
       snapshot: {
-        trainerId: doc.userId || doc._id.toString(),
+        trainerId: doc.userId.toString(),
         fullName: doc.headline || 'Fitness Trainer',
         headline: doc.headline || '',
         profileImage: doc.avatarUrl || '',

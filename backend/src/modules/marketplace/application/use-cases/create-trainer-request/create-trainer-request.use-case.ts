@@ -33,23 +33,26 @@ export class CreateTrainerRequestUseCase {
         trainerInfo ? trainerInfo.eligibility : null,
       );
 
-      // 2. Interrogate Coaching Gateway for active relationship existence
+      // 2. Extract canonical Trainer User ID from resolved snapshot
+      const trainerUserId = trainerInfo!.snapshot.trainerId;
+
+      // 3. Interrogate Coaching Gateway for active relationship existence
       const hasCoachingRelationship = await this.coachingGateway.hasActiveRelationship(
         dto.clientId,
-        dto.trainerId,
+        trainerUserId,
       );
       if (hasCoachingRelationship) {
-        throw new ActiveCoachingRelationshipExistsException(dto.clientId, dto.trainerId);
+        throw new ActiveCoachingRelationshipExistsException(dto.clientId, trainerUserId);
       }
 
-      // 3. Enforce DuplicateTrainerRequestPolicy for this Client-Trainer pair
+      // 4. Enforce DuplicateTrainerRequestPolicy for this Client-Trainer pair
       const existingPairPipeline = await this.pipelineRepo.findActivePipelineBetween(
         dto.clientId,
-        dto.trainerId,
+        trainerUserId,
       );
       this.duplicatePolicy.validate(
         dto.clientId,
-        dto.trainerId,
+        trainerUserId,
         existingPairPipeline
           ? {
               clientId: existingPairPipeline.clientId,
@@ -59,10 +62,10 @@ export class CreateTrainerRequestUseCase {
           : null,
       );
 
-      // 4. Enforce SingleActivePipelinePolicy for this Client across platform
+      // 5. Enforce SingleActivePipelinePolicy for this Client across platform
       const existingActivePipeline = await this.pipelineRepo.findActivePipeline(dto.clientId);
       if (existingActivePipeline) {
-        this.singleActivePolicy.validate(dto.clientId, dto.trainerId, [
+        this.singleActivePolicy.validate(dto.clientId, trainerUserId, [
           {
             clientId: existingActivePipeline.clientId,
             trainerId: existingActivePipeline.trainerId,
@@ -71,10 +74,10 @@ export class CreateTrainerRequestUseCase {
         ]);
       }
 
-      // 5. Construct Aggregate Root using Factory
+      // 6. Construct Aggregate Root using Factory
       const factoryResult = AcquisitionPipelineFactory.createNewPipeline({
         clientId: dto.clientId,
-        trainerId: dto.trainerId,
+        trainerId: trainerUserId,
         clientGoal: dto.goal,
         clientMessage: dto.message,
         trainerSnapshot: trainerInfo!.snapshot,

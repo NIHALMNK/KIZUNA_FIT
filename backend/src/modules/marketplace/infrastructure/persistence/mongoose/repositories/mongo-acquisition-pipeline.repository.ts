@@ -30,6 +30,17 @@ export class MongoAcquisitionPipelineRepository implements IAcquisitionPipelineR
     return doc ? AcquisitionPipelinePersistenceMapper.toDomain(doc) : null;
   }
 
+  public async findByRequestId(requestId: string): Promise<AcquisitionPipeline | null> {
+    if (!requestId) {
+      return null;
+    }
+
+    const doc = await AcquisitionPipelineModel.findOne({
+      'trainerRequest.requestId': requestId,
+    });
+    return doc ? AcquisitionPipelinePersistenceMapper.toDomain(doc) : null;
+  }
+
   public async findActivePipeline(clientId: string): Promise<AcquisitionPipeline | null> {
     if (!Types.ObjectId.isValid(clientId)) {
       return null;

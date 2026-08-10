@@ -45,6 +45,7 @@ describe('Marketplace Application Layer Use Cases', () => {
     mockPipelineRepo = {
       save: vi.fn().mockResolvedValue(undefined),
       findById: vi.fn().mockImplementation(async () => activePipeline),
+      findByRequestId: vi.fn().mockImplementation(async () => activePipeline),
       findActivePipeline: vi.fn().mockResolvedValue(null),
       findActivePipelineBetween: vi.fn().mockResolvedValue(null),
       findByClientId: vi

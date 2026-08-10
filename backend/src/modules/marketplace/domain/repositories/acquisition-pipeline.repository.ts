@@ -20,6 +20,7 @@ export interface PaginatedPipelinesResult {
 export interface IAcquisitionPipelineRepository {
   save(pipeline: AcquisitionPipeline): Promise<void>;
   findById(id: string): Promise<AcquisitionPipeline | null>;
+  findByRequestId(requestId: string): Promise<AcquisitionPipeline | null>;
   findActivePipeline(clientId: string): Promise<AcquisitionPipeline | null>;
   findActivePipelineBetween(
     clientId: string,

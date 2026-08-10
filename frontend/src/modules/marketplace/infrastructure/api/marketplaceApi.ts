@@ -8,75 +8,45 @@ import {
 } from '../../domain/types';
 
 export const marketplaceApi = {
-  createRequest: async (
-    payload: CreateTrainerRequestPayload,
-  ): Promise<TrainerRequestResponseDTO> => {
-    const res = await httpClient.post<{ success: boolean; data: TrainerRequestResponseDTO }>(
-      '/trainer-requests',
-      payload,
-    );
-    return res.data;
+  createRequest: (payload: CreateTrainerRequestPayload): Promise<TrainerRequestResponseDTO> => {
+    return httpClient.post<TrainerRequestResponseDTO>('/trainer-requests', payload);
   },
 
-  listRequests: async (
+  listRequests: (params?: TrainerRequestsQueryParams): Promise<PaginatedTrainerRequestsDTO> => {
+    return httpClient.get<PaginatedTrainerRequestsDTO>('/trainer-requests', { params });
+  },
+
+  getPendingRequests: (
     params?: TrainerRequestsQueryParams,
   ): Promise<PaginatedTrainerRequestsDTO> => {
-    const res = await httpClient.get<{ success: boolean; data: PaginatedTrainerRequestsDTO }>(
-      '/trainer-requests',
-      { params },
-    );
-    return res.data;
+    return httpClient.get<PaginatedTrainerRequestsDTO>('/trainer-requests/pending', { params });
   },
 
-  getPendingRequests: async (
+  getRequestHistory: (
     params?: TrainerRequestsQueryParams,
   ): Promise<PaginatedTrainerRequestsDTO> => {
-    const res = await httpClient.get<{ success: boolean; data: PaginatedTrainerRequestsDTO }>(
-      '/trainer-requests/pending',
-      { params },
-    );
-    return res.data;
+    return httpClient.get<PaginatedTrainerRequestsDTO>('/trainer-requests/history', { params });
   },
 
-  getRequestHistory: async (
-    params?: TrainerRequestsQueryParams,
-  ): Promise<PaginatedTrainerRequestsDTO> => {
-    const res = await httpClient.get<{ success: boolean; data: PaginatedTrainerRequestsDTO }>(
-      '/trainer-requests/history',
-      { params },
-    );
-    return res.data;
+  getRequestById: (requestId: string): Promise<TrainerRequestResponseDTO> => {
+    return httpClient.get<TrainerRequestResponseDTO>(`/trainer-requests/${requestId}`);
   },
 
-  getRequestById: async (requestId: string): Promise<TrainerRequestResponseDTO> => {
-    const res = await httpClient.get<{ success: boolean; data: TrainerRequestResponseDTO }>(
-      `/trainer-requests/${requestId}`,
-    );
-    return res.data;
+  acceptRequest: (requestId: string): Promise<TrainerRequestResponseDTO> => {
+    return httpClient.post<TrainerRequestResponseDTO>(`/trainer-requests/${requestId}/accept`);
   },
 
-  acceptRequest: async (requestId: string): Promise<TrainerRequestResponseDTO> => {
-    const res = await httpClient.post<{ success: boolean; data: TrainerRequestResponseDTO }>(
-      `/trainer-requests/${requestId}/accept`,
-    );
-    return res.data;
-  },
-
-  rejectRequest: async (
+  rejectRequest: (
     requestId: string,
     payload?: RejectTrainerRequestPayload,
   ): Promise<TrainerRequestResponseDTO> => {
-    const res = await httpClient.post<{ success: boolean; data: TrainerRequestResponseDTO }>(
+    return httpClient.post<TrainerRequestResponseDTO>(
       `/trainer-requests/${requestId}/reject`,
       payload || {},
     );
-    return res.data;
   },
 
-  withdrawRequest: async (requestId: string): Promise<TrainerRequestResponseDTO> => {
-    const res = await httpClient.post<{ success: boolean; data: TrainerRequestResponseDTO }>(
-      `/trainer-requests/${requestId}/withdraw`,
-    );
-    return res.data;
+  withdrawRequest: (requestId: string): Promise<TrainerRequestResponseDTO> => {
+    return httpClient.post<TrainerRequestResponseDTO>(`/trainer-requests/${requestId}/withdraw`);
   },
 };

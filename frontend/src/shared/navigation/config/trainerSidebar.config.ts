@@ -29,8 +29,9 @@ export const trainerSidebarConfig: SidebarConfig = {
           description: 'Pending client intake & coaching proposals',
           href: '/trainer/requests',
           iconName: 'requests',
-          status: 'comingSoon',
-          badge: { type: 'COMING_SOON', text: 'Coming Soon' },
+          status: 'active',
+          pageTitle: 'Client Requests',
+          breadcrumb: ['Dashboard', 'Requests'],
         },
         {
           id: 'trainer-consultations',

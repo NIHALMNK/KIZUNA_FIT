@@ -7,10 +7,11 @@ import { CloudinaryProvider } from '../../infrastructure/storage/CloudinaryProvi
 import { MockEmailProvider } from '../../infrastructure/mail/MockEmailProvider';
 import { SocketIOManager } from '../../infrastructure/websocket/SocketIOManager';
 import { WebRTCSignaling } from '../../infrastructure/websocket/WebRTCSignaling';
+import { registerMarketplaceModule } from '../../modules/marketplace/module';
 
 export const configureContainer = () => {
   const container = createContainer({
-    injectionMode: InjectionMode.CLASSIC
+    injectionMode: InjectionMode.CLASSIC,
   });
 
   container.register({
@@ -21,8 +22,10 @@ export const configureContainer = () => {
     cloudinaryProvider: asClass(CloudinaryProvider).singleton(),
     emailProvider: asClass(MockEmailProvider).singleton(),
     socketIOManager: asClass(SocketIOManager).singleton(),
-    webRTCSignaling: asClass(WebRTCSignaling).singleton()
+    webRTCSignaling: asClass(WebRTCSignaling).singleton(),
   });
+
+  registerMarketplaceModule(container);
 
   return container;
 };

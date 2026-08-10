@@ -432,7 +432,7 @@ The Marketplace Domain exists to connect Client → Trainer before consultation,
 | :---- | :---- |
 | **Ownership** | Owned By: AcquisitionPipeline |
 | **Storage Strategy** | Embedded Entity |
-| **Fields** | requestId | clientMessage | status | submittedAt | respondedAt | responseReason |
+| **Fields** | requestId | clientGoal | clientMessage | status | submittedAt | respondedAt | responseReason |
 | **Lifecycle States** | REQUEST\_PENDING | REQUEST\_ACCEPTED | REQUEST\_REJECTED | REQUEST\_CANCELLED |
 
  

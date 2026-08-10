@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGetPublicTrainerProfile } from '@/modules/profile/presentation/hooks/usePublicTrainers';
+import { useAuthStore } from '@/modules/identity/application/store/authStore';
+import { RequestCoachingModal } from '@/modules/marketplace/presentation/components/RequestCoachingModal';
 import { ROUTES } from '@/shared/constants/routes';
 import { TrainerAvailabilityStatus } from '@/modules/profile/domain/enums/profile.enums';
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
@@ -22,7 +24,11 @@ if (typeof window !== 'undefined') {
 
 export default function PublicTrainerDetailsPage() {
   const params = useParams();
+  const router = useRouter();
   const trainerId = params?.id as string;
+
+  const { status: authStatus, user } = useAuthStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     data: trainer,
@@ -69,6 +75,21 @@ export default function PublicTrainerDetailsPage() {
     toast.success(isSaved ? 'Trainer removed from saved' : 'Trainer saved to favorites!');
   };
 
+  const handleCoachingCTA = () => {
+    if (authStatus !== 'authenticated' || !user) {
+      toast.info('Please log in or register as a client to request coaching.');
+      router.push(`${ROUTES.LOGIN}?redirect=/trainers/${trainerId}`);
+      return;
+    }
+
+    if (user.role === 'TRAINER') {
+      toast.warning('Trainers cannot submit coaching requests to other trainers.');
+      return;
+    }
+
+    setIsModalOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[var(--color-background)] py-20 px-6 max-w-4xl mx-auto">
@@ -103,6 +124,8 @@ export default function PublicTrainerDetailsPage() {
   const isAvailable = trainer.availabilityStatus === TrainerAvailabilityStatus.AVAILABLE;
   const ratingDisplay =
     trainer.totalReviews > 0 ? `★ ${trainer.averageRating?.toFixed(1)}` : 'No reviews yet';
+  const trainerDisplayName =
+    trainer.trainerName || trainer.fullName || trainer.name || 'Certified Trainer';
 
   return (
     <div
@@ -171,7 +194,7 @@ export default function PublicTrainerDetailsPage() {
             <div className="flex-1 space-y-1.5">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-heading)] tracking-tight">
-                  {trainer.trainerName || trainer.fullName || trainer.name || 'Certified Trainer'}
+                  {trainerDisplayName}
                 </h1>
                 <Badge variant="primary">Verified Coach ✓</Badge>
               </div>
@@ -208,11 +231,9 @@ export default function PublicTrainerDetailsPage() {
 
             {/* Hero CTA Button */}
             <div className="shrink-0 flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-2 sm:pt-0">
-              <Link href={`${ROUTES.REGISTER}?role=CLIENT`}>
-                <Button variant="primary" size="md">
-                  Interested in Coaching
-                </Button>
-              </Link>
+              <Button variant="primary" size="md" onClick={handleCoachingCTA}>
+                Interested in Coaching
+              </Button>
             </div>
           </div>
         </div>
@@ -405,15 +426,23 @@ export default function PublicTrainerDetailsPage() {
                   ? 'This coach is currently accepting new 1-on-1 clients.'
                   : 'This coach is currently at capacity or unavailable for new clients.'}
               </p>
-              <Link href={`${ROUTES.REGISTER}?role=CLIENT`} className="block w-full">
-                <Button variant="primary" size="md" className="w-full">
-                  Interested in Coaching
-                </Button>
-              </Link>
+              <Button variant="primary" size="md" className="w-full" onClick={handleCoachingCTA}>
+                Interested in Coaching
+              </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Request Coaching Modal */}
+      <RequestCoachingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        trainerId={trainer.id || trainerId}
+        trainerName={trainerDisplayName}
+        trainerHeadline={trainer.headline}
+        avatarUrl={trainer.avatarUrl || undefined}
+      />
     </div>
   );
 }

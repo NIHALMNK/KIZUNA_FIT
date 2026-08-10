@@ -3,31 +3,65 @@ import http from 'http';
 import { ILogger } from '../../shared/contracts/ILogger';
 import { RedisManager } from '../cache/RedisManager';
 import { createAdapter } from '@socket.io/redis-adapter';
+import { env } from '../../config/env.config';
+import { socketAuthMiddleware } from './middleware/socket-auth.middleware';
+import { UserRoom } from './utils/user-room.util';
 
 export class SocketIOManager {
   private io!: Server;
 
-  constructor(private logger: ILogger, private redisManager: RedisManager) {}
+  constructor(
+    private readonly logger: ILogger,
+    private readonly redisManager: RedisManager,
+  ) {}
 
   public initialize(httpServer: http.Server): Server {
+    const allowedOrigins = Array.from(
+      new Set([
+        env.CORS_ORIGIN,
+        env.FRONTEND_URL,
+        'http://localhost:3002',
+        'http://localhost:3000',
+      ]),
+    );
+
     this.io = new Server(httpServer, {
       cors: {
-        origin: '*', // To be restricted via config in production
-        methods: ['GET', 'POST']
-      }
+        origin: allowedOrigins,
+        credentials: true,
+        methods: ['GET', 'POST'],
+      },
     });
 
     const pubClient = this.redisManager.getClient();
     const subClient = pubClient.duplicate();
-    
-    // Wire redis adapter for scale-out
+
+    // Wire Redis adapter for scale-out
     this.io.adapter(createAdapter(pubClient, subClient));
 
+    // Register authentication middleware
+    this.io.use(socketAuthMiddleware);
+
+    // Handle authenticated connections
     this.io.on('connection', (socket: Socket) => {
-      this.logger.debug(`Socket connected: ${socket.id}`);
-      
-      socket.on('disconnect', () => {
-        this.logger.debug(`Socket disconnected: ${socket.id}`);
+      const user = socket.data.user;
+
+      if (user?.userId) {
+        const userRoom = UserRoom.forUser(user.userId);
+        socket.join(userRoom);
+
+        this.logger.info(
+          `🔌 Socket authenticated & connected: ${socket.id} (User: ${user.userId}, Role: ${user.role}) joined ${userRoom}`,
+        );
+      } else {
+        this.logger.debug(`Socket connected without identity: ${socket.id}`);
+      }
+
+      socket.on('disconnect', (reason: string) => {
+        const userId = socket.data.user?.userId || 'anonymous';
+        this.logger.info(
+          `❌ Socket disconnected: ${socket.id} (User: ${userId}, Reason: ${reason})`,
+        );
       });
     });
 
@@ -36,7 +70,7 @@ export class SocketIOManager {
 
   public getIO(): Server {
     if (!this.io) {
-      throw new Error("Socket.IO has not been initialized.");
+      throw new Error('Socket.IO has not been initialized.');
     }
     return this.io;
   }

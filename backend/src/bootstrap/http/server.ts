@@ -39,6 +39,7 @@ async function bootstrap() {
   // Resolve providers that don't need to be kept around
   container.resolve<CloudinaryProvider>('cloudinaryProvider');
   container.resolve<MockEmailProvider>('emailProvider');
+  container.resolve('realtimeDomainEventSubscriber');
 
   try {
     // 3. Connect MongoDB (Fail Fast)

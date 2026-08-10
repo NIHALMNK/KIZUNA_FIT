@@ -7,6 +7,9 @@ import { CloudinaryProvider } from '../../infrastructure/storage/CloudinaryProvi
 import { MockEmailProvider } from '../../infrastructure/mail/MockEmailProvider';
 import { SocketIOManager } from '../../infrastructure/websocket/SocketIOManager';
 import { WebRTCSignaling } from '../../infrastructure/websocket/WebRTCSignaling';
+import { DomainEventDispatcher } from '../../shared/events/domain-event-dispatcher';
+import { SocketIORealtimePublisher } from '../../infrastructure/websocket/publishers/SocketIORealtimePublisher';
+import { RealtimeDomainEventSubscriber } from '../../infrastructure/websocket/subscribers/RealtimeDomainEventSubscriber';
 import { registerMarketplaceModule } from '../../modules/marketplace/module';
 
 export const configureContainer = () => {
@@ -23,6 +26,9 @@ export const configureContainer = () => {
     emailProvider: asClass(MockEmailProvider).singleton(),
     socketIOManager: asClass(SocketIOManager).singleton(),
     webRTCSignaling: asClass(WebRTCSignaling).singleton(),
+    domainEventDispatcher: asClass(DomainEventDispatcher).singleton(),
+    realtimePublisher: asClass(SocketIORealtimePublisher).singleton(),
+    realtimeDomainEventSubscriber: asClass(RealtimeDomainEventSubscriber).singleton(),
   });
 
   registerMarketplaceModule(container);

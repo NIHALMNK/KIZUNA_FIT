@@ -17,6 +17,9 @@ import { GetUpcomingConsultationsUseCase } from './application/use-cases/get-upc
 import { GetConsultationHistoryUseCase } from './application/use-cases/get-consultation-history.use-case';
 import { GetConsultationByRoomIdUseCase } from './application/use-cases/get-consultation-by-room-id.use-case';
 
+// Presentation Controller
+import { ConsultationController } from './presentation/controllers/consultation.controller';
+
 export const registerConsultationDependencies = (container: AwilixContainer): void => {
   // Repository (Scoped)
   container.register({
@@ -37,5 +40,10 @@ export const registerConsultationDependencies = (container: AwilixContainer): vo
     getUpcomingConsultationsUseCase: asClass(GetUpcomingConsultationsUseCase).scoped(),
     getConsultationHistoryUseCase: asClass(GetConsultationHistoryUseCase).scoped(),
     getConsultationByRoomIdUseCase: asClass(GetConsultationByRoomIdUseCase).scoped(),
+  });
+
+  // Presentation Controller (Scoped)
+  container.register({
+    consultationController: asClass(ConsultationController).scoped(),
   });
 };

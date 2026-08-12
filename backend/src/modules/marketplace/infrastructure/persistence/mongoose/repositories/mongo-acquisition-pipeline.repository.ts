@@ -10,7 +10,11 @@ import { AcquisitionPipelineModel } from '../schemas/acquisition-pipeline.schema
 import { IAcquisitionPipelineDocument } from '../documents/acquisition-pipeline.document';
 import { AcquisitionPipelinePersistenceMapper } from '../mappers/acquisition-pipeline-persistence.mapper';
 
+import { DomainEventDispatcher } from '../../../../../../shared/events/domain-event-dispatcher';
+
 export class MongoAcquisitionPipelineRepository implements IAcquisitionPipelineRepository {
+  constructor(private readonly domainEventDispatcher?: DomainEventDispatcher) {}
+
   public async save(pipeline: AcquisitionPipeline): Promise<void> {
     const rawData = AcquisitionPipelinePersistenceMapper.toPersistence(pipeline);
 
@@ -19,6 +23,11 @@ export class MongoAcquisitionPipelineRepository implements IAcquisitionPipelineR
       { $set: rawData },
       { upsert: true, new: true, runValidators: true },
     );
+
+    if (this.domainEventDispatcher && pipeline.domainEvents.length > 0) {
+      await this.domainEventDispatcher.dispatchAll(pipeline.domainEvents);
+      pipeline.clearEvents();
+    }
   }
 
   public async findById(id: string): Promise<AcquisitionPipeline | null> {

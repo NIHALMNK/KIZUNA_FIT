@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { DomainEventDispatcher } from '../../../src/shared/events/domain-event-dispatcher';
 import { RealtimeDomainEventSubscriber } from '../../../src/infrastructure/websocket/subscribers/RealtimeDomainEventSubscriber';
 import { IDomainEvent } from '../../../src/shared/core/AggregateRoot';
+import { configureContainer } from '../../../src/bootstrap/dependency-injection/container';
 
 class SampleDomainEvent implements IDomainEvent {
   public readonly dateTimeOccurred = new Date();
@@ -17,6 +18,14 @@ class SampleDomainEvent implements IDomainEvent {
 }
 
 describe('RealtimeDomainEventSubscriber (TEST R7, R8, R9, R10, R11, R12)', () => {
+  it('should resolve realtimeDomainEventSubscriber from Awilix container without throwing AwilixResolutionError', () => {
+    const container = configureContainer();
+    const subscriber = container.resolve<RealtimeDomainEventSubscriber>(
+      'realtimeDomainEventSubscriber',
+    );
+    expect(subscriber).toBeInstanceOf(RealtimeDomainEventSubscriber);
+  });
+
   it('TEST R7, R8, R9, R10 — should bridge dispatched domain event to IRealtimePublisher target user room', async () => {
     const dispatcher = new DomainEventDispatcher();
     const mockPublishToUser = vi.fn();

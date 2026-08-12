@@ -15,9 +15,17 @@ export const CreateTrainerRequestSchema = z.object({
 });
 
 export const RejectTrainerRequestSchema = z.object({
-  body: z.object({
-    reason: z.string().max(500, 'reason cannot exceed 500 characters').optional(),
-  }),
+  params: z
+    .object({
+      requestId: z.string().optional(),
+    })
+    .passthrough()
+    .optional(),
+  body: z
+    .object({
+      reason: z.string().max(500, 'reason cannot exceed 500 characters').optional(),
+    })
+    .optional(),
 });
 
 export const GetTrainerRequestsQuerySchema = z.object({

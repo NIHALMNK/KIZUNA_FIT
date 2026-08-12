@@ -22,7 +22,7 @@ export class RealtimeDomainEventSubscriber {
   private resolvers: Map<string, EventToRecipientResolver> = new Map();
 
   constructor(
-    private readonly dispatcher: DomainEventDispatcher,
+    private readonly domainEventDispatcher: DomainEventDispatcher,
     private readonly realtimePublisher: IRealtimePublisher,
     private readonly logger: ILogger,
   ) {}
@@ -37,7 +37,7 @@ export class RealtimeDomainEventSubscriber {
     this.resolvers.set(domainEventName, resolver as EventToRecipientResolver);
 
     // Subscribe handler with DomainEventDispatcher
-    this.dispatcher.register<T>(domainEventName, async (event: T) => {
+    this.domainEventDispatcher.register<T>(domainEventName, async (event: T) => {
       await this.handleDomainEvent(event);
     });
 

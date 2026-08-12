@@ -73,7 +73,11 @@ export function useAcceptTrainerRequest() {
       queryClient.invalidateQueries({ queryKey: ['trainer-requests'] });
       queryClient.invalidateQueries({ queryKey: ['trainer-requests-pending'] });
       queryClient.invalidateQueries({ queryKey: ['trainer-requests-history'] });
-      queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.requestDetail(requestId) });
+      if (requestId) {
+        queryClient.invalidateQueries({
+          queryKey: MARKETPLACE_QUERY_KEYS.requestDetail(requestId),
+        });
+      }
     },
     onError: (err: any) => {
       const msg =
@@ -94,12 +98,17 @@ export function useRejectTrainerRequest() {
       requestId: string;
       payload?: RejectTrainerRequestPayload;
     }) => marketplaceApi.rejectRequest(requestId, payload),
-    onSuccess: (_data, { requestId }) => {
+    onSuccess: (_data, variables) => {
+      const requestId = variables?.requestId;
       toast.success('Trainer request rejected.');
       queryClient.invalidateQueries({ queryKey: ['trainer-requests'] });
       queryClient.invalidateQueries({ queryKey: ['trainer-requests-pending'] });
       queryClient.invalidateQueries({ queryKey: ['trainer-requests-history'] });
-      queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.requestDetail(requestId) });
+      if (requestId) {
+        queryClient.invalidateQueries({
+          queryKey: MARKETPLACE_QUERY_KEYS.requestDetail(requestId),
+        });
+      }
     },
     onError: (err: any) => {
       const msg =
@@ -119,7 +128,11 @@ export function useWithdrawTrainerRequest() {
       queryClient.invalidateQueries({ queryKey: ['trainer-requests'] });
       queryClient.invalidateQueries({ queryKey: ['trainer-requests-pending'] });
       queryClient.invalidateQueries({ queryKey: ['trainer-requests-history'] });
-      queryClient.invalidateQueries({ queryKey: MARKETPLACE_QUERY_KEYS.requestDetail(requestId) });
+      if (requestId) {
+        queryClient.invalidateQueries({
+          queryKey: MARKETPLACE_QUERY_KEYS.requestDetail(requestId),
+        });
+      }
     },
     onError: (err: any) => {
       const msg =

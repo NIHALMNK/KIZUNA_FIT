@@ -66,32 +66,37 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!queryBridge) return;
 
-    const unCreated = queryBridge.registerRule('marketplace:request:created', () => [
+    const unCreated = queryBridge.registerRule('marketplace:request:created', (event) => [
       ['trainer-requests-pending'],
       ['trainer-requests'],
+      ['trainer-request-detail', (event.payload as any)?.requestId || ''],
     ]);
 
-    const unAccepted = queryBridge.registerRule('marketplace:request:accepted', () => [
-      ['trainer-requests'],
-      ['trainer-requests-pending'],
-      ['trainer-requests-history'],
-    ]);
-
-    const unRejected = queryBridge.registerRule('marketplace:request:rejected', () => [
+    const unAccepted = queryBridge.registerRule('marketplace:request:accepted', (event) => [
       ['trainer-requests'],
       ['trainer-requests-pending'],
       ['trainer-requests-history'],
+      ['trainer-request-detail', (event.payload as any)?.requestId || ''],
     ]);
 
-    const unWithdrawn = queryBridge.registerRule('marketplace:request:withdrawn', () => [
+    const unRejected = queryBridge.registerRule('marketplace:request:rejected', (event) => [
       ['trainer-requests'],
       ['trainer-requests-pending'],
       ['trainer-requests-history'],
+      ['trainer-request-detail', (event.payload as any)?.requestId || ''],
     ]);
 
-    const unClosed = queryBridge.registerRule('marketplace:request:closed', () => [
+    const unWithdrawn = queryBridge.registerRule('marketplace:request:withdrawn', (event) => [
+      ['trainer-requests'],
+      ['trainer-requests-pending'],
+      ['trainer-requests-history'],
+      ['trainer-request-detail', (event.payload as any)?.requestId || ''],
+    ]);
+
+    const unClosed = queryBridge.registerRule('marketplace:request:closed', (event) => [
       ['trainer-requests'],
       ['trainer-requests-history'],
+      ['trainer-request-detail', (event.payload as any)?.requestId || ''],
     ]);
 
     return () => {

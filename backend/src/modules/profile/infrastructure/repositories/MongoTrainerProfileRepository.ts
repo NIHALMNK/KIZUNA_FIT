@@ -17,9 +17,8 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
     const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
     if (doc.userId) {
       const userDoc = await UserModel.findById(doc.userId).exec();
-      if (userDoc && (userDoc as any).fullName) {
-        (domainProfile as any).fullName = (userDoc as any).fullName;
-        (domainProfile as any).trainerName = (userDoc as any).fullName;
+      if (userDoc && userDoc.fullName) {
+        domainProfile.setFullName(userDoc.fullName);
       }
     }
     return domainProfile;
@@ -30,9 +29,8 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
     if (!doc) return null;
     const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
     const userDoc = await UserModel.findById(userId).exec();
-    if (userDoc && (userDoc as any).fullName) {
-      (domainProfile as any).fullName = (userDoc as any).fullName;
-      (domainProfile as any).trainerName = (userDoc as any).fullName;
+    if (userDoc && userDoc.fullName) {
+      domainProfile.setFullName(userDoc.fullName);
     }
     return domainProfile;
   }
@@ -154,8 +152,7 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
     const profiles = dataResult.map((doc) => {
       const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
       if (doc.user && doc.user.fullName) {
-        (domainProfile as unknown as Record<string, unknown>).fullName = doc.user.fullName;
-        (domainProfile as unknown as Record<string, unknown>).trainerName = doc.user.fullName;
+        domainProfile.setFullName(doc.user.fullName);
       }
       return domainProfile;
     });

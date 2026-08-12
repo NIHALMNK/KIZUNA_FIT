@@ -11,6 +11,14 @@ import { IConsultationDocument } from '../documents/consultation.document';
 import { ConsultationPersistenceMapper } from '../mappers/consultation-persistence.mapper';
 import { DomainEventDispatcher } from '../../../../../../shared/events/domain-event-dispatcher';
 
+function isMongoDuplicateKeyError(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) {
+    return false;
+  }
+  const err = error as { code?: number; codeName?: string };
+  return err.code === 11000 || err.codeName === 'DuplicateKey';
+}
+
 export class MongoConsultationRepository implements IConsultationRepository {
   constructor(private readonly domainEventDispatcher?: DomainEventDispatcher) {}
 
@@ -23,8 +31,8 @@ export class MongoConsultationRepository implements IConsultationRepository {
         { $set: rawData },
         { upsert: true, new: true, runValidators: true },
       );
-    } catch (error: any) {
-      if (error && (error.code === 11000 || error.codeName === 'DuplicateKey')) {
+    } catch (error: unknown) {
+      if (isMongoDuplicateKeyError(error)) {
         throw new Error(
           `A consultation already exists for acquisition pipeline '${consultation.acquisitionPipelineId}'`,
         );

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { trainerProfileUseCases } from '../../application/usecases/TrainerProfileUseCases';
 import { CreateTrainerProfileDTO, UpdateTrainerProfileDTO } from '../../domain/types/profile.types';
+import { PUBLIC_TRAINER_PROFILE_QUERY_KEY, SEARCH_TRAINERS_QUERY_KEY } from './usePublicTrainers';
 
 export const TRAINER_PROFILE_QUERY_KEY = ['trainerProfile'];
 
@@ -22,6 +23,8 @@ export function useCreateTrainerProfile() {
     onSuccess: (data) => {
       queryClient.setQueryData(TRAINER_PROFILE_QUERY_KEY, data);
       queryClient.invalidateQueries({ queryKey: TRAINER_PROFILE_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [PUBLIC_TRAINER_PROFILE_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEARCH_TRAINERS_QUERY_KEY] });
       toast.success('Trainer profile created successfully!');
     },
     onError: (error: any) => {
@@ -37,6 +40,8 @@ export function useUpdateTrainerProfile() {
     mutationFn: (dto: UpdateTrainerProfileDTO) => trainerProfileUseCases.updateProfile(dto),
     onSuccess: (data) => {
       queryClient.setQueryData(TRAINER_PROFILE_QUERY_KEY, data);
+      queryClient.invalidateQueries({ queryKey: [PUBLIC_TRAINER_PROFILE_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEARCH_TRAINERS_QUERY_KEY] });
       toast.success('Trainer profile updated successfully!');
     },
     onError: (error: any) => {
@@ -52,6 +57,8 @@ export function useUploadTrainerAvatar() {
     mutationFn: (file: File) => trainerProfileUseCases.uploadAvatar(file),
     onSuccess: (data) => {
       queryClient.setQueryData(TRAINER_PROFILE_QUERY_KEY, data);
+      queryClient.invalidateQueries({ queryKey: [PUBLIC_TRAINER_PROFILE_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEARCH_TRAINERS_QUERY_KEY] });
       toast.success('Avatar uploaded successfully!');
     },
     onError: (error: any) => {
@@ -67,6 +74,8 @@ export function useDeleteTrainerAvatar() {
     mutationFn: () => trainerProfileUseCases.deleteAvatar(),
     onSuccess: (data) => {
       queryClient.setQueryData(TRAINER_PROFILE_QUERY_KEY, data);
+      queryClient.invalidateQueries({ queryKey: [PUBLIC_TRAINER_PROFILE_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEARCH_TRAINERS_QUERY_KEY] });
       toast.success('Avatar removed successfully!');
     },
     onError: (error: any) => {

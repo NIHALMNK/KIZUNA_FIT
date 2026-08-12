@@ -60,10 +60,12 @@ export class TrainerAvatarDeletedEvent implements IDomainEvent {
 export class TrainerAvailabilityChangedEvent implements IDomainEvent {
   public readonly dateTimeOccurred: Date = new Date();
   public readonly trainerProfileId: string;
+  public readonly userId: string;
   public readonly newStatus: TrainerAvailabilityStatus;
 
-  constructor(trainerProfileId: string, newStatus: TrainerAvailabilityStatus) {
+  constructor(trainerProfileId: string, userId: string, newStatus: TrainerAvailabilityStatus) {
     this.trainerProfileId = trainerProfileId;
+    this.userId = userId;
     this.newStatus = newStatus;
   }
 

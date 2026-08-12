@@ -231,7 +231,9 @@ export class TrainerProfile extends AggregateRoot<TrainerProfileProps> {
   public updateAvailability(newAvailability: TrainerAvailability): Result<void> {
     this.props.availability = newAvailability;
     this.props.updatedAt = new Date();
-    this.addDomainEvent(new TrainerAvailabilityChangedEvent(this.id, newAvailability.status));
+    this.addDomainEvent(
+      new TrainerAvailabilityChangedEvent(this.id, this.userId, newAvailability.status),
+    );
     return Result.ok<void>();
   }
 

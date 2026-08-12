@@ -5,7 +5,7 @@ import { RedisManager } from '../cache/RedisManager';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { env } from '../../config/env.config';
 import { socketAuthMiddleware } from './middleware/socket-auth.middleware';
-import { UserRoom } from './utils/user-room.util';
+import { UserRoom, TrainerProfileRoom } from './utils/user-room.util';
 
 export class SocketIOManager {
   private io!: Server;
@@ -56,6 +56,28 @@ export class SocketIOManager {
       } else {
         this.logger.debug(`Socket connected without identity: ${socket.id}`);
       }
+
+      // Handle controlled subscription to public trainer profile viewer rooms
+      socket.on('profile:subscribe', (data: { profileId: string }) => {
+        if (!data || !data.profileId || !TrainerProfileRoom.isValid(data.profileId)) {
+          this.logger.warn(
+            `Rejected invalid profile subscription attempt from ${socket.id}: ${data?.profileId}`,
+          );
+          return;
+        }
+        const room = TrainerProfileRoom.forProfile(data.profileId);
+        socket.join(room);
+        this.logger.info(`🔌 Socket ${socket.id} joined profile room: ${room}`);
+      });
+
+      socket.on('profile:unsubscribe', (data: { profileId: string }) => {
+        if (!data || !data.profileId || !TrainerProfileRoom.isValid(data.profileId)) {
+          return;
+        }
+        const room = TrainerProfileRoom.forProfile(data.profileId);
+        socket.leave(room);
+        this.logger.info(`🔌 Socket ${socket.id} left profile room: ${room}`);
+      });
 
       socket.on('disconnect', (reason: string) => {
         const userId = socket.data.user?.userId || 'anonymous';

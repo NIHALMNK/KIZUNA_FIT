@@ -6,7 +6,11 @@ import { TrainerProfileModel } from '../persistence/mongoose/models/TrainerProfi
 import { TrainerProfilePersistenceMapper } from '../persistence/mongoose/mappers/TrainerProfilePersistenceMapper';
 import { UserModel } from '../../../identity/infrastructure/persistence/mongoose/models/UserModel';
 
+import { DomainEventDispatcher } from '../../../../shared/events/domain-event-dispatcher';
+
 export class MongoTrainerProfileRepository implements ITrainerProfileRepository {
+  constructor(private readonly domainEventDispatcher?: DomainEventDispatcher) {}
+
   public async findById(id: string): Promise<TrainerProfile | null> {
     const doc = await TrainerProfileModel.findById(id).exec();
     if (!doc) return null;
@@ -45,6 +49,12 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
       new: true,
       setDefaultsOnInsert: true,
     }).exec();
+
+    if (this.domainEventDispatcher && profile.domainEvents.length > 0) {
+      const eventsToDispatch = [...profile.domainEvents];
+      await this.domainEventDispatcher.dispatchAll(eventsToDispatch);
+      profile.clearEvents();
+    }
   }
 
   public async delete(id: string): Promise<void> {

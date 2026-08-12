@@ -14,6 +14,7 @@ import { SocketIOManager } from '../../infrastructure/websocket/SocketIOManager'
 import { WebRTCSignaling } from '../../infrastructure/websocket/WebRTCSignaling';
 import { RealtimeDomainEventSubscriber } from '../../infrastructure/websocket/subscribers/RealtimeDomainEventSubscriber';
 import { registerMarketplaceRealtimeEvents } from '../../modules/marketplace/infrastructure/realtime/marketplace-realtime.subscriber';
+import { registerProfileRealtimeEvents } from '../../modules/profile/infrastructure/realtime/profile-realtime.subscriber';
 
 async function bootstrap() {
   // 1. Load Environment (Handled by env import)
@@ -45,6 +46,7 @@ async function bootstrap() {
     'realtimeDomainEventSubscriber',
   );
   registerMarketplaceRealtimeEvents(realtimeSubscriber);
+  registerProfileRealtimeEvents(realtimeSubscriber);
 
   try {
     // 3. Connect MongoDB (Fail Fast)

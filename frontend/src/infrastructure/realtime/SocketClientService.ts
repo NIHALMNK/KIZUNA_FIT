@@ -81,11 +81,17 @@ export class SocketClientService {
     this.setupSocketListeners();
   }
 
+  private activeProfileSubscriptions: Set<string> = new Set();
+
   private setupSocketListeners(): void {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
       this.setState('CONNECTED');
+      // Re-subscribe active profile room subscriptions on reconnect
+      this.activeProfileSubscriptions.forEach((profileId) => {
+        this.socket?.emit('profile:subscribe', { profileId });
+      });
     });
 
     this.socket.on('disconnect', (reason) => {
@@ -113,6 +119,22 @@ export class SocketClientService {
         this.dispatchRealtimeEvent(eventType, data);
       });
     });
+  }
+
+  public subscribeToTrainerProfile(profileId: string): void {
+    if (!profileId) return;
+    this.activeProfileSubscriptions.add(profileId);
+    if (this.socket && this.socket.connected) {
+      this.socket.emit('profile:subscribe', { profileId });
+    }
+  }
+
+  public unsubscribeFromTrainerProfile(profileId: string): void {
+    if (!profileId) return;
+    this.activeProfileSubscriptions.delete(profileId);
+    if (this.socket && this.socket.connected) {
+      this.socket.emit('profile:unsubscribe', { profileId });
+    }
   }
 
   public subscribe<T = unknown>(eventType: string, handler: RealtimeEventHandler<T>): () => void {

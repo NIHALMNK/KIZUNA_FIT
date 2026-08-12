@@ -99,12 +99,33 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       ['trainer-request-detail', (event.payload as any)?.requestId || ''],
     ]);
 
+    const unTrainerAvailability = queryBridge.registerRule(
+      'profile:trainer:availability-changed',
+      (event) => [
+        ['searchTrainers'],
+        ['publicTrainerProfile', (event.payload as any)?.trainerUserId || ''],
+        ['publicTrainerProfile', (event.payload as any)?.trainerProfileId || ''],
+        ['trainerAvailability'],
+        ['trainerProfile'],
+      ],
+    );
+
+    const unTrainerUpdated = queryBridge.registerRule('profile:trainer:updated', (event) => [
+      ['searchTrainers'],
+      ['publicTrainerProfile', (event.payload as any)?.trainerUserId || ''],
+      ['publicTrainerProfile', (event.payload as any)?.trainerProfileId || ''],
+      ['publicTrainerProfile', event.entityId || ''],
+      ['publicTrainerProfile'],
+    ]);
+
     return () => {
       unCreated();
       unAccepted();
       unRejected();
       unWithdrawn();
       unClosed();
+      unTrainerAvailability();
+      unTrainerUpdated();
     };
   }, [queryBridge]);
 

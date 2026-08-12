@@ -16,6 +16,7 @@ import { Avatar } from '@/shared/components/ui/Avatar';
 import { Badge } from '@/shared/components/ui/Badge';
 import { StatusBadge } from '@/shared/components/ui/StatusBadge';
 import { Button } from '@/shared/components/ui/Button';
+import { socketClientService } from '@/infrastructure/realtime/SocketClientService';
 import { toast } from 'sonner';
 
 if (typeof window !== 'undefined') {
@@ -40,6 +41,18 @@ export default function PublicTrainerDetailsPage() {
 
   const [isSaved, setIsSaved] = useState(false);
   const profileContainerRef = useRef<HTMLDivElement>(null);
+
+  // Subscribe to realtime trainer profile room updates
+  useEffect(() => {
+    const targetId = trainer?.id || trainerId;
+    if (!targetId) return;
+
+    socketClientService.subscribeToTrainerProfile(targetId);
+
+    return () => {
+      socketClientService.unsubscribeFromTrainerProfile(targetId);
+    };
+  }, [trainer?.id, trainerId]);
 
   // GSAP animation on trainer profile load
   useEffect(() => {

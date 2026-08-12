@@ -11,6 +11,7 @@ import { DomainEventDispatcher } from '../../shared/events/domain-event-dispatch
 import { SocketIORealtimePublisher } from '../../infrastructure/websocket/publishers/SocketIORealtimePublisher';
 import { RealtimeDomainEventSubscriber } from '../../infrastructure/websocket/subscribers/RealtimeDomainEventSubscriber';
 import { registerMarketplaceModule } from '../../modules/marketplace/module';
+import { registerConsultationModule } from '../../modules/consultation/module';
 
 export const configureContainer = () => {
   const container = createContainer({
@@ -32,6 +33,7 @@ export const configureContainer = () => {
   });
 
   registerMarketplaceModule(container);
+  registerConsultationModule(container);
 
   return container;
 };

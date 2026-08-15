@@ -3,6 +3,7 @@ import { CreateConsultationUseCase } from '../../../../src/modules/consultation/
 import { BookConsultationSlotUseCase } from '../../../../src/modules/consultation/application/use-cases/book-consultation-slot.use-case';
 import { ScheduleConsultationUseCase } from '../../../../src/modules/consultation/application/use-cases/schedule-consultation.use-case';
 import { ConfirmConsultationScheduleUseCase } from '../../../../src/modules/consultation/application/use-cases/confirm-consultation-schedule.use-case';
+import { RescheduleConsultationUseCase } from '../../../../src/modules/consultation/application/use-cases/reschedule-consultation.use-case';
 import { CancelConsultationUseCase } from '../../../../src/modules/consultation/application/use-cases/cancel-consultation.use-case';
 import { CompleteConsultationUseCase } from '../../../../src/modules/consultation/application/use-cases/complete-consultation.use-case';
 import { MarkConsultationNoShowUseCase } from '../../../../src/modules/consultation/application/use-cases/mark-consultation-no-show.use-case';
@@ -356,6 +357,34 @@ describe('Consultation Application Layer Use Cases', () => {
 
       expect(result.isSuccess).toBe(true);
       expect(result.getValue().roomId).toBe(roomId);
+    });
+
+    it('RescheduleConsultationUseCase should update slot for scheduled consultation', async () => {
+      const consultation = Consultation.create(
+        {
+          acquisitionPipelineId: pipelineId,
+          clientId,
+          trainerId,
+          slot: sampleSlot,
+          status: ConsultationStatus.SCHEDULED,
+        },
+        consultationId,
+      ).getValue();
+      mockConsultationRepo.findById.mockResolvedValueOnce(consultation);
+
+      const useCase = new RescheduleConsultationUseCase(mockConsultationRepo);
+      const newStartAt = new Date(Date.now() + 86400000);
+      const newEndAt = new Date(Date.now() + 90000000);
+      const result = await useCase.execute({
+        consultationId,
+        userId: clientId,
+        scheduledStartAt: newStartAt,
+        scheduledEndAt: newEndAt,
+        timezone: 'UTC',
+      });
+
+      expect(result.isSuccess).toBe(true);
+      expect(mockConsultationRepo.save).toHaveBeenCalled();
     });
   });
 });

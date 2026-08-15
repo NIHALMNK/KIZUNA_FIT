@@ -95,7 +95,9 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
     const unClosed = queryBridge.registerRule('marketplace:request:closed', (event) => [
       ['trainer-requests'],
+      ['trainer-requests-pending'],
       ['trainer-requests-history'],
+      ['consultations'],
       ['trainer-request-detail', (event.payload as any)?.requestId || ''],
     ]);
 
@@ -112,10 +114,40 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
     const unTrainerUpdated = queryBridge.registerRule('profile:trainer:updated', (event) => [
       ['searchTrainers'],
-      ['publicTrainerProfile', (event.payload as any)?.trainerUserId || ''],
-      ['publicTrainerProfile', (event.payload as any)?.trainerProfileId || ''],
+      ['publicTrainerProfile', (event.payload as Record<string, unknown>)?.trainerUserId || ''],
+      ['publicTrainerProfile', (event.payload as Record<string, unknown>)?.trainerProfileId || ''],
       ['publicTrainerProfile', event.entityId || ''],
       ['publicTrainerProfile'],
+    ]);
+
+    const unConsultationCreated = queryBridge.registerRule('consultation:created', (event) => [
+      ['consultations'],
+      ['client-dashboard', 'upcoming-consultations'],
+      ['consultations', 'detail', (event.payload as Record<string, unknown>)?.consultationId || ''],
+    ]);
+
+    const unConsultationScheduled = queryBridge.registerRule('consultation:scheduled', (event) => [
+      ['consultations'],
+      ['client-dashboard', 'upcoming-consultations'],
+      ['consultations', 'detail', (event.payload as Record<string, unknown>)?.consultationId || ''],
+    ]);
+
+    const unConsultationCancelled = queryBridge.registerRule('consultation:cancelled', (event) => [
+      ['consultations'],
+      ['client-dashboard', 'upcoming-consultations'],
+      ['consultations', 'detail', (event.payload as Record<string, unknown>)?.consultationId || ''],
+    ]);
+
+    const unConsultationCompleted = queryBridge.registerRule('consultation:completed', (event) => [
+      ['consultations'],
+      ['client-dashboard', 'upcoming-consultations'],
+      ['consultations', 'detail', (event.payload as Record<string, unknown>)?.consultationId || ''],
+    ]);
+
+    const unConsultationNoShow = queryBridge.registerRule('consultation:no-show', (event) => [
+      ['consultations'],
+      ['client-dashboard', 'upcoming-consultations'],
+      ['consultations', 'detail', (event.payload as Record<string, unknown>)?.consultationId || ''],
     ]);
 
     return () => {
@@ -126,6 +158,11 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       unClosed();
       unTrainerAvailability();
       unTrainerUpdated();
+      unConsultationCreated();
+      unConsultationScheduled();
+      unConsultationCancelled();
+      unConsultationCompleted();
+      unConsultationNoShow();
     };
   }, [queryBridge]);
 

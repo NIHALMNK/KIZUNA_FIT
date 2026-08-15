@@ -8,6 +8,7 @@ import { ILogger } from '../../../shared/contracts/ILogger';
 
 export type EventToRecipientResolver<T extends IDomainEvent = IDomainEvent> = (event: T) => {
   targetUserId?: string;
+  targetUserIds?: string[];
   targetRoom?: string;
   realtimeType: string;
   payload?: unknown;
@@ -55,7 +56,7 @@ export class RealtimeDomainEventSubscriber {
     }
 
     try {
-      const { targetUserId, targetRoom, realtimeType, payload } = resolver(event);
+      const { targetUserId, targetUserIds, targetRoom, realtimeType, payload } = resolver(event);
 
       const envelope: RealtimeEventPayload = {
         type: realtimeType,
@@ -67,7 +68,17 @@ export class RealtimeDomainEventSubscriber {
         payload: payload || event,
       };
 
-      if (targetUserId) {
+      if (targetUserIds && targetUserIds.length > 0) {
+        const uniqueUserIds = Array.from(
+          new Set(targetUserIds.filter((id): id is string => Boolean(id))),
+        );
+        for (const userId of uniqueUserIds) {
+          this.realtimePublisher.publishToUser(userId, envelope);
+          this.logger.debug(
+            `[RealtimeDomainEventSubscriber] Published '${realtimeType}' to user '${userId}'`,
+          );
+        }
+      } else if (targetUserId) {
         this.realtimePublisher.publishToUser(targetUserId, envelope);
         this.logger.debug(
           `[RealtimeDomainEventSubscriber] Published '${realtimeType}' to user '${targetUserId}'`,

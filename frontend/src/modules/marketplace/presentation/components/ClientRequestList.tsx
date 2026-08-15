@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useGetTrainerRequests, useWithdrawTrainerRequest } from '../../application/useMarketplace';
 import { TrainerRequestResponseDTO } from '../../domain/types';
+import { useCreateConsultation } from '@/modules/consultation/application/hooks/useConsultationMutations';
+import { consultationApi } from '@/modules/consultation/infrastructure/api/consultationApi';
 import { LoadingState } from '@/shared/components/feedback/LoadingState';
 import { EmptyState } from '@/shared/components/feedback/EmptyState';
 import { ErrorState } from '@/shared/components/feedback/ErrorState';
@@ -194,8 +197,8 @@ export const ClientRequestList: React.FC = () => {
                 )}
 
                 {/* Actions Footer */}
-                {canWithdraw && (
-                  <div className="flex justify-end pt-2">
+                <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-[var(--color-border)]">
+                  {canWithdraw && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -205,13 +208,68 @@ export const ClientRequestList: React.FC = () => {
                     >
                       Withdraw Request
                     </Button>
-                  </div>
-                )}
+                  )}
+
+                  {(req.requestStatus || req.status || '').toUpperCase().includes('ACCEPT') && (
+                    <AcceptedScheduleButton pipelineId={req.pipelineId} />
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
       )}
     </div>
+  );
+};
+
+const AcceptedScheduleButton: React.FC<{ pipelineId: string }> = ({ pipelineId }) => {
+  const router = useRouter();
+  const createMutation = useCreateConsultation();
+  const [isChecking, setIsChecking] = useState(false);
+
+  const handleScheduleClick = async () => {
+    setIsChecking(true);
+    try {
+      const existing = await consultationApi.getConsultationByPipeline(pipelineId);
+      if (existing && existing.consultationId) {
+        router.push(ROUTES.CLIENT_CONSULTATION_DETAIL(existing.consultationId));
+        return;
+      }
+    } catch {
+      // Consultation not found (404), proceed to create
+    } finally {
+      setIsChecking(false);
+    }
+
+    const tomorrowMs = Date.now() + 86400000;
+    const startIso = new Date(tomorrowMs).toISOString();
+    const endIso = new Date(tomorrowMs + 2700000).toISOString();
+
+    createMutation.mutate(
+      {
+        acquisitionPipelineId: pipelineId,
+        scheduledStartAt: startIso,
+        scheduledEndAt: endIso,
+        timezone: 'UTC',
+      },
+      {
+        onSuccess: (data) => {
+          router.push(ROUTES.CLIENT_CONSULTATION_DETAIL(data.consultationId));
+        },
+      },
+    );
+  };
+
+  return (
+    <Button
+      variant="primary"
+      size="sm"
+      className="text-xs font-bold bg-[var(--color-primary)] text-white"
+      isLoading={isChecking || createMutation.isPending}
+      onClick={handleScheduleClick}
+    >
+      Schedule Consultation
+    </Button>
   );
 };

@@ -39,9 +39,11 @@ export const trainerSidebarConfig: SidebarConfig = {
           description: 'Scheduled 1-on-1 client consultation calls',
           href: '/trainer/consultations',
           iconName: 'consultations',
-          status: 'comingSoon',
-          badge: { type: 'COMING_SOON', text: 'Coming Soon' },
+          status: 'active',
+          pageTitle: 'Consultations',
+          breadcrumb: ['Dashboard', 'Consultations'],
         },
+
         {
           id: 'trainer-offers',
           label: 'Offers',

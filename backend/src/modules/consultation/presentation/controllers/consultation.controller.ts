@@ -6,6 +6,7 @@ import { CreateConsultationUseCase } from '../../application/use-cases/create-co
 import { BookConsultationSlotUseCase } from '../../application/use-cases/book-consultation-slot.use-case';
 import { ScheduleConsultationUseCase } from '../../application/use-cases/schedule-consultation.use-case';
 import { ConfirmConsultationScheduleUseCase } from '../../application/use-cases/confirm-consultation-schedule.use-case';
+import { RescheduleConsultationUseCase } from '../../application/use-cases/reschedule-consultation.use-case';
 import { CancelConsultationUseCase } from '../../application/use-cases/cancel-consultation.use-case';
 import { CompleteConsultationUseCase } from '../../application/use-cases/complete-consultation.use-case';
 import { MarkConsultationNoShowUseCase } from '../../application/use-cases/mark-consultation-no-show.use-case';
@@ -33,6 +34,7 @@ export class ConsultationController {
     private readonly getUpcomingConsultationsUseCase: GetUpcomingConsultationsUseCase,
     private readonly getConsultationHistoryUseCase: GetConsultationHistoryUseCase,
     private readonly getConsultationByRoomIdUseCase: GetConsultationByRoomIdUseCase,
+    private readonly rescheduleConsultationUseCase: RescheduleConsultationUseCase,
   ) {}
 
   public async create(req: Request, res: Response): Promise<void> {
@@ -123,6 +125,31 @@ export class ConsultationController {
     const result = await this.confirmConsultationScheduleUseCase.execute({
       consultationId,
       trainerId: userId,
+    });
+
+    if (result.isFailure) {
+      ConsultationPresenter.handleError(res, result.error);
+      return;
+    }
+
+    ConsultationPresenter.handleSuccess(res, result.getValue());
+  }
+
+  public async reschedule(req: Request, res: Response): Promise<void> {
+    const userId = req.auth?.userId;
+    if (!userId) {
+      ApiResponse.error(res, 'Authentication required', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const consultationId = req.params.consultationId;
+
+    const result = await this.rescheduleConsultationUseCase.execute({
+      consultationId,
+      userId,
+      scheduledStartAt: new Date(req.body.scheduledStartAt),
+      scheduledEndAt: new Date(req.body.scheduledEndAt),
+      timezone: req.body.timezone,
     });
 
     if (result.isFailure) {

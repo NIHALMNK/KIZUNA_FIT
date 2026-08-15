@@ -7,6 +7,7 @@ import { asyncHandler } from '../../../../shared/infrastructure/http/utils/async
 import {
   CreateConsultationSchema,
   BookConsultationSlotSchema,
+  RescheduleConsultationSchema,
   ScheduleConsultationSchema,
   CancelConsultationSchema,
   ConsultationIdParamSchema,
@@ -100,6 +101,23 @@ export const consultationRouter = (): Router => {
     requireRole(['CLIENT', 'TRAINER']),
     validateRequest(ConsultationIdParamSchema),
     asyncHandler((req: Request, res: Response) => resolveController(req).confirmSchedule(req, res)),
+  );
+
+  // 9b. Reschedule Consultation (PATCH /:consultationId & POST /:consultationId/reschedule)
+  router.patch(
+    '/:consultationId',
+    requireAuth,
+    requireRole(['CLIENT', 'TRAINER']),
+    validateRequest(RescheduleConsultationSchema),
+    asyncHandler((req: Request, res: Response) => resolveController(req).reschedule(req, res)),
+  );
+
+  router.post(
+    '/:consultationId/reschedule',
+    requireAuth,
+    requireRole(['CLIENT', 'TRAINER']),
+    validateRequest(RescheduleConsultationSchema),
+    asyncHandler((req: Request, res: Response) => resolveController(req).reschedule(req, res)),
   );
 
   // 10. Cancel Consultation (Client | Trainer)

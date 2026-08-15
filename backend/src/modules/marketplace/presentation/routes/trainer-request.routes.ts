@@ -8,6 +8,7 @@ import {
   CreateTrainerRequestSchema,
   RejectTrainerRequestSchema,
   GetTrainerRequestsQuerySchema,
+  SwitchTrainerSchema,
 } from '../validators/trainer-request.validator';
 
 export const trainerRequestRouter = (): Router => {
@@ -91,6 +92,15 @@ export const trainerRequestRouter = (): Router => {
     requireAuth,
     requireRole(['TRAINER']),
     asyncHandler((req: Request, res: Response) => resolveController(req).close(req, res)),
+  );
+
+  // 10. Switch Trainer (Client)
+  router.post(
+    '/switch-trainer',
+    requireAuth,
+    requireRole(['CLIENT']),
+    validateRequest(SwitchTrainerSchema),
+    asyncHandler((req: Request, res: Response) => resolveController(req).switchTrainer(req, res)),
   );
 
   return router;

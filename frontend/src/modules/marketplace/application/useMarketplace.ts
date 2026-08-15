@@ -141,3 +141,23 @@ export function useWithdrawTrainerRequest() {
     },
   });
 }
+
+export function useSwitchTrainer() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload?: { reason?: string }) => marketplaceApi.switchTrainer(payload),
+    onSuccess: () => {
+      toast.success('Pre-coaching trainer switch completed.');
+      queryClient.invalidateQueries({ queryKey: ['trainer-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['trainer-requests-pending'] });
+      queryClient.invalidateQueries({ queryKey: ['trainer-requests-history'] });
+      queryClient.invalidateQueries({ queryKey: ['consultations'] });
+      queryClient.invalidateQueries({ queryKey: ['client-dashboard'] });
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to switch trainer.';
+      toast.error(msg);
+    },
+  });
+}

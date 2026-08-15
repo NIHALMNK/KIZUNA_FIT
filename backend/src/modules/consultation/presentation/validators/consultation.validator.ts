@@ -31,6 +31,21 @@ export const BookConsultationSlotSchema = z.object({
   }),
 });
 
+export const RescheduleConsultationSchema = z.object({
+  params: z.object({
+    consultationId: z.string().min(1, 'consultationId is required'),
+  }),
+  body: z.object({
+    scheduledStartAt: z
+      .string()
+      .datetime({ message: 'scheduledStartAt must be a valid ISO 8601 date string' }),
+    scheduledEndAt: z
+      .string()
+      .datetime({ message: 'scheduledEndAt must be a valid ISO 8601 date string' }),
+    timezone: z.string().min(1, 'timezone is required'),
+  }),
+});
+
 export const ScheduleConsultationSchema = z.object({
   params: z.object({
     consultationId: z.string().min(1, 'consultationId is required'),

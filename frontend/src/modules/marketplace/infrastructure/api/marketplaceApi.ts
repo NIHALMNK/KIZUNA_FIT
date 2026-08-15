@@ -49,4 +49,13 @@ export const marketplaceApi = {
   withdrawRequest: (requestId: string): Promise<TrainerRequestResponseDTO> => {
     return httpClient.post<TrainerRequestResponseDTO>(`/trainer-requests/${requestId}/withdraw`);
   },
+
+  switchTrainer: (payload?: {
+    reason?: string;
+  }): Promise<{ success: boolean; message: string }> => {
+    return httpClient.post<{ success: boolean; message: string }>(
+      '/trainer-requests/switch-trainer',
+      payload || {},
+    );
+  },
 };

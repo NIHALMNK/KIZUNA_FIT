@@ -42,3 +42,11 @@ export const GetTrainerRequestsQuerySchema = z.object({
     sort: z.enum(['newest', 'oldest']).optional(),
   }),
 });
+
+export const SwitchTrainerSchema = z.object({
+  body: z
+    .object({
+      reason: z.string().max(500, 'reason cannot exceed 500 characters').optional(),
+    })
+    .optional(),
+});

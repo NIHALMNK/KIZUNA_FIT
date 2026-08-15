@@ -10,6 +10,7 @@ import { AcceptTrainerRequestUseCase } from '../../application/use-cases/accept-
 import { RejectTrainerRequestUseCase } from '../../application/use-cases/reject-trainer-request/reject-trainer-request.use-case';
 import { WithdrawTrainerRequestUseCase } from '../../application/use-cases/withdraw-trainer-request/withdraw-trainer-request.use-case';
 import { CloseTrainerRequestUseCase } from '../../application/use-cases/close-trainer-request/close-trainer-request.use-case';
+import { SwitchTrainerUseCase } from '../../application/use-cases/switch-trainer/switch-trainer.use-case';
 import { TrainerRequestPresenter } from '../presenters/trainer-request.presenter';
 import { AcquisitionPipelineStatus } from '../../domain/enums/acquisition-pipeline-status.enum';
 
@@ -24,6 +25,7 @@ export class TrainerRequestController {
     private readonly rejectTrainerRequestUseCase: RejectTrainerRequestUseCase,
     private readonly withdrawTrainerRequestUseCase: WithdrawTrainerRequestUseCase,
     private readonly closeTrainerRequestUseCase: CloseTrainerRequestUseCase,
+    private readonly switchTrainerUseCase: SwitchTrainerUseCase,
   ) {}
 
   public async create(req: Request, res: Response): Promise<void> {
@@ -248,5 +250,25 @@ export class TrainerRequestController {
     }
 
     TrainerRequestPresenter.handleSuccess(res, result.getValue());
+  }
+
+  public async switchTrainer(req: Request, res: Response): Promise<void> {
+    const userId = req.auth?.userId;
+    if (!userId) {
+      ApiResponse.error(res, 'Authentication required', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const result = await this.switchTrainerUseCase.execute({
+      clientId: userId,
+      reason: req.body?.reason,
+    });
+
+    if (result.isFailure) {
+      TrainerRequestPresenter.handleError(res, result.error);
+      return;
+    }
+
+    ApiResponse.ok(res, result.getValue());
   }
 }

@@ -6,6 +6,7 @@ import { AcceptTrainerRequestUseCase } from '../../../../src/modules/marketplace
 import { RejectTrainerRequestUseCase } from '../../../../src/modules/marketplace/application/use-cases/reject-trainer-request/reject-trainer-request.use-case';
 import { WithdrawTrainerRequestUseCase } from '../../../../src/modules/marketplace/application/use-cases/withdraw-trainer-request/withdraw-trainer-request.use-case';
 import { CloseTrainerRequestUseCase } from '../../../../src/modules/marketplace/application/use-cases/close-trainer-request/close-trainer-request.use-case';
+import { SwitchTrainerUseCase } from '../../../../src/modules/marketplace/application/use-cases/switch-trainer/switch-trainer.use-case';
 import { IAcquisitionPipelineRepository } from '../../../../src/modules/marketplace/domain/repositories/acquisition-pipeline.repository';
 import { ProfileGateway } from '../../../../src/modules/marketplace/application/ports/profile-gateway.port';
 import { CoachingGateway } from '../../../../src/modules/marketplace/application/ports/coaching-gateway.port';
@@ -248,6 +249,28 @@ describe('Marketplace Application Layer Use Cases', () => {
       expect(result.isSuccess).toBe(true);
       expect(result.getValue().status).toBe(AcquisitionPipelineStatus.CLOSED);
       expect(mockPipelineRepo.save).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('SwitchTrainerUseCase', () => {
+    it('should cancel active consultation and pipeline for pre-coaching trainer switch', async () => {
+      (mockPipelineRepo.findActivePipeline as any).mockResolvedValueOnce(activePipeline);
+      const mockConsultationRepo: any = {
+        findByAcquisitionPipelineId: vi.fn().mockResolvedValue(null),
+        save: vi.fn().mockResolvedValue(undefined),
+      };
+
+      const useCase = new SwitchTrainerUseCase(mockPipelineRepo, mockConsultationRepo);
+
+      const result = await useCase.execute({
+        clientId: 'client_123',
+        reason: 'Client wants another specialization',
+      });
+
+      expect(result.isSuccess).toBe(true);
+      expect(result.getValue().cancelledPipelineId).toBe(activePipeline.id);
+      expect(activePipeline.status).toBe(AcquisitionPipelineStatus.CANCELLED);
+      expect(mockPipelineRepo.save).toHaveBeenCalled();
     });
   });
 });

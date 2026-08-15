@@ -58,6 +58,7 @@ export class MongoAcquisitionPipelineRepository implements IAcquisitionPipelineR
     const terminalStates = [
       AcquisitionPipelineStatus.REJECTED,
       AcquisitionPipelineStatus.WITHDRAWN,
+      AcquisitionPipelineStatus.CANCELLED,
       AcquisitionPipelineStatus.OFFER_DECLINED,
       AcquisitionPipelineStatus.CONVERTED,
       AcquisitionPipelineStatus.CLOSED,
@@ -82,6 +83,7 @@ export class MongoAcquisitionPipelineRepository implements IAcquisitionPipelineR
     const terminalStates = [
       AcquisitionPipelineStatus.REJECTED,
       AcquisitionPipelineStatus.WITHDRAWN,
+      AcquisitionPipelineStatus.CANCELLED,
       AcquisitionPipelineStatus.OFFER_DECLINED,
       AcquisitionPipelineStatus.CONVERTED,
       AcquisitionPipelineStatus.CLOSED,
@@ -180,6 +182,8 @@ export class MongoAcquisitionPipelineRepository implements IAcquisitionPipelineR
       AcquisitionPipelineStatus.ACCEPTED,
       AcquisitionPipelineStatus.REJECTED,
       AcquisitionPipelineStatus.WITHDRAWN,
+      AcquisitionPipelineStatus.CANCELLED,
+      AcquisitionPipelineStatus.OFFER_DECLINED,
       AcquisitionPipelineStatus.CONVERTED,
       AcquisitionPipelineStatus.CLOSED,
     ];

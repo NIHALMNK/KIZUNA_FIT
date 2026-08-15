@@ -79,10 +79,15 @@ export class AcquisitionPipeline extends AggregateRoot<AcquisitionPipelineProps>
     return this.props.status === AcquisitionPipelineStatus.ACCEPTED;
   }
 
+  public canCancel(): boolean {
+    return this.isOpen();
+  }
+
   public isOpen(): boolean {
     const terminalStates = [
       AcquisitionPipelineStatus.REJECTED,
       AcquisitionPipelineStatus.WITHDRAWN,
+      AcquisitionPipelineStatus.CANCELLED,
       AcquisitionPipelineStatus.OFFER_DECLINED,
       AcquisitionPipelineStatus.CONVERTED,
       AcquisitionPipelineStatus.CLOSED,
@@ -155,6 +160,23 @@ export class AcquisitionPipeline extends AggregateRoot<AcquisitionPipelineProps>
 
     this.addDomainEvent(
       new TrainerRequestWithdrawnEvent(this._id, this.props.clientId, this.props.trainerId),
+    );
+  }
+
+  /**
+   * Cancel an open acquisition pipeline (e.g. when associated consultation is cancelled).
+   * Transitions status to CANCELLED and emits AcquisitionPipelineClosedEvent.
+   */
+  public cancel(): void {
+    if (!this.canCancel()) {
+      throw new InvalidPipelineTransitionException(this.props.status, 'cancel');
+    }
+
+    this.props.status = AcquisitionPipelineStatus.CANCELLED;
+    this.props.updatedAt = new Date();
+
+    this.addDomainEvent(
+      new AcquisitionPipelineClosedEvent(this._id, this.props.clientId, this.props.trainerId),
     );
   }
 

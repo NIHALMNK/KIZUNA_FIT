@@ -11,6 +11,7 @@ export class ActivePipelineSpecification {
   private static readonly TERMINAL_STATES = new Set<AcquisitionPipelineStatus>([
     AcquisitionPipelineStatus.REJECTED,
     AcquisitionPipelineStatus.WITHDRAWN,
+    AcquisitionPipelineStatus.CANCELLED,
     AcquisitionPipelineStatus.OFFER_DECLINED,
     AcquisitionPipelineStatus.CONVERTED,
     AcquisitionPipelineStatus.CLOSED,

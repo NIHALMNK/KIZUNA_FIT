@@ -89,6 +89,7 @@ AcquisitionPipelineSchema.virtual('isOpen').get(function (this: IAcquisitionPipe
   const terminalStates = [
     AcquisitionPipelineStatus.REJECTED,
     AcquisitionPipelineStatus.WITHDRAWN,
+    AcquisitionPipelineStatus.CANCELLED,
     AcquisitionPipelineStatus.OFFER_DECLINED,
     AcquisitionPipelineStatus.CONVERTED,
     AcquisitionPipelineStatus.CLOSED,

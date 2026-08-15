@@ -67,11 +67,11 @@ export const registerMarketplaceRealtimeEvents = (
     }),
   );
 
-  // 5. Trainer closes pipeline -> notify Client User ID
+  // 5. Pipeline closed/cancelled -> notify both Client and Trainer User IDs
   subscriber.registerMapping<AcquisitionPipelineClosedEvent>(
     'AcquisitionPipelineClosedEvent',
     (event) => ({
-      targetUserId: event.clientId,
+      targetUserIds: [event.clientId, event.trainerId],
       realtimeType: 'marketplace:request:closed',
       payload: {
         pipelineId: event.pipelineId,

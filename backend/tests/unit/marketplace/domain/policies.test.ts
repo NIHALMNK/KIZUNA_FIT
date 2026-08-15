@@ -41,7 +41,13 @@ describe('Marketplace Domain Policies', () => {
         trainerId: 'trainer_1',
         status: AcquisitionPipelineStatus.CLOSED,
       };
+      const cancelledPipeline = {
+        clientId: 'client_1',
+        trainerId: 'trainer_1',
+        status: AcquisitionPipelineStatus.CANCELLED,
+      };
       expect(() => policy.validate('client_1', 'trainer_1', closedPipeline)).not.toThrow();
+      expect(() => policy.validate('client_1', 'trainer_1', cancelledPipeline)).not.toThrow();
     });
 
     it('should throw DuplicateTrainerRequestException when active pipeline between pair exists', () => {

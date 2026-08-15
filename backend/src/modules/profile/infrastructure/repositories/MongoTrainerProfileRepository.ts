@@ -4,18 +4,35 @@ import { TrainerProfile } from '../../domain/aggregates/TrainerProfile';
 import { SearchTrainerQuery } from '../../application/dto/public/search-trainer.query';
 import { TrainerProfileModel } from '../persistence/mongoose/models/TrainerProfileModel';
 import { TrainerProfilePersistenceMapper } from '../persistence/mongoose/mappers/TrainerProfilePersistenceMapper';
+import { UserModel } from '../../../identity/infrastructure/persistence/mongoose/models/UserModel';
+
+import { DomainEventDispatcher } from '../../../../shared/events/domain-event-dispatcher';
 
 export class MongoTrainerProfileRepository implements ITrainerProfileRepository {
+  constructor(private readonly domainEventDispatcher?: DomainEventDispatcher) {}
+
   public async findById(id: string): Promise<TrainerProfile | null> {
     const doc = await TrainerProfileModel.findById(id).exec();
     if (!doc) return null;
-    return TrainerProfilePersistenceMapper.toDomain(doc);
+    const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
+    if (doc.userId) {
+      const userDoc = await UserModel.findById(doc.userId).exec();
+      if (userDoc && userDoc.fullName) {
+        domainProfile.setFullName(userDoc.fullName);
+      }
+    }
+    return domainProfile;
   }
 
   public async findByUserId(userId: string): Promise<TrainerProfile | null> {
     const doc = await TrainerProfileModel.findOne({ userId }).exec();
     if (!doc) return null;
-    return TrainerProfilePersistenceMapper.toDomain(doc);
+    const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
+    const userDoc = await UserModel.findById(userId).exec();
+    if (userDoc && userDoc.fullName) {
+      domainProfile.setFullName(userDoc.fullName);
+    }
+    return domainProfile;
   }
 
   public async existsByUserId(userId: string): Promise<boolean> {
@@ -30,6 +47,12 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
       new: true,
       setDefaultsOnInsert: true,
     }).exec();
+
+    if (this.domainEventDispatcher && profile.domainEvents.length > 0) {
+      const eventsToDispatch = [...profile.domainEvents];
+      await this.domainEventDispatcher.dispatchAll(eventsToDispatch);
+      profile.clearEvents();
+    }
   }
 
   public async delete(id: string): Promise<void> {
@@ -129,7 +152,7 @@ export class MongoTrainerProfileRepository implements ITrainerProfileRepository 
     const profiles = dataResult.map((doc) => {
       const domainProfile = TrainerProfilePersistenceMapper.toDomain(doc);
       if (doc.user && doc.user.fullName) {
-        (domainProfile as unknown as Record<string, unknown>).fullName = doc.user.fullName;
+        domainProfile.setFullName(doc.user.fullName);
       }
       return domainProfile;
     });

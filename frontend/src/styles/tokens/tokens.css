@@ -1,0 +1,19 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - CENTRAL DESIGN TOKENS INDEX
+ * ==============================================================================
+ * Master import index aggregating all modular enterprise design token layers.
+ * ==============================================================================
+ */
+
+@import './primitive-colors.css';
+@import './semantic-colors.css';
+@import './typography.css';
+@import './spacing.css';
+@import './radius.css';
+@import './elevation.css';
+@import './motion.css';
+@import './breakpoints.css';
+@import './z-index.css';
+@import './status.css';
+@import './themes.css';

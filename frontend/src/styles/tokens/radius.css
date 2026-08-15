@@ -1,0 +1,19 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - BORDER RADIUS TOKENS
+ * ==============================================================================
+ * Corner curvature scale for UI elements, cards, buttons, and modals.
+ * ==============================================================================
+ */
+
+:root {
+  --radius-none: 0px;
+  --radius-xs: 0.125rem;  /* 2px */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.375rem;  /* 6px */
+  --radius-lg: 0.5rem;    /* 8px - Default base radius */
+  --radius-xl: 0.75rem;   /* 12px */
+  --radius-2xl: 1rem;     /* 16px */
+  --radius-3xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;  /* Pill / Circle */
+}

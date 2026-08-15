@@ -56,10 +56,12 @@ export class TrainerProfileMapper {
   }
 
   public static toPublicDTO(profile: TrainerProfile): PublicTrainerProfileResponseDTO {
+    const name = profile.fullName || profile.trainerName || null;
     return {
       id: profile.id,
       userId: profile.userId,
-      fullName: (profile as any).fullName || null,
+      fullName: name,
+      trainerName: name,
       headline: profile.headline,
       bio: profile.bio,
       avatarUrl: profile.avatarUrl || null,

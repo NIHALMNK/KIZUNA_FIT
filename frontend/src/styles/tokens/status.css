@@ -1,0 +1,68 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - STATUS, MARKETPLACE & MODULE TOKENS
+ * ==============================================================================
+ * Semantic status colors, Marketplace domain badges, and future module bindings.
+ * ==============================================================================
+ */
+
+:root {
+  /* ==============================================================================
+   * 1. INTERACTION & SYSTEM STATES
+   * ============================================================================== */
+  --color-state-hover: rgba(0, 0, 0, 0.04);
+  --color-state-active: rgba(0, 0, 0, 0.08);
+  --color-state-focus: var(--primitive-blue-500);
+  --color-state-selected: var(--primitive-blue-50);
+  --color-state-selected-text: var(--primitive-blue-700);
+
+  --color-state-loading: var(--primitive-blue-500);
+  --color-state-skeleton-base: var(--primitive-slate-200);
+  --color-state-skeleton-highlight: var(--primitive-slate-100);
+
+  /* ==============================================================================
+   * 2. MARKETPLACE DOMAIN TOKENS
+   * ============================================================================== */
+  /* --- Trainer Availability & Verification Statuses --- */
+  --color-trainer-available: var(--primitive-emerald-600);
+  --color-trainer-available-bg: var(--primitive-emerald-50);
+  --color-trainer-busy: var(--primitive-amber-600);
+  --color-trainer-busy-bg: var(--primitive-amber-50);
+  --color-trainer-verified: var(--primitive-blue-600);
+  --color-trainer-verified-bg: var(--primitive-blue-50);
+  --color-trainer-premium: #9333ea;
+  --color-trainer-premium-bg: #faf5ff;
+  --color-trainer-offline: var(--primitive-slate-500);
+  --color-trainer-offline-bg: var(--primitive-slate-100);
+
+  /* --- Marketplace Acquisition Request Pipeline Statuses --- */
+  --color-request-pending: var(--primitive-amber-600);
+  --color-request-pending-bg: var(--primitive-amber-50);
+  --color-request-accepted: var(--primitive-emerald-600);
+  --color-request-accepted-bg: var(--primitive-emerald-50);
+  --color-request-rejected: var(--primitive-red-600);
+  --color-request-rejected-bg: var(--primitive-red-50);
+  --color-request-closed: var(--primitive-slate-600);
+  --color-request-closed-bg: var(--primitive-slate-100);
+  --color-request-cancelled: var(--primitive-stone-600);
+  --color-request-cancelled-bg: var(--primitive-stone-100);
+  --color-request-expired: var(--primitive-gray-500);
+  --color-request-expired-bg: var(--primitive-gray-100);
+
+  /* ==============================================================================
+   * 3. FUTURE MODULE TOKEN BINDINGS (Reusing Primitive Scales)
+   * ============================================================================== */
+  --color-module-marketplace: var(--primitive-blue-600);
+  --color-module-coaching: var(--primitive-cyan-600);
+  --color-module-workout: var(--primitive-emerald-600);
+  --color-module-nutrition: var(--primitive-amber-600);
+  --color-module-progress: var(--primitive-cyan-500);
+  --color-module-bookings: var(--primitive-indigo-600);
+  --color-module-calendar: var(--primitive-blue-500);
+  --color-module-messaging: var(--primitive-indigo-500);
+  --color-module-payments: var(--primitive-emerald-700);
+  --color-module-reviews: var(--primitive-amber-500);
+  --color-module-analytics: var(--primitive-indigo-700);
+  --color-module-notifications: var(--primitive-rose-500);
+  --color-module-admin: var(--primitive-slate-900);
+}

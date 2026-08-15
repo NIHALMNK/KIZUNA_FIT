@@ -12,6 +12,11 @@ import { CloudinaryProvider } from '../../infrastructure/storage/CloudinaryProvi
 import { MockEmailProvider } from '../../infrastructure/mail/MockEmailProvider';
 import { SocketIOManager } from '../../infrastructure/websocket/SocketIOManager';
 import { WebRTCSignaling } from '../../infrastructure/websocket/WebRTCSignaling';
+import { RealtimeDomainEventSubscriber } from '../../infrastructure/websocket/subscribers/RealtimeDomainEventSubscriber';
+import { registerMarketplaceRealtimeEvents } from '../../modules/marketplace/infrastructure/realtime/marketplace-realtime.subscriber';
+import { registerProfileRealtimeEvents } from '../../modules/profile/infrastructure/realtime/profile-realtime.subscriber';
+import { registerConsultationRealtimeEvents } from '../../modules/consultation/infrastructure/realtime/consultation-realtime.subscriber';
+import { MarketplaceConsultationSubscriber } from '../../modules/marketplace/infrastructure/subscribers/marketplace-consultation.subscriber';
 
 async function bootstrap() {
   // 1. Load Environment (Handled by env import)
@@ -39,6 +44,17 @@ async function bootstrap() {
   // Resolve providers that don't need to be kept around
   container.resolve<CloudinaryProvider>('cloudinaryProvider');
   container.resolve<MockEmailProvider>('emailProvider');
+  const realtimeSubscriber = container.resolve<RealtimeDomainEventSubscriber>(
+    'realtimeDomainEventSubscriber',
+  );
+  const marketplaceConsultationSubscriber = container.resolve<MarketplaceConsultationSubscriber>(
+    'marketplaceConsultationSubscriber',
+  );
+  marketplaceConsultationSubscriber.register();
+
+  registerMarketplaceRealtimeEvents(realtimeSubscriber);
+  registerProfileRealtimeEvents(realtimeSubscriber);
+  registerConsultationRealtimeEvents(realtimeSubscriber);
 
   try {
     // 3. Connect MongoDB (Fail Fast)

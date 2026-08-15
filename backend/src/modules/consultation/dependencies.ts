@@ -8,6 +8,7 @@ import { CreateConsultationUseCase } from './application/use-cases/create-consul
 import { BookConsultationSlotUseCase } from './application/use-cases/book-consultation-slot.use-case';
 import { ScheduleConsultationUseCase } from './application/use-cases/schedule-consultation.use-case';
 import { ConfirmConsultationScheduleUseCase } from './application/use-cases/confirm-consultation-schedule.use-case';
+import { RescheduleConsultationUseCase } from './application/use-cases/reschedule-consultation.use-case';
 import { CancelConsultationUseCase } from './application/use-cases/cancel-consultation.use-case';
 import { CompleteConsultationUseCase } from './application/use-cases/complete-consultation.use-case';
 import { MarkConsultationNoShowUseCase } from './application/use-cases/mark-consultation-no-show.use-case';
@@ -32,6 +33,7 @@ export const registerConsultationDependencies = (container: AwilixContainer): vo
     bookConsultationSlotUseCase: asClass(BookConsultationSlotUseCase).scoped(),
     scheduleConsultationUseCase: asClass(ScheduleConsultationUseCase).scoped(),
     confirmConsultationScheduleUseCase: asClass(ConfirmConsultationScheduleUseCase).scoped(),
+    rescheduleConsultationUseCase: asClass(RescheduleConsultationUseCase).scoped(),
     cancelConsultationUseCase: asClass(CancelConsultationUseCase).scoped(),
     completeConsultationUseCase: asClass(CompleteConsultationUseCase).scoped(),
     markConsultationNoShowUseCase: asClass(MarkConsultationNoShowUseCase).scoped(),

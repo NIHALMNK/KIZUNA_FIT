@@ -40,6 +40,14 @@ export interface ConfirmConsultationScheduleCommandDTO {
   trainerId: string;
 }
 
+export interface RescheduleConsultationCommandDTO {
+  consultationId: string;
+  userId: string;
+  scheduledStartAt: Date;
+  scheduledEndAt: Date;
+  timezone: string;
+}
+
 export interface CancelConsultationCommandDTO {
   consultationId: string;
   userId: string;

@@ -113,7 +113,11 @@ export class MongoConsultationRepository implements IConsultationRepository {
       return { consultations: [], total: 0 };
     }
 
-    const activeStatuses = [ConsultationStatus.SLOT_BOOKED, ConsultationStatus.SCHEDULED];
+    const activeStatuses = [
+      ConsultationStatus.CREATED,
+      ConsultationStatus.SLOT_BOOKED,
+      ConsultationStatus.SCHEDULED,
+    ];
     const query: FilterQuery<IConsultationDocument> = {
       clientId: clientId.trim(),
       status: { $in: activeStatuses },
@@ -131,7 +135,11 @@ export class MongoConsultationRepository implements IConsultationRepository {
       return { consultations: [], total: 0 };
     }
 
-    const activeStatuses = [ConsultationStatus.SLOT_BOOKED, ConsultationStatus.SCHEDULED];
+    const activeStatuses = [
+      ConsultationStatus.CREATED,
+      ConsultationStatus.SLOT_BOOKED,
+      ConsultationStatus.SCHEDULED,
+    ];
     const query: FilterQuery<IConsultationDocument> = {
       trainerId: trainerId.trim(),
       status: { $in: activeStatuses },

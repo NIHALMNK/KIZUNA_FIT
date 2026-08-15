@@ -12,6 +12,7 @@ import { ConsultationScheduledEvent } from '../events/consultation-scheduled.eve
 import { ConsultationCancelledEvent } from '../events/consultation-cancelled.event';
 import { ConsultationCompletedEvent } from '../events/consultation-completed.event';
 import { ConsultationNoShowEvent } from '../events/consultation-no-show.event';
+import { ConsultationRescheduledEvent } from '../events/consultation-rescheduled.event';
 import { InvalidConsultationStateTransitionException } from '../exceptions/invalid-consultation-state-transition.exception';
 
 export interface ConsultationProps {
@@ -111,6 +112,13 @@ export class Consultation extends AggregateRoot<ConsultationProps> {
 
   public canConfirmSchedule(): boolean {
     return this.props.status === ConsultationStatus.SLOT_BOOKED;
+  }
+
+  public canReschedule(): boolean {
+    return (
+      this.props.status === ConsultationStatus.SLOT_BOOKED ||
+      this.props.status === ConsultationStatus.SCHEDULED
+    );
   }
 
   public canCancel(): boolean {
@@ -224,6 +232,31 @@ export class Consultation extends AggregateRoot<ConsultationProps> {
         this.props.slot.scheduledStartAt,
         this.props.slot.scheduledEndAt,
         this.props.roomId,
+      ),
+    );
+  }
+
+  /**
+   * Reschedule consultation with a new slot.
+   * Keeps status as SLOT_BOOKED or SCHEDULED while updating slot.
+   */
+  public reschedule(newSlot: ConsultationSlot): void {
+    if (!this.canReschedule()) {
+      throw new InvalidConsultationStateTransitionException(this.props.status, 'reschedule');
+    }
+
+    this.props.slot = newSlot;
+    this.props.updatedAt = new Date();
+
+    this.addDomainEvent(
+      new ConsultationRescheduledEvent(
+        this._id,
+        this.props.acquisitionPipelineId,
+        this.props.clientId,
+        this.props.trainerId,
+        newSlot.scheduledStartAt,
+        newSlot.scheduledEndAt,
+        newSlot.timezone,
       ),
     );
   }

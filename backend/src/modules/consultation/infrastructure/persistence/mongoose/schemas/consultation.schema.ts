@@ -94,7 +94,6 @@ ConsultationSchema.index({ clientId: 1, status: 1 });
 ConsultationSchema.index({ trainerId: 1, status: 1 });
 ConsultationSchema.index({ clientId: 1, 'slot.scheduledStartAt': 1 });
 ConsultationSchema.index({ trainerId: 1, 'slot.scheduledStartAt': 1 });
-ConsultationSchema.index({ roomId: 1 });
 
 // --- Pre-Save Validation Hooks ---
 ConsultationSchema.pre('save', function (next) {

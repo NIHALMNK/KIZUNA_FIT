@@ -186,6 +186,20 @@ export class SocketClientService {
     }
   }
 
+  public getSocket(): Socket | null {
+    return this.socket;
+  }
+
+  public emit(eventType: string, data?: unknown, ack?: unknown): void {
+    if (this.socket) {
+      if (typeof ack === 'function') {
+        this.socket.emit(eventType, data, ack);
+      } else {
+        this.socket.emit(eventType, data);
+      }
+    }
+  }
+
   public disconnect(): void {
     if (this.socket) {
       this.socket.removeAllListeners();

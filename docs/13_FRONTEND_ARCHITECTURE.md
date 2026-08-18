@@ -5381,6 +5381,10 @@ Notifications should remain timely, relevant, and non-disruptive.
 
 Video consultation sessions require realtime signaling.
 
+> [!NOTE]
+> **Phase 4 Architecture Reconciliation (ADR-015):**
+> Frontend Consultation Room routes (`/client/consultations/[consultationId]/room` & `/trainer/consultations/[consultationId]/room`) fetch Consultation details via `useConsultationDetail` to determine room identity (`consultation.roomId` = `consultation:<consultationId>`). The client uses `SocketClientService` for transient signaling (`webrtc:join-room`, `webrtc:offer`, `webrtc:answer`, `webrtc:ice-candidate`) and manages browser media tracks (`getUserMedia`, `RTCPeerConnection`).
+
 The frontend is responsible for:
 
 * Session negotiation.  

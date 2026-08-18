@@ -15114,6 +15114,10 @@ None
    
 **VideoCall.api.md**
 
+> [!NOTE]
+> **Phase 4 Architecture Reconciliation (ADR-015):**
+> The `/api/v1/video-calls` endpoints specified below require an active `relationshipId` (CoachingRelationship) and are **INAPPLICABLE** to Phase 4 Marketplace Consultations. Phase 4 Marketplace Consultations use existing `/api/v1/consultations/:consultationId/*` REST APIs for fetching details and completing/cancelling appointments, combined with Socket.IO `webrtc:*` events for transient WebRTC signaling.
+
 # **Create Video Call**
 
 POST /api/v1/video-calls

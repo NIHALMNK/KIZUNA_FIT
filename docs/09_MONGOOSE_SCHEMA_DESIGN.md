@@ -11806,6 +11806,10 @@ The `MessageReport` aggregate provides a dedicated moderation workflow without c
 
 # **VideoSession**
 
+> [!IMPORTANT]
+> **Phase 4 Architecture Reconciliation (ADR-015):**
+> This `VideoSession` schema definition is **DEFERRED** and **NOT implemented** for Phase 4 Marketplace Consultations. Phase 4 Marketplace Consultations rely exclusively on the `Consultation` aggregate (`Consultation.schema.ts`) for business scheduling, authorization, and room identity (`consultation:<id>`). WebRTC signaling is transient via Socket.IO without database persistence. The schema below is reserved for post-acquisition 1-on-1 coaching relationship video sessions.
+
 ---
 
 # **1\. Purpose**

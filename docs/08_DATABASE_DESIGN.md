@@ -4873,6 +4873,10 @@ It is responsible for scheduling, hosting, joining, monitoring, recording, and a
 
 Unlike the Communication Domain, which manages text-based messaging, the Video Session Domain manages real-time interactive coaching sessions.
 
+> [!IMPORTANT]
+> **Phase 4 Architecture Reconciliation (ADR-015):**
+> For Phase 4 Marketplace Consultations, the `videoSessions` collection is **NOT implemented**. The `Consultation` collection (`consultations`) serves as the sole aggregate root for scheduling, authorization, and room identity (`consultation:<id>`). WebRTC signaling is transiently managed via Socket.IO without database persistence. The `videoSessions` collection model is deferred and reserved for post-acquisition 1-on-1 coaching relationship sessions.
+
 The same Video Session infrastructure supports:
 
 * Pre-sales consultations  

@@ -50,8 +50,9 @@ export const trainerSidebarConfig: SidebarConfig = {
           description: 'Customized client package offers & pricing',
           href: '/trainer/offers',
           iconName: 'offers',
-          status: 'comingSoon',
-          badge: { type: 'COMING_SOON', text: 'Coming Soon' },
+          status: 'active',
+          pageTitle: 'Offers',
+          breadcrumb: ['Dashboard', 'Offers'],
         },
         {
           id: 'trainer-clients',

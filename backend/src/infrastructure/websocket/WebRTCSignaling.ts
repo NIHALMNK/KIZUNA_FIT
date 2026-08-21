@@ -189,10 +189,10 @@ export class WebRTCSignaling {
           }
 
           const io = this.socketIOManager.getIO();
-          const roomSocketIds = io.sockets.adapter.rooms.get(roomId);
+          const roomSocketIds = io?.sockets?.adapter?.rooms?.get(roomId);
           const existingParticipants: WebRTCParticipantInfo[] = [];
 
-          if (roomSocketIds) {
+          if (roomSocketIds && io?.sockets?.sockets) {
             for (const socketId of roomSocketIds) {
               const existingSocket = io.sockets.sockets.get(socketId);
               if (existingSocket && existingSocket.id !== socket.id) {

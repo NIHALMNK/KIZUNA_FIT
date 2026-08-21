@@ -9,7 +9,9 @@ export class ConsultationRoom {
   public static isValid(roomId: string): boolean {
     if (!roomId || typeof roomId !== 'string') return false;
     return (
-      /^consultation:[a-zA-Z0-9_-]{1,64}$/.test(roomId) || /^room_[a-zA-Z0-9_-]{1,64}$/.test(roomId)
+      /^consultation:[a-zA-Z0-9_-]{1,64}$/.test(roomId) ||
+      /^room_[a-zA-Z0-9_-]{1,64}$/.test(roomId) ||
+      /^call_room_[a-zA-Z0-9_-]{1,64}$/.test(roomId)
     );
   }
 

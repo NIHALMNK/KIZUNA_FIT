@@ -12,6 +12,7 @@ import { SocketIORealtimePublisher } from '../../infrastructure/websocket/publis
 import { RealtimeDomainEventSubscriber } from '../../infrastructure/websocket/subscribers/RealtimeDomainEventSubscriber';
 import { registerMarketplaceModule } from '../../modules/marketplace/module';
 import { registerConsultationModule } from '../../modules/consultation/module';
+import { registerOfferModule } from '../../modules/offer/module';
 
 export const configureContainer = () => {
   const container = createContainer({
@@ -34,6 +35,7 @@ export const configureContainer = () => {
 
   registerMarketplaceModule(container);
   registerConsultationModule(container);
+  registerOfferModule(container);
 
   return container;
 };

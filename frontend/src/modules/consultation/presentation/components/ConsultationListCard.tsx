@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ConsultationResponseDTO, ConsultationStatus } from '../../domain/types/consultation.types';
 import { ConsultationStatusBadge } from './ConsultationStatusBadge';
 import { useGetPublicTrainerProfile } from '../../../profile/presentation/hooks/usePublicTrainers';
+import { useOfferByConsultation } from '../../../offer/application/hooks/useOffers';
 import { Avatar } from '../../../../shared/components/ui/Avatar';
 import { Button } from '../../../../shared/components/ui/Button';
 import { ROUTES } from '../../../../shared/constants/routes';
@@ -12,6 +13,7 @@ interface ConsultationListCardProps {
   role?: 'CLIENT' | 'TRAINER';
   onBookSlotClick?: (consultation: ConsultationResponseDTO) => void;
   onCancelClick?: (consultation: ConsultationResponseDTO) => void;
+  onCreateOfferClick?: (consultation: ConsultationResponseDTO) => void;
 }
 
 export const ConsultationListCard: React.FC<ConsultationListCardProps> = ({
@@ -19,12 +21,16 @@ export const ConsultationListCard: React.FC<ConsultationListCardProps> = ({
   role = 'CLIENT',
   onBookSlotClick,
   onCancelClick,
+  onCreateOfferClick,
 }) => {
   const isTrainer = role === 'TRAINER';
 
   const { data: trainerProfile, isLoading: isLoadingTrainer } = useGetPublicTrainerProfile(
     consultation.trainerId,
   );
+
+  const isCompleted = consultation.status === ConsultationStatus.COMPLETED;
+  const { data: existingOffer } = useOfferByConsultation(consultation.consultationId, isCompleted);
 
   const formatDate = (isoString: string) => {
     try {
@@ -58,7 +64,7 @@ export const ConsultationListCard: React.FC<ConsultationListCardProps> = ({
     : ROUTES.CLIENT_CONSULTATION_ROOM(consultation.consultationId);
 
   return (
-    <div className="p-5 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-sm space-y-4 transition-all hover:border-[var(--color-primary)]/40">
+    <div className="p-5 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-xs space-y-4 transition-all hover:border-[var(--color-primary)]/40">
       {/* Header row: Participant info & Status badge */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--color-border)]">
         <div className="flex items-center gap-3">
@@ -138,7 +144,7 @@ export const ConsultationListCard: React.FC<ConsultationListCardProps> = ({
           </Button>
         </Link>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
           {!isTerminal && onCancelClick && (
             <Button
               variant="outline"
@@ -164,6 +170,45 @@ export const ConsultationListCard: React.FC<ConsultationListCardProps> = ({
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
               >
                 Join Live Session
+              </Button>
+            </Link>
+          )}
+
+          {/* COMPLETED Consultation Trainer Action: Create Offer / View Offer */}
+          {isTrainer && isCompleted && (
+            <>
+              {existingOffer ? (
+                <Link href={ROUTES.TRAINER_OFFERS}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs text-amber-600 border-amber-500/40 hover:bg-amber-500/10 font-bold"
+                  >
+                    View Offer ({existingOffer.status})
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => onCreateOfferClick && onCreateOfferClick(consultation)}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-xs text-xs"
+                >
+                  + Create Offer
+                </Button>
+              )}
+            </>
+          )}
+
+          {/* COMPLETED Consultation Client Action: Review Received Offer if available */}
+          {!isTrainer && isCompleted && existingOffer && (
+            <Link href={ROUTES.CLIENT_OFFERS}>
+              <Button
+                variant="primary"
+                size="sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-xs text-xs"
+              >
+                Review Coaching Offer
               </Button>
             </Link>
           )}

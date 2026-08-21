@@ -22,4 +22,6 @@ export const ROUTES = {
   TRAINER_CONSULTATIONS: '/trainer/consultations',
   TRAINER_CONSULTATION_DETAIL: (id: string) => `/trainer/consultations/${id}`,
   TRAINER_CONSULTATION_ROOM: (id: string) => `/trainer/consultations/${id}/room`,
+  CLIENT_OFFERS: '/client/offers',
+  TRAINER_OFFERS: '/trainer/offers',
 } as const;

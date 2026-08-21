@@ -17,10 +17,10 @@ import {
 } from 'lucide-react';
 import { useWebRTCConsultation } from '../../application/hooks/useWebRTCConsultation';
 import { useCompleteConsultation } from '../../application/hooks/useConsultationMutations';
-import { Button } from '@/shared/components/ui/Button';
-import { Dialog, DialogFooter } from '@/shared/components/ui/Dialog';
-import { Avatar } from '@/shared/components/ui/Avatar';
-import { ROUTES } from '@/shared/constants/routes';
+import { Button } from '../../../../shared/components/ui/Button';
+import { Dialog, DialogFooter } from '../../../../shared/components/ui/Dialog';
+import { Avatar } from '../../../../shared/components/ui/Avatar';
+import { ROUTES } from '../../../../shared/constants/routes';
 
 export interface ConsultationVideoRoomProps {
   consultation: {

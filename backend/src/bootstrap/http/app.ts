@@ -12,6 +12,7 @@ import { clientProfileRouter } from '../../modules/profile/presentation/routes/c
 import { trainerProfileRouter } from '../../modules/profile/presentation/routes/trainerProfile.routes';
 import { marketplaceRouter } from '../../modules/marketplace/routes';
 import { consultationModuleRouter } from '../../modules/consultation/routes';
+import { offerModuleRouter } from '../../modules/offer/routes';
 
 export function createApp(container: AwilixContainer): express.Application {
   const app = express();
@@ -56,6 +57,7 @@ export function createApp(container: AwilixContainer): express.Application {
   app.use('/api/v1/trainer-profiles', trainerProfileRouter());
   app.use('/api/v1', marketplaceRouter());
   app.use('/api/v1', consultationModuleRouter());
+  app.use('/api/v1', offerModuleRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

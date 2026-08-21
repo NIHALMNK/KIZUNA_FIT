@@ -150,6 +150,45 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       ['consultations', 'detail', (event.payload as Record<string, unknown>)?.consultationId || ''],
     ]);
 
+    const unOfferCreated = queryBridge.registerRule('offer:created', (event) => [
+      ['offers'],
+      ['offers', 'sent'],
+      ['client-dashboard', 'pending-offers'],
+      ['offers', 'detail', (event.payload as Record<string, unknown>)?.offerId || ''],
+    ]);
+
+    const unOfferSent = queryBridge.registerRule('offer:sent', (event) => [
+      ['offers'],
+      ['offers', 'sent'],
+      ['offers', 'received'],
+      ['client-dashboard', 'pending-offers'],
+      ['offers', 'detail', (event.payload as Record<string, unknown>)?.offerId || ''],
+    ]);
+
+    const unOfferAccepted = queryBridge.registerRule('offer:accepted', (event) => [
+      ['offers'],
+      ['offers', 'sent'],
+      ['offers', 'received'],
+      ['client-dashboard', 'pending-offers'],
+      ['offers', 'detail', (event.payload as Record<string, unknown>)?.offerId || ''],
+    ]);
+
+    const unOfferDeclined = queryBridge.registerRule('offer:declined', (event) => [
+      ['offers'],
+      ['offers', 'sent'],
+      ['offers', 'received'],
+      ['client-dashboard', 'pending-offers'],
+      ['offers', 'detail', (event.payload as Record<string, unknown>)?.offerId || ''],
+    ]);
+
+    const unOfferExpired = queryBridge.registerRule('offer:expired', (event) => [
+      ['offers'],
+      ['offers', 'sent'],
+      ['offers', 'received'],
+      ['client-dashboard', 'pending-offers'],
+      ['offers', 'detail', (event.payload as Record<string, unknown>)?.offerId || ''],
+    ]);
+
     return () => {
       unCreated();
       unAccepted();
@@ -163,6 +202,11 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       unConsultationCancelled();
       unConsultationCompleted();
       unConsultationNoShow();
+      unOfferCreated();
+      unOfferSent();
+      unOfferAccepted();
+      unOfferDeclined();
+      unOfferExpired();
     };
   }, [queryBridge]);
 

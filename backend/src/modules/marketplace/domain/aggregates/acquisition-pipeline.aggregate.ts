@@ -236,11 +236,15 @@ export class AcquisitionPipeline extends AggregateRoot<AcquisitionPipelineProps>
   }
 
   public declineOffer(): void {
-    if (this.props.status !== AcquisitionPipelineStatus.OFFER_SENT) {
+    if (!this.isOpen()) {
       throw new InvalidPipelineTransitionException(this.props.status, 'declineOffer');
     }
     this.props.status = AcquisitionPipelineStatus.OFFER_DECLINED;
     this.props.updatedAt = new Date();
+
+    this.addDomainEvent(
+      new AcquisitionPipelineClosedEvent(this._id, this.props.clientId, this.props.trainerId),
+    );
   }
 
   public markPaymentCompleted(): void {

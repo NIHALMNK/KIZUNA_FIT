@@ -5,6 +5,7 @@ import { MongoAcquisitionPipelineRepository } from './infrastructure/persistence
 import { ProfileGatewayAdapter } from './infrastructure/gateways/profile-gateway.adapter';
 import { CoachingGatewayAdapter } from './infrastructure/gateways/coaching-gateway.adapter';
 import { MarketplaceConsultationSubscriber } from './infrastructure/subscribers/marketplace-consultation.subscriber';
+import { MarketplaceOfferSubscriber } from './infrastructure/subscribers/marketplace-offer.subscriber';
 
 // Application Use Cases
 import { CreateTrainerRequestUseCase } from './application/use-cases/create-trainer-request/create-trainer-request.use-case';
@@ -28,6 +29,7 @@ export const registerMarketplaceDependencies = (container: AwilixContainer): voi
     profileGateway: asClass(ProfileGatewayAdapter).scoped(),
     coachingGateway: asClass(CoachingGatewayAdapter).scoped(),
     marketplaceConsultationSubscriber: asClass(MarketplaceConsultationSubscriber).singleton(),
+    marketplaceOfferSubscriber: asClass(MarketplaceOfferSubscriber).singleton(),
   });
 
   // Application Use Cases (Scoped)

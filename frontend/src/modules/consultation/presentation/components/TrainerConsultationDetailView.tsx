@@ -6,6 +6,10 @@ import {
   useCompleteConsultation,
   useMarkNoShow,
 } from '../../application/hooks/useConsultationMutations';
+import { useOfferByConsultation } from '../../../offer/application/hooks/useOffers';
+import { useOfferActions } from '../../../offer/application/hooks/useOfferActions';
+import { CreateOfferPayload } from '../../../offer/domain/types/offer.types';
+import { CreateOfferModal } from '../../../offer/presentation/components/CreateOfferModal';
 import { ConsultationStatus } from '../../domain/types/consultation.types';
 import { ConsultationStatusBadge } from './ConsultationStatusBadge';
 import { ScheduleConsultationModal } from './ScheduleConsultationModal';
@@ -25,8 +29,16 @@ export const TrainerConsultationDetailView: React.FC<TrainerConsultationDetailVi
 }) => {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isCreateOfferModalOpen, setIsCreateOfferModalOpen] = useState(false);
 
   const { data: consultation, isLoading, isError, refetch } = useConsultationDetail(consultationId);
+
+  const isCompleted = consultation?.status === ConsultationStatus.COMPLETED;
+  const { data: existingOffer, refetch: refetchOffer } = useOfferByConsultation(
+    consultationId,
+    isCompleted,
+  );
+  const { createOffer } = useOfferActions();
 
   const confirmScheduleMutation = useConfirmSchedule();
   const completeMutation = useCompleteConsultation();
@@ -45,6 +57,12 @@ export const TrainerConsultationDetailView: React.FC<TrainerConsultationDetailVi
       />
     );
   }
+
+  const handleCreateOfferSubmit = async (payload: CreateOfferPayload) => {
+    await createOffer(payload);
+    refetchOffer();
+    refetch();
+  };
 
   const formatIso = (isoString?: string | null) => {
     if (!isoString) return { date: 'N/A', time: 'N/A' };
@@ -84,7 +102,7 @@ export const TrainerConsultationDetailView: React.FC<TrainerConsultationDetailVi
       </div>
 
       {/* Main Detail Card */}
-      <div className="p-6 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-sm space-y-6">
+      <div className="p-6 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-xs space-y-6">
         {/* Client Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-4">
@@ -101,6 +119,32 @@ export const TrainerConsultationDetailView: React.FC<TrainerConsultationDetailVi
               </p>
             </div>
           </div>
+
+          {/* If completed, highlight Offer status */}
+          {isCompleted && (
+            <div className="flex items-center gap-2">
+              {existingOffer ? (
+                <Link href={ROUTES.TRAINER_OFFERS}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs text-amber-600 border-amber-500/40 hover:bg-amber-500/10 font-bold"
+                  >
+                    View Offer ({existingOffer.status})
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setIsCreateOfferModalOpen(true)}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-xs text-xs"
+                >
+                  + Create Offer
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Schedule & Timing Overview */}
@@ -230,6 +274,32 @@ export const TrainerConsultationDetailView: React.FC<TrainerConsultationDetailVi
                 </Link>
               </>
             )}
+
+            {/* If completed, also provide the action button in the actions bar */}
+            {isCompleted && (
+              <>
+                {existingOffer ? (
+                  <Link href={ROUTES.TRAINER_OFFERS}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs text-amber-600 border-amber-500/40 hover:bg-amber-500/10 font-bold"
+                    >
+                      View Existing Offer
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setIsCreateOfferModalOpen(true)}
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-xs text-xs"
+                  >
+                    + Create Offer
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -249,6 +319,16 @@ export const TrainerConsultationDetailView: React.FC<TrainerConsultationDetailVi
         onClose={() => setIsCancelModalOpen(false)}
         consultationId={consultation.consultationId}
       />
+
+      {/* Create Offer Modal */}
+      {isCreateOfferModalOpen && (
+        <CreateOfferModal
+          isOpen={isCreateOfferModalOpen}
+          onClose={() => setIsCreateOfferModalOpen(false)}
+          consultationId={consultation.consultationId}
+          onSubmit={handleCreateOfferSubmit}
+        />
+      )}
     </div>
   );
 };

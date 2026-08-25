@@ -20,6 +20,7 @@ export class SocketIOManager {
       new Set([
         env.CORS_ORIGIN,
         env.FRONTEND_URL,
+        'http://localhost:3100',
         'http://localhost:3002',
         'http://localhost:3000',
       ]),

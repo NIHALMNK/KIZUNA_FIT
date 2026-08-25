@@ -6,7 +6,7 @@ import {
   ConnectionStateListener,
 } from './realtime.types';
 
-const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000';
+const SOCKET_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
 
 export class SocketClientService {
   private socket: Socket | null = null;

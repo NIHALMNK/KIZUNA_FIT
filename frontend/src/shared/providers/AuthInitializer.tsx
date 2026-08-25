@@ -12,28 +12,28 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
-    
+
     // Attempt to restore session silently on initial app load
     // This relies on the backend HttpOnly 'refreshToken' cookie
     const restoreSession = async () => {
       try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
-        const res = await axios.post<{ success: boolean, data: { accessToken: string } }>(
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+        const res = await axios.post<{ success: boolean; data: { accessToken: string } }>(
           `${API_BASE_URL}/identity/refresh`,
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
-        
+
         const newAccessToken = res.data.data.accessToken;
         tokenStorage.setAccessToken(newAccessToken);
         setAuthenticated(newAccessToken);
       } catch (error) {
-        // No valid session, or token expired. 
+        // No valid session, or token expired.
         // User remains unauthenticated in Zustand.
         setAuthenticated(null);
       }
     };
-    
+
     // Only run on mount
     restoreSession();
     // Multi-tab logout synchronization

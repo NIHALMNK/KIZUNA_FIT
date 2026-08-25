@@ -1,15 +1,22 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { ApiError, NetworkError, TimeoutError } from '../../shared/exceptions/ApiError';
 import { tokenStorage } from '../storage/TokenStorage';
 import { useAuthStore } from '../../modules/identity/application/store/authStore';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 const DEFAULT_TIMEOUT = 10000;
 
 class HttpClient {
   private api: AxiosInstance;
   private isRefreshing = false;
-  private refreshSubscribers: { resolve: (token: string) => void, reject: (error: any) => void }[] = [];
+  private refreshSubscribers: { resolve: (token: string) => void; reject: (error: any) => void }[] =
+    [];
 
   constructor() {
     this.api = axios.create({
@@ -47,7 +54,7 @@ class HttpClient {
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     this.api.interceptors.response.use(
@@ -64,39 +71,61 @@ class HttpClient {
         }
 
         const { status, data } = error.response;
-        const errorData = data as { error?: { message?: string, code?: string, details?: Record<string, string[]> } };
+        const errorData = data as {
+          error?: { message?: string; code?: string; details?: Record<string, string[]> };
+        };
         const backendError = errorData?.error;
-        const message = backendError?.message || (errorData as Record<string, unknown>)?.message as string || 'An error occurred while communicating with the server.';
-        const code = backendError?.code || (errorData as Record<string, unknown>)?.code as string || 'UNKNOWN_ERROR';
-        const details = backendError?.details || (errorData as Record<string, unknown>)?.details as Record<string, unknown> || undefined;
+        const message =
+          backendError?.message ||
+          ((errorData as Record<string, unknown>)?.message as string) ||
+          'An error occurred while communicating with the server.';
+        const code =
+          backendError?.code ||
+          ((errorData as Record<string, unknown>)?.code as string) ||
+          'UNKNOWN_ERROR';
+        const details =
+          backendError?.details ||
+          ((errorData as Record<string, unknown>)?.details as Record<string, unknown>) ||
+          undefined;
 
-        if (status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== '/identity/refresh' && originalRequest.url !== '/identity/login') {
+        if (
+          status === 401 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          originalRequest.url !== '/identity/refresh' &&
+          originalRequest.url !== '/identity/login'
+        ) {
           originalRequest._retry = true;
 
           if (!this.isRefreshing) {
             this.isRefreshing = true;
             try {
               // Call the refresh endpoint (which relies on the HttpOnly cookie)
-              const res = await axios.post<{ success: boolean, data: { accessToken: string } }>(
+              const res = await axios.post<{ success: boolean; data: { accessToken: string } }>(
                 `${API_BASE_URL}/identity/refresh`,
                 {},
-                { withCredentials: true }
+                { withCredentials: true },
               );
-              
+
               const newAccessToken = res.data.data.accessToken;
               tokenStorage.setAccessToken(newAccessToken);
               this.onRefreshed(newAccessToken);
               this.isRefreshing = false;
-              
+
               originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
               return this.api(originalRequest);
             } catch (refreshError) {
               this.isRefreshing = false;
               tokenStorage.removeAccessToken();
               useAuthStore.getState().logout();
-              const apiError = new ApiError('Session expired. Please log in again.', 401, 'SESSION_EXPIRED', {});
+              const apiError = new ApiError(
+                'Session expired. Please log in again.',
+                401,
+                'SESSION_EXPIRED',
+                {},
+              );
               this.onRefreshFailed(apiError);
-              
+
               // Only redirect if we are in the browser
               if (typeof window !== 'undefined') {
                 const currentPath = window.location.pathname;
@@ -117,12 +146,12 @@ class HttpClient {
               },
               (error) => {
                 reject(error);
-              }
+              },
             );
           });
         }
         return Promise.reject(new ApiError(message, status, code, errorData, details));
-      }
+      },
     );
   }
 
@@ -134,25 +163,25 @@ class HttpClient {
   }
 
   public get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return this.api.get(url, config).then(res => this.unwrapResponse<T>(res));
+    return this.api.get(url, config).then((res) => this.unwrapResponse<T>(res));
   }
 
   public post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     console.log('7. HttpClient called');
     console.log('8. network request sent', url);
-    return this.api.post(url, data, config).then(res => this.unwrapResponse<T>(res));
+    return this.api.post(url, data, config).then((res) => this.unwrapResponse<T>(res));
   }
 
   public put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return this.api.put(url, data, config).then(res => this.unwrapResponse<T>(res));
+    return this.api.put(url, data, config).then((res) => this.unwrapResponse<T>(res));
   }
 
   public patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return this.api.patch(url, data, config).then(res => this.unwrapResponse<T>(res));
+    return this.api.patch(url, data, config).then((res) => this.unwrapResponse<T>(res));
   }
 
   public delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return this.api.delete(url, config).then(res => this.unwrapResponse<T>(res));
+    return this.api.delete(url, config).then((res) => this.unwrapResponse<T>(res));
   }
 
   public createCancelToken() {

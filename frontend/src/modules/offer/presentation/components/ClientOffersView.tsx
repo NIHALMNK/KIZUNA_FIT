@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useReceivedOffers } from '../../application/hooks/useOffers';
 import { useOfferActions } from '../../application/hooks/useOfferActions';
 import { CoachingOfferResponseDTO, CoachingOfferStatus } from '../../domain/types/offer.types';
+import { usePayments } from '../../../payment/application/queries/usePayments';
+import { PaymentSummary } from '../../../payment/domain/types/payment.types';
 import { OfferCard } from './OfferCard';
 import { OfferDetailsModal } from './OfferDetailsModal';
 import { Button } from '../../../../shared/components/ui/Button';
@@ -17,9 +19,21 @@ export const ClientOffersView: React.FC = () => {
 
   const queryParams = selectedStatus === 'ALL' ? undefined : { status: selectedStatus };
   const { data, isLoading, error, refetch } = useReceivedOffers(queryParams);
+  const { data: paymentsData } = usePayments({ page: 1, limit: 100 });
   const { acceptOffer, declineOffer } = useOfferActions();
 
   const offers = data?.offers || [];
+  const payments = paymentsData?.data || [];
+
+  const paymentsByOfferId = useMemo(() => {
+    const map = new Map<string, PaymentSummary>();
+    payments.forEach((p) => {
+      if (p.offerId) {
+        map.set(p.offerId, p);
+      }
+    });
+    return map;
+  }, [payments]);
 
   const handleOpenDetails = (offer: CoachingOfferResponseDTO) => {
     setActiveOffer(offer);
@@ -132,6 +146,7 @@ export const ClientOffersView: React.FC = () => {
             <OfferCard
               key={offer.offerId}
               offer={offer}
+              payment={paymentsByOfferId.get(offer.offerId) || null}
               onSelect={handleOpenDetails}
               onAccept={handleAccept}
               onDecline={() => {
@@ -147,6 +162,7 @@ export const ClientOffersView: React.FC = () => {
       {/* Modal */}
       <OfferDetailsModal
         offer={activeOffer}
+        payment={activeOffer ? paymentsByOfferId.get(activeOffer.offerId) || null : null}
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);

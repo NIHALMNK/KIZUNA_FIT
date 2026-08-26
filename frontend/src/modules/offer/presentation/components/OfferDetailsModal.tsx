@@ -1,12 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { CoachingOfferResponseDTO, CoachingOfferStatus } from '../../domain/types/offer.types';
+import { PaymentSummary, PaymentStatus } from '../../../payment/domain/types/payment.types';
 import { OfferStatusBadge } from './OfferStatusBadge';
 import { Button } from '../../../../shared/components/ui/Button';
+import { PayNowButton } from '../../../payment/presentation/components/PayNowButton';
+import { CheckCircle2, Sparkles, Loader2, AlertCircle } from 'lucide-react';
 
 interface OfferDetailsModalProps {
   offer: CoachingOfferResponseDTO | null;
+  payment?: PaymentSummary | null;
   isOpen: boolean;
   onClose: () => void;
   onAccept?: (offerId: string) => Promise<void>;
@@ -17,6 +22,7 @@ interface OfferDetailsModalProps {
 
 export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   offer,
+  payment,
   isOpen,
   onClose,
   onAccept,
@@ -230,6 +236,83 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
           <Button variant="outline" size="md" onClick={onClose} disabled={isSubmitting}>
             Close
           </Button>
+
+          {isClient && offer.status === CoachingOfferStatus.ACCEPTED && (
+            <>
+              {/* NO PAYMENT: show Pay Now */}
+              {!payment && (
+                <PayNowButton
+                  offerId={offer.offerId}
+                  label="Pay Now & Activate Coaching"
+                  className="!w-auto !py-2 !px-5 !text-xs !bg-emerald-600 !text-white !font-bold"
+                  onSuccess={() => onClose()}
+                />
+              )}
+
+              {/* PAYMENT CREATED: show Continue Payment */}
+              {payment?.status === PaymentStatus.CREATED && (
+                <PayNowButton
+                  offerId={offer.offerId}
+                  label="Continue Payment"
+                  className="!w-auto !py-2 !px-5 !text-xs !bg-amber-600 !text-white !font-bold"
+                  onSuccess={() => onClose()}
+                />
+              )}
+
+              {/* PAYMENT PROCESSING: show Payment Processing indicator and hide Pay button */}
+              {payment?.status === PaymentStatus.PROCESSING && (
+                <div
+                  className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 px-4 py-2 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800"
+                  data-testid="modal-payment-processing"
+                >
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Payment Processing in Background...</span>
+                </div>
+              )}
+
+              {/* PAYMENT SUCCESS: hide Pay button, show Payment Successful & Coaching Activated & safe navigation */}
+              {payment?.status === PaymentStatus.SUCCESS && (
+                <div className="flex items-center gap-2" data-testid="modal-payment-success">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Payment Successful • Coaching Activated</span>
+                  </span>
+                  <Link href="/client" onClick={() => onClose()}>
+                    <Button
+                      variant="primary"
+                      size="md"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-xs font-bold"
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
+              {/* PAYMENT FAILED: show Payment Failed with Retry action */}
+              {payment?.status === PaymentStatus.FAILED && (
+                <div className="flex items-center gap-2" data-testid="modal-payment-failed">
+                  <span className="text-xs text-rose-600 font-semibold">Payment failed.</span>
+                  <PayNowButton
+                    offerId={offer.offerId}
+                    label="Retry Payment"
+                    className="!w-auto !py-2 !px-4 !text-xs !bg-rose-600 !text-white"
+                    onSuccess={() => onClose()}
+                  />
+                </div>
+              )}
+
+              {/* PAYMENT REFUNDED: hide Pay button, show Payment Refunded */}
+              {payment?.status === PaymentStatus.REFUNDED && (
+                <span
+                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400"
+                  data-testid="modal-payment-refunded"
+                >
+                  Payment Refunded
+                </span>
+              )}
+            </>
+          )}
 
           {isClient && offer.status === CoachingOfferStatus.SENT && !showDeclineReason && (
             <>

@@ -13,6 +13,7 @@ describe('Offer Presentation Contract & Invariant Tests', () => {
       platformFee: 0,
       totalAmount: 12000,
       currency: 'INR',
+      commissionRate: 0.1,
     },
     scope: {
       durationDays: 84,

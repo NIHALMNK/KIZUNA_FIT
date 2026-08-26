@@ -34,6 +34,9 @@ const envSchema = z.object({
   BACKEND_URL: z.string().url(),
   CORS_ORIGIN: z.string().url(),
   LOG_LEVEL: z.string().default('debug'),
+  RAZORPAY_KEY_ID: z.string().default('rzp_test_placeholder'),
+  RAZORPAY_KEY_SECRET: z.string().default('placeholder_secret'),
+  RAZORPAY_WEBHOOK_SECRET: z.string().default('placeholder_webhook_secret'),
 });
 
 const _env = envSchema.safeParse(process.env);

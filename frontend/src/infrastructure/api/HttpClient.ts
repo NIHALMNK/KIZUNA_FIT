@@ -72,20 +72,23 @@ class HttpClient {
 
         const { status, data } = error.response;
         const errorData = data as {
-          error?: { message?: string; code?: string; details?: Record<string, string[]> };
+          error?: string | { message?: string; code?: string; details?: Record<string, string[]> };
+          message?: string;
+          code?: string;
+          details?: Record<string, unknown>;
         };
         const backendError = errorData?.error;
         const message =
-          backendError?.message ||
-          ((errorData as Record<string, unknown>)?.message as string) ||
+          (typeof backendError === 'string' ? backendError : backendError?.message) ||
+          errorData?.message ||
           'An error occurred while communicating with the server.';
         const code =
-          backendError?.code ||
-          ((errorData as Record<string, unknown>)?.code as string) ||
+          (typeof backendError === 'object' ? backendError?.code : undefined) ||
+          errorData?.code ||
           'UNKNOWN_ERROR';
         const details =
-          backendError?.details ||
-          ((errorData as Record<string, unknown>)?.details as Record<string, unknown>) ||
+          (typeof backendError === 'object' ? backendError?.details : undefined) ||
+          errorData?.details ||
           undefined;
 
         if (

@@ -4,6 +4,7 @@ import { cn } from '../../utils/cn';
 export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
+  subtitle?: string;
   badge?: React.ReactNode;
   actions?: React.ReactNode;
 }
@@ -11,16 +12,18 @@ export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   description,
+  subtitle,
   badge,
   actions,
   className,
   ...props
 }) => {
+  const desc = description || subtitle;
   return (
     <div
       className={cn(
         'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[var(--color-border)] mb-6',
-        className
+        className,
       )}
       {...props}
     >
@@ -31,9 +34,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </h1>
           {badge}
         </div>
-        {description && (
+        {desc && (
           <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl leading-relaxed">
-            {description}
+            {desc}
           </p>
         )}
       </div>

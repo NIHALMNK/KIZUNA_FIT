@@ -6,6 +6,7 @@ import { ProfileGatewayAdapter } from './infrastructure/gateways/profile-gateway
 import { CoachingGatewayAdapter } from './infrastructure/gateways/coaching-gateway.adapter';
 import { MarketplaceConsultationSubscriber } from './infrastructure/subscribers/marketplace-consultation.subscriber';
 import { MarketplaceOfferSubscriber } from './infrastructure/subscribers/marketplace-offer.subscriber';
+import { MarketplacePaymentSubscriber } from './infrastructure/subscribers/marketplace-payment.subscriber';
 
 // Application Use Cases
 import { CreateTrainerRequestUseCase } from './application/use-cases/create-trainer-request/create-trainer-request.use-case';
@@ -30,6 +31,7 @@ export const registerMarketplaceDependencies = (container: AwilixContainer): voi
     coachingGateway: asClass(CoachingGatewayAdapter).scoped(),
     marketplaceConsultationSubscriber: asClass(MarketplaceConsultationSubscriber).singleton(),
     marketplaceOfferSubscriber: asClass(MarketplaceOfferSubscriber).singleton(),
+    marketplacePaymentSubscriber: asClass(MarketplacePaymentSubscriber).singleton(),
   });
 
   // Application Use Cases (Scoped)

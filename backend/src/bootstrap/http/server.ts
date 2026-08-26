@@ -57,6 +57,11 @@ async function bootstrap() {
   );
   marketplaceOfferSubscriber.register();
 
+  const marketplacePaymentSubscriber = container.resolve<{ register: () => void }>(
+    'marketplacePaymentSubscriber',
+  );
+  marketplacePaymentSubscriber.register();
+
   registerMarketplaceRealtimeEvents(realtimeSubscriber);
   registerProfileRealtimeEvents(realtimeSubscriber);
   registerConsultationRealtimeEvents(realtimeSubscriber);

@@ -112,39 +112,38 @@
 **POST   /api/v1/offers/:offerId/expire**
 
 **06\_Payment**  
+**06_Payment**
 **Payment.api.md**  
-**POST   /api/v1/payments**
-
+**POST   /api/v1/payments**  
+**POST   /api/v1/payments/:paymentId/verify**  
 **GET    /api/v1/payments**  
-**GET    /api/v1/payments/:paymentId**
+**GET    /api/v1/payments/:paymentId**  
+**GET    /api/v1/payments/:paymentId/invoice**  
+**POST   /api/v1/payments/webhook/razorpay**  
 
-**GET    /api/v1/payments/history**
+**Refund.api.md (Payment-Scoped)**  
+**POST   /api/v1/payments/:paymentId/refunds**  
+**GET    /api/v1/payments/:paymentId/refunds/:refundId**  
+**GET    /api/v1/payments/refunds**  
+**PATCH  /api/v1/payments/:paymentId/refunds/:refundId/review**  
+**PATCH  /api/v1/payments/:paymentId/refunds/:refundId/approve**  
+**PATCH  /api/v1/payments/:paymentId/refunds/:refundId/reject**  
+**POST   /api/v1/payments/:paymentId/refunds/:refundId/process**  
 
-**POST   /api/v1/payments/:paymentId/verify**
+**Dispute.api.md (Payment-Scoped)**  
+**POST   /api/v1/payments/:paymentId/disputes**  
+**GET    /api/v1/payments/:paymentId/disputes/:disputeId**  
+**GET    /api/v1/payments/disputes**  
+**PATCH  /api/v1/payments/:paymentId/disputes/:disputeId/investigate**  
+**PATCH  /api/v1/payments/:paymentId/disputes/:disputeId/resolve**  
+**PATCH  /api/v1/payments/:paymentId/disputes/:disputeId/close**  
 
-**POST   /api/v1/payments/:paymentId/refund**
-
-**GET    /api/v1/payments/:paymentId/invoice**
-
-**Refund.api.md**  
-**POST   /api/v1/refunds**
-
-**GET    /api/v1/refunds**  
-**GET    /api/v1/refunds/:refundId**
-
-**POST   /api/v1/refunds/:refundId/approve**  
-**POST   /api/v1/refunds/:refundId/reject**  
-**POST   /api/v1/refunds/:refundId/process**
-
-**Payout.api.md**  
-**POST   /api/v1/payouts**
-
-**GET    /api/v1/payouts**  
-**GET    /api/v1/payouts/:payoutId**
-
-**POST   /api/v1/payouts/:payoutId/process**  
-**POST   /api/v1/payouts/:payoutId/complete**  
-**POST   /api/v1/payouts/:payoutId/fail**
+**Payout.api.md (Payment-Scoped)**  
+**GET    /api/v1/payments/:paymentId/payout/eligibility**  
+**GET    /api/v1/payments/:paymentId/payout**  
+**GET    /api/v1/payments/payouts**  
+**POST   /api/v1/payments/:paymentId/payout/process**  
+**GET    /api/v1/payments/:paymentId/settlement**
 
 **07\_Coaching**  
 **CoachingRelationship.api.md**  

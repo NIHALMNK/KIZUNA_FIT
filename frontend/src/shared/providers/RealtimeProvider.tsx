@@ -10,6 +10,7 @@ import {
   RealtimeEventHandler,
 } from '../../infrastructure/realtime/realtime.types';
 import { RealtimeQueryBridge } from '../infrastructure/realtime/realtimeQueryBridge';
+import { registerPaymentRealtimeRules } from '../../modules/payment/infrastructure/realtime/paymentRealtimeBridge';
 
 interface RealtimeContextValue {
   connectionState: RealtimeConnectionState;
@@ -26,7 +27,7 @@ const RealtimeContext = createContext<RealtimeContextValue>({
 });
 
 export function RealtimeProvider({ children }: { children: React.ReactNode }) {
-  const { status } = useAuthStore();
+  const { status, user } = useAuthStore();
   const queryClient = useQueryClient();
   const [connectionState, setConnectionState] = useState<RealtimeConnectionState>(
     socketClientService.getState(),
@@ -189,6 +190,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       ['offers', 'detail', (event.payload as Record<string, unknown>)?.offerId || ''],
     ]);
 
+    const unPayment = registerPaymentRealtimeRules(queryBridge, user?.role);
+
     return () => {
       unCreated();
       unAccepted();
@@ -207,8 +210,9 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       unOfferAccepted();
       unOfferDeclined();
       unOfferExpired();
+      unPayment();
     };
-  }, [queryBridge]);
+  }, [queryBridge, user?.role]);
 
   const value = useMemo<RealtimeContextValue>(
     () => ({

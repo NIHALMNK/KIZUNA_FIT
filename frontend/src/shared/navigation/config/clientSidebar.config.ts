@@ -110,6 +110,16 @@ export const clientSidebarConfig: SidebarConfig = {
           breadcrumb: ['Dashboard', 'Account', 'Profile'],
         },
         {
+          id: 'payments',
+          label: 'Payments & Billing',
+          description: 'Payment history, invoices & escrow protection',
+          href: '/client/payments',
+          iconName: 'invoices',
+          status: 'active',
+          pageTitle: 'Payment & Billing',
+          breadcrumb: ['Dashboard', 'Account', 'Payments'],
+        },
+        {
           id: 'settings',
           label: 'Settings',
           description: 'Security, password & notification preferences',

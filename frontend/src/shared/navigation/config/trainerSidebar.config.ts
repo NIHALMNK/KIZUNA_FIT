@@ -55,6 +55,16 @@ export const trainerSidebarConfig: SidebarConfig = {
           breadcrumb: ['Dashboard', 'Offers'],
         },
         {
+          id: 'trainer-payments',
+          label: 'Earnings & Payouts',
+          description: 'Track coaching revenue, escrow clearance & payouts',
+          href: '/trainer/payments',
+          iconName: 'invoices',
+          status: 'active',
+          pageTitle: 'Earnings & Payouts',
+          breadcrumb: ['Dashboard', 'Earnings & Payouts'],
+        },
+        {
           id: 'trainer-clients',
           label: 'My Clients',
           description: 'Active client roster and coaching management',

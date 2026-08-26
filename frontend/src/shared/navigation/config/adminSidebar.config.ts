@@ -14,6 +14,13 @@ export const adminSidebarConfig: SidebarConfig = {
           iconName: 'dashboard',
           status: 'active',
         },
+        {
+          id: 'admin-payments',
+          label: 'Payments & Payouts',
+          href: '/admin/payments',
+          iconName: 'invoices',
+          status: 'active',
+        },
       ],
     },
   ],

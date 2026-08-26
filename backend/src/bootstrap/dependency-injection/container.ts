@@ -13,6 +13,7 @@ import { RealtimeDomainEventSubscriber } from '../../infrastructure/websocket/su
 import { registerMarketplaceModule } from '../../modules/marketplace/module';
 import { registerConsultationModule } from '../../modules/consultation/module';
 import { registerOfferModule } from '../../modules/offer/module';
+import { registerPaymentModule } from '../../modules/payment/module';
 
 export const configureContainer = () => {
   const container = createContainer({
@@ -36,6 +37,7 @@ export const configureContainer = () => {
   registerMarketplaceModule(container);
   registerConsultationModule(container);
   registerOfferModule(container);
+  registerPaymentModule(container);
 
   return container;
 };

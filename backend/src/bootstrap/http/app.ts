@@ -13,6 +13,7 @@ import { trainerProfileRouter } from '../../modules/profile/presentation/routes/
 import { marketplaceRouter } from '../../modules/marketplace/routes';
 import { consultationModuleRouter } from '../../modules/consultation/routes';
 import { offerModuleRouter } from '../../modules/offer/routes';
+import { paymentModuleRouter } from '../../modules/payment/routes';
 
 export function createApp(container: AwilixContainer): express.Application {
   const app = express();
@@ -30,7 +31,13 @@ export function createApp(container: AwilixContainer): express.Application {
       credentials: true,
     }),
   );
-  app.use(express.json());
+  app.use(
+    express.json({
+      verify: (req: Request, _res: Response, buf: Buffer) => {
+        (req as unknown as { rawBody?: Buffer }).rawBody = buf;
+      },
+    }),
+  );
   app.use(cookieParser());
 
   app.get('/api/v1/health', (req, res) => {
@@ -58,6 +65,7 @@ export function createApp(container: AwilixContainer): express.Application {
   app.use('/api/v1', marketplaceRouter());
   app.use('/api/v1', consultationModuleRouter());
   app.use('/api/v1', offerModuleRouter());
+  app.use('/api/v1', paymentModuleRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

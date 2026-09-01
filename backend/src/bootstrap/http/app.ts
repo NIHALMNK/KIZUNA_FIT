@@ -14,6 +14,7 @@ import { marketplaceRouter } from '../../modules/marketplace/routes';
 import { consultationModuleRouter } from '../../modules/consultation/routes';
 import { offerModuleRouter } from '../../modules/offer/routes';
 import { paymentModuleRouter } from '../../modules/payment/routes';
+import { coachingModuleRouter } from '../../modules/coaching/routes';
 
 export function createApp(container: AwilixContainer): express.Application {
   const app = express();
@@ -66,6 +67,7 @@ export function createApp(container: AwilixContainer): express.Application {
   app.use('/api/v1', consultationModuleRouter());
   app.use('/api/v1', offerModuleRouter());
   app.use('/api/v1', paymentModuleRouter());
+  app.use('/api/v1', coachingModuleRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

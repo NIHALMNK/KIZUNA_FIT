@@ -17,10 +17,30 @@ export class ClientDashboardApi {
   public async getActiveCoaching(): Promise<CoachingRelationshipSummary[]> {
     try {
       const res = await httpClient.get<any>('/coaching-relationships/active');
-      if (Array.isArray(res)) return res;
-      if (res?.relationships && Array.isArray(res.relationships)) return res.relationships;
-      if (res && typeof res === 'object' && 'id' in res) return [res as CoachingRelationshipSummary];
-      return [];
+      const rawList = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.relationships)
+          ? res.relationships
+          : res && typeof res === 'object' && ('relationshipId' in res || 'id' in res)
+            ? [res]
+            : [];
+
+      return rawList.map((r: any) => ({
+        id: r.relationshipId || r.id,
+        clientId: r.clientId,
+        trainerId: r.trainerId,
+        trainerName: r.trainer?.fullName || r.trainerName || 'Assigned Coach',
+        trainerAvatarUrl: r.trainer?.avatarUrl || r.trainerAvatarUrl,
+        programTitle: r.trainer?.specialization
+          ? `${r.trainer.specialization} Coaching`
+          : r.planType
+            ? `${r.planType} Coaching Plan`
+            : r.programTitle || '1-on-1 Personalized Coaching',
+        status: r.status,
+        startedAt: r.startedAt || r.timeline?.activatedAt || r.createdAt,
+        endsAt: r.endsAt,
+        createdAt: r.createdAt,
+      }));
     } catch (error) {
       if (error instanceof ApiError && (error.status === 404 || error.status === 200)) {
         return [];

@@ -24,7 +24,8 @@ export const ClientCoachingCard: React.FC<ClientCoachingCardProps> = ({ relation
             Your coaching journey starts here.
           </h2>
           <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] font-normal leading-relaxed max-w-xl">
-            Find a certified trainer who matches your personal fitness goals and start your 1-on-1 coaching program.
+            Find a certified trainer who matches your personal fitness goals and start your 1-on-1
+            coaching program.
           </p>
         </div>
 
@@ -60,7 +61,11 @@ export const ClientCoachingCard: React.FC<ClientCoachingCardProps> = ({ relation
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return null;
     try {
-      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
     } catch {
       return dateStr;
     }
@@ -103,21 +108,29 @@ export const ClientCoachingCard: React.FC<ClientCoachingCardProps> = ({ relation
         <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-[var(--color-surface-alt)] border border-[var(--color-border)] text-xs">
           {startDateFormatted && (
             <div>
-              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Started</span>
-              <span className="font-semibold text-[var(--color-text-primary)]">{startDateFormatted}</span>
+              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">
+                Started
+              </span>
+              <span className="font-semibold text-[var(--color-text-primary)]">
+                {startDateFormatted}
+              </span>
             </div>
           )}
           {endDateFormatted && (
             <div>
-              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Ends</span>
-              <span className="font-semibold text-[var(--color-text-primary)]">{endDateFormatted}</span>
+              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">
+                Ends
+              </span>
+              <span className="font-semibold text-[var(--color-text-primary)]">
+                {endDateFormatted}
+              </span>
             </div>
           )}
         </div>
       )}
 
       <div className="pt-1">
-        <Link href="/client/requests">
+        <Link href="/client/coaching">
           <Button
             variant="outline"
             size="md"

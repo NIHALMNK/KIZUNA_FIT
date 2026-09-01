@@ -64,6 +64,16 @@ export const clientSidebarConfig: SidebarConfig = {
       title: 'MY COACHING',
       items: [
         {
+          id: 'my-coaching-overview',
+          label: 'My Coaching',
+          description: 'Active contract, coach details & coaching lifecycle',
+          href: '/client/coaching',
+          iconName: 'profile',
+          status: 'active',
+          pageTitle: 'My Coaching',
+          breadcrumb: ['Dashboard', 'My Coaching'],
+        },
+        {
           id: 'workout-programs',
           label: 'Workout Programs',
           description: 'Assigned sets, reps & exercise video guides',

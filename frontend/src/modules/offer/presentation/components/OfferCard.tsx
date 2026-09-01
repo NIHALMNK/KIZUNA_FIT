@@ -122,18 +122,43 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         </div>
       )}
 
+      {/* Payment Success & Coaching Status Banner */}
+      {isClient &&
+        offer.status === CoachingOfferStatus.ACCEPTED &&
+        payment?.status === PaymentStatus.SUCCESS && (
+          <div
+            className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
+            data-testid="payment-success-state"
+          >
+            <span
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+              data-testid="payment-successful-badge"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Payment Successful</span>
+            </span>
+            <span
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-700 dark:text-teal-300"
+              data-testid="coaching-activated-badge"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Coaching Activated</span>
+            </span>
+          </div>
+        )}
+
       {/* Actions */}
-      <div className="flex items-center justify-between gap-2 pt-2 border-t border-[var(--color-border)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[var(--color-border)]">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onSelect(offer)}
-          className="text-xs font-bold"
+          className="text-xs font-bold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
         >
           View Full Offer
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {isClient && offer.status === CoachingOfferStatus.ACCEPTED && (
             <>
               {/* NO PAYMENT: show Pay & Activate */}
@@ -141,7 +166,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
                 <PayNowButton
                   offerId={offer.offerId}
                   label="Pay & Activate"
-                  className="!w-auto !py-1.5 !px-3.5 !text-xs !bg-emerald-600 !text-white"
+                  className="!w-auto !py-1.5 !px-3.5 !text-xs !bg-emerald-600 hover:!bg-emerald-500 !text-white font-bold"
                 />
               )}
 
@@ -150,7 +175,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
                 <PayNowButton
                   offerId={offer.offerId}
                   label="Continue Payment"
-                  className="!w-auto !py-1.5 !px-3.5 !text-xs !bg-amber-600 !text-white"
+                  className="!w-auto !py-1.5 !px-3.5 !text-xs !bg-amber-600 hover:!bg-amber-500 !text-white font-bold"
                 />
               )}
 
@@ -165,31 +190,26 @@ export const OfferCard: React.FC<OfferCardProps> = ({
                 </div>
               )}
 
-              {/* PAYMENT SUCCESS: hide Pay button, show Payment Successful & Coaching Activated & safe navigation */}
+              {/* PAYMENT SUCCESS: Action buttons */}
               {payment?.status === PaymentStatus.SUCCESS && (
-                <div className="flex items-center gap-2" data-testid="payment-success-state">
-                  <span
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                    data-testid="payment-successful-badge"
-                  >
-                    <CheckCircle2 className="w-3 h-3" />
-                    <span>Payment Successful</span>
-                  </span>
-                  <span
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-500/10 border border-teal-500/20 text-teal-600 dark:text-teal-400"
-                    data-testid="coaching-activated-badge"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Coaching Activated</span>
-                  </span>
-                  <Link href="/client">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link href="/client/payments">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-xs font-bold !py-1 !px-2.5"
+                      className="text-xs font-bold !py-1.5 !px-3"
                       data-testid="view-payment-action"
                     >
                       View Payment
+                    </Button>
+                  </Link>
+                  <Link href="/client/coaching">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="text-xs font-bold !py-1.5 !px-3 bg-emerald-600 hover:bg-emerald-500 text-white"
+                    >
+                      Go to Coaching &rarr;
                     </Button>
                   </Link>
                 </div>
@@ -198,14 +218,14 @@ export const OfferCard: React.FC<OfferCardProps> = ({
               {/* PAYMENT FAILED: show Payment Failed with Retry action */}
               {payment?.status === PaymentStatus.FAILED && (
                 <div className="flex items-center gap-2" data-testid="payment-failed-state">
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400">
-                    <AlertCircle className="w-3 h-3" />
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400">
+                    <AlertCircle className="w-3.5 h-3.5" />
                     <span>Failed</span>
                   </span>
                   <PayNowButton
                     offerId={offer.offerId}
                     label="Retry Payment"
-                    className="!w-auto !py-1.5 !px-3.5 !text-xs !bg-rose-600 !text-white"
+                    className="!w-auto !py-1.5 !px-3.5 !text-xs !bg-rose-600 hover:!bg-rose-500 !text-white font-bold"
                   />
                 </div>
               )}
@@ -213,7 +233,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
               {/* PAYMENT REFUNDED: hide Pay button, show Payment Refunded */}
               {payment?.status === PaymentStatus.REFUNDED && (
                 <span
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400"
                   data-testid="payment-refunded-state"
                 >
                   <span>Payment Refunded</span>

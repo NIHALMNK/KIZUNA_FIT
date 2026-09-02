@@ -69,6 +69,9 @@ async function bootstrap() {
   try {
     // 3. Connect MongoDB (Fail Fast)
     await dbManager.connect();
+    const { seedExercisesIfEmpty } =
+      await import('../../modules/workout/infrastructure/seeds/seedExercisesIfEmpty');
+    await seedExercisesIfEmpty();
 
     // 4. Connect Redis (Fail Fast)
     await redisManager.connect();

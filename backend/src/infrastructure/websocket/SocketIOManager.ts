@@ -35,10 +35,12 @@ export class SocketIOManager {
     });
 
     const pubClient = this.redisManager.getClient();
-    const subClient = pubClient.duplicate();
-
-    // Wire Redis adapter for scale-out
-    this.io.adapter(createAdapter(pubClient, subClient));
+    if (pubClient && pubClient.isOpen) {
+      const subClient = pubClient.duplicate();
+      subClient.connect().catch(() => {});
+      // Wire Redis adapter for scale-out
+      this.io.adapter(createAdapter(pubClient, subClient));
+    }
 
     // Register authentication middleware
     this.io.use(socketAuthMiddleware);

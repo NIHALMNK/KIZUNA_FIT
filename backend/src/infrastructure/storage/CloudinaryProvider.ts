@@ -14,17 +14,23 @@ export class CloudinaryProvider implements IStorageProvider {
     }
   }
 
-  async uploadFile(fileBuffer: Buffer, folder: string): Promise<string> {
+  async uploadFile(
+    fileBuffer: Buffer,
+    folder: string,
+    options?: { resourceType?: 'image' | 'video' | 'auto' },
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder },
+        { folder, resource_type: options?.resourceType || 'auto' },
         (error: Error | undefined, result: unknown) => {
           if (error) {
             return reject(error);
           }
           const secureUrl = (result as Record<string, unknown> | undefined)?.secure_url;
           if (typeof secureUrl !== 'string') {
-            return reject(new Error('Cloudinary upload failed: No secure_url returned in response'));
+            return reject(
+              new Error('Cloudinary upload failed: No secure_url returned in response'),
+            );
           }
           resolve(secureUrl);
         },
@@ -36,8 +42,15 @@ export class CloudinaryProvider implements IStorageProvider {
 
   async deleteFile(fileUrl: string): Promise<boolean> {
     const publicId = this.extractPublicId(fileUrl);
-    const result = await cloudinary.uploader.destroy(publicId);
-    return result.result === 'ok';
+    const isVideo = /\.(mp4|mov|webm|mkv|avi)$/i.test(fileUrl) || fileUrl.includes('/video/');
+    try {
+      const result = await cloudinary.uploader.destroy(publicId, {
+        resource_type: isVideo ? 'video' : 'image',
+      });
+      return result.result === 'ok';
+    } catch (_error) {
+      return false;
+    }
   }
 
   private extractPublicId(url: string): string {

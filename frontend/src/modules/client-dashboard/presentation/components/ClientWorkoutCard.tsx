@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { AssignedWorkoutProgram } from '../../domain/types/clientDashboard.types';
+import { useActiveWorkoutProgram } from '../../../workout/application/queries/useWorkoutPrograms';
 import { Button } from '../../../../shared/components/ui/Button';
 
 interface ClientWorkoutCardProps {
@@ -10,7 +11,18 @@ interface ClientWorkoutCardProps {
 }
 
 export const ClientWorkoutCard: React.FC<ClientWorkoutCardProps> = ({ programs = [] }) => {
-  const activeProgram = programs.find((p) => p.status === 'ACTIVE') || programs[0];
+  const { data: fetchedActiveProgram } = useActiveWorkoutProgram();
+
+  const activeProgram =
+    programs.find((p) => p.status === 'ACTIVE') ||
+    (fetchedActiveProgram
+      ? {
+          id: fetchedActiveProgram.id,
+          title: fetchedActiveProgram.title,
+          status: fetchedActiveProgram.status,
+          assignedAt: fetchedActiveProgram.activatedAt || fetchedActiveProgram.createdAt,
+        }
+      : programs[0]);
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return null;
@@ -28,7 +40,7 @@ export const ClientWorkoutCard: React.FC<ClientWorkoutCardProps> = ({ programs =
           WORKOUT PROGRAM
         </span>
         {activeProgram && (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
             Active
           </span>
         )}
@@ -58,10 +70,9 @@ export const ClientWorkoutCard: React.FC<ClientWorkoutCardProps> = ({ programs =
         <Button
           variant="outline"
           size="md"
-          fullWidth
-          className="border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] font-semibold rounded-xl"
+          className="w-full border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] font-bold rounded-xl"
         >
-          View Workouts
+          {activeProgram ? "View Today's Routine" : 'Browse Workouts'}
         </Button>
       </Link>
     </div>

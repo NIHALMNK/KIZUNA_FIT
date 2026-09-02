@@ -11,6 +11,8 @@ import {
 } from '../../infrastructure/realtime/realtime.types';
 import { RealtimeQueryBridge } from '../infrastructure/realtime/realtimeQueryBridge';
 import { registerPaymentRealtimeRules } from '../../modules/payment/infrastructure/realtime/paymentRealtimeBridge';
+import { registerWorkoutRealtimeRules } from '../../modules/workout/infrastructure/realtime/workoutRealtimeBridge';
+import { registerCoachingRealtimeRules } from '../../modules/coaching/infrastructure/realtime/coachingRealtimeBridge';
 
 interface RealtimeContextValue {
   connectionState: RealtimeConnectionState;
@@ -61,7 +63,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     } else if (status === 'unauthenticated') {
       socketClientService.disconnect();
     }
-  }, [status]);
+  }, [status, user?.id]);
 
   // Register platform Marketplace realtime query invalidation rules
   useEffect(() => {
@@ -191,6 +193,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     ]);
 
     const unPayment = registerPaymentRealtimeRules(queryBridge, user?.role);
+    const unWorkout = registerWorkoutRealtimeRules(queryBridge);
+    const unCoaching = registerCoachingRealtimeRules(queryBridge);
 
     return () => {
       unCreated();
@@ -211,6 +215,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       unOfferDeclined();
       unOfferExpired();
       unPayment();
+      unWorkout();
+      unCoaching();
     };
   }, [queryBridge, user?.role]);
 

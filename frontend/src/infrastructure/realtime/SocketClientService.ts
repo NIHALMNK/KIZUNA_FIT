@@ -54,14 +54,12 @@ export class SocketClientService {
       return;
     }
 
-    // If token changed on active socket, update auth payload and reconnect
+    // If token changed on active socket, update auth payload and force re-handshake
     if (this.socket && this.currentToken !== accessToken) {
       this.currentToken = accessToken;
       this.socket.auth = { token: `Bearer ${accessToken}` };
-      if (!this.socket.connected) {
-        this.setState('CONNECTING');
-        this.socket.connect();
-      }
+      this.setState('CONNECTING');
+      this.socket.disconnect().connect();
       return;
     }
 

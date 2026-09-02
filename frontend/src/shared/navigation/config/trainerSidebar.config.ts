@@ -86,8 +86,9 @@ export const trainerSidebarConfig: SidebarConfig = {
           description: 'Workout plans & exercise prescription library',
           href: '/trainer/workouts',
           iconName: 'workouts',
-          status: 'comingSoon',
-          badge: { type: 'COMING_SOON', text: 'Coming Soon' },
+          status: 'active',
+          pageTitle: 'Workouts',
+          breadcrumb: ['Dashboard', 'Workouts'],
         },
         {
           id: 'trainer-nutrition',

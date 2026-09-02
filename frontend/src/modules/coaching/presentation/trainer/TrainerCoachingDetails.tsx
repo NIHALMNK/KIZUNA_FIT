@@ -197,7 +197,7 @@ export const TrainerCoachingDetails: React.FC<TrainerCoachingDetailsProps> = ({
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
-            href="/trainer/workouts"
+            href={`/trainer/workouts?coachingRelationshipId=${relationship.relationshipId}`}
             className="group p-5 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 hover:shadow-xs transition-all flex flex-col justify-between space-y-4"
           >
             <div className="space-y-2">

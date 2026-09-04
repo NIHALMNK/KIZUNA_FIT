@@ -13,7 +13,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-    "prepare": "husky install"
+    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production' && !process.env.CI && !process.env.VERCEL) { import('husky').then(h => h.default()).catch(err => { if (err.code !== 'ERR_MODULE_NOT_FOUND') throw err; }); }\""
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",

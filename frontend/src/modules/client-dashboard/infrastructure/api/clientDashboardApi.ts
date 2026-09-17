@@ -6,7 +6,6 @@ import {
   AssignedWorkoutProgram,
   AssignedNutritionPlan,
   PendingCoachingOffer,
-  CoachingEvaluationSummary,
 } from '../../domain/types/clientDashboard.types';
 
 export class ClientDashboardApi {
@@ -112,24 +111,6 @@ export class ClientDashboardApi {
       const res = await httpClient.get<any>('/nutrition-plans/assigned');
       if (Array.isArray(res)) return res;
       if (res?.plans && Array.isArray(res.plans)) return res.plans;
-      return [];
-    } catch (error) {
-      if (error instanceof ApiError && (error.status === 404 || error.status === 200)) {
-        return [];
-      }
-      throw error;
-    }
-  }
-
-  /**
-   * Fetch coaching evaluations
-   * GET /api/v1/coaching-evaluations
-   */
-  public async getCoachingEvaluations(): Promise<CoachingEvaluationSummary[]> {
-    try {
-      const res = await httpClient.get<any>('/coaching-evaluations');
-      if (Array.isArray(res)) return res;
-      if (res?.evaluations && Array.isArray(res.evaluations)) return res.evaluations;
       return [];
     } catch (error) {
       if (error instanceof ApiError && (error.status === 404 || error.status === 200)) {

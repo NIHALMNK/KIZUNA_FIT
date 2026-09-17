@@ -7,7 +7,6 @@ export const CLIENT_DASHBOARD_KEYS = {
   pendingOffers: ['client-dashboard', 'pending-offers'] as const,
   assignedWorkouts: ['client-dashboard', 'assigned-workouts'] as const,
   assignedNutrition: ['client-dashboard', 'assigned-nutrition'] as const,
-  evaluations: ['client-dashboard', 'evaluations'] as const,
 };
 
 export const useActiveCoaching = () => {
@@ -50,15 +49,6 @@ export const useAssignedNutrition = () => {
   return useQuery({
     queryKey: CLIENT_DASHBOARD_KEYS.assignedNutrition,
     queryFn: () => clientDashboardApi.getAssignedNutrition(),
-    staleTime: 1000 * 60 * 5,
-    retry: 1,
-  });
-};
-
-export const useCoachingEvaluations = () => {
-  return useQuery({
-    queryKey: CLIENT_DASHBOARD_KEYS.evaluations,
-    queryFn: () => clientDashboardApi.getCoachingEvaluations(),
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });

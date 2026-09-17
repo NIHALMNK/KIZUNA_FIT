@@ -1,11 +1,15 @@
 import { SidebarBadgeConfig } from '../types/navigation.types';
 
-export const isNavRouteActive = (pathname: string, targetHref: string): boolean => {
+export const isNavRouteActive = (
+  pathname: string,
+  targetHref: string,
+  exact: boolean = false,
+): boolean => {
   if (!pathname || !targetHref) return false;
-  if (targetHref === '/client' || targetHref === '/trainer' || targetHref === '/admin') {
+  if (exact || targetHref === '/client' || targetHref === '/trainer' || targetHref === '/admin') {
     return pathname === targetHref;
   }
-  return pathname.startsWith(targetHref);
+  return pathname === targetHref || pathname.startsWith(targetHref + '/');
 };
 
 export const getBadgeClasses = (badge?: SidebarBadgeConfig): string => {

@@ -25,8 +25,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({ item, onClick }) => {
   const tooltipContent = isComingSoon
     ? 'This feature will be available in a future update.'
     : isCollapsed
-    ? item.label
-    : '';
+      ? item.label
+      : '';
 
   const buttonContent = (
     <motion.div
@@ -39,8 +39,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({ item, onClick }) => {
         active
           ? 'bg-[var(--color-tag)] text-[var(--color-tag-text)] border-l-3 border-[var(--color-primary)] font-extrabold'
           : isDisabled
-          ? 'opacity-50 text-[var(--color-text-muted)] cursor-not-allowed'
-          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] border-l-3 border-transparent'
+            ? 'opacity-50 text-[var(--color-text-muted)] cursor-not-allowed'
+            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] border-l-3 border-transparent'
       }`}
     >
       {/* Icon */}
@@ -49,8 +49,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({ item, onClick }) => {
           active
             ? 'text-[var(--color-primary)]'
             : isDisabled
-            ? 'text-[var(--color-text-muted)]'
-            : 'text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)]'
+              ? 'text-[var(--color-text-muted)]'
+              : 'text-[var(--color-text-muted)] group-hover:text-[var(--color-primary)]'
         }`}
       />
 
@@ -79,11 +79,44 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({ item, onClick }) => {
     );
   }
 
+  const hasChildren = item.children && item.children.length > 0;
+
   return (
-    <SidebarTooltip content={isCollapsed ? item.label : ''} disabled={!isCollapsed}>
-      <Link href={item.href} onClick={onClick} className="w-full">
-        {buttonContent}
-      </Link>
-    </SidebarTooltip>
+    <div className="w-full space-y-1">
+      <SidebarTooltip content={isCollapsed ? item.label : ''} disabled={!isCollapsed}>
+        <Link href={item.href} onClick={onClick} className="w-full block">
+          {buttonContent}
+        </Link>
+      </SidebarTooltip>
+
+      {!isCollapsed && hasChildren && (
+        <div className="pl-7 pr-1 space-y-0.5 border-l border-[var(--color-border)] ml-5 my-0.5">
+          {item.children!.map((child) => {
+            const childActive = isRouteActive(child.href, true);
+            return (
+              <Link
+                key={child.id}
+                href={child.href}
+                onClick={onClick}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  childActive
+                    ? 'bg-[var(--color-tag)] text-[var(--color-primary)] font-bold'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)]'
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                    childActive
+                      ? 'bg-[var(--color-primary)]'
+                      : 'bg-[var(--color-text-muted)] opacity-40'
+                  }`}
+                />
+                <span className="truncate">{child.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };

@@ -96,8 +96,9 @@ export const trainerSidebarConfig: SidebarConfig = {
           description: 'Macro targets & custom diet plans',
           href: '/trainer/nutrition',
           iconName: 'nutrition',
-          status: 'comingSoon',
-          badge: { type: 'COMING_SOON', text: 'Coming Soon' },
+          status: 'active',
+          pageTitle: 'Nutrition',
+          breadcrumb: ['Dashboard', 'Nutrition'],
         },
         {
           id: 'trainer-progress',

@@ -916,6 +916,99 @@ trainers may receive new coaching requests.
 
 ---
 
+# **STATE MACHINE 13**
+
+# **Nutrition Plan**
+
+## **Domain**
+
+Nutrition
+
+---
+
+## **Purpose**
+
+Manage nutrition plan prescription lifecycle with mandatory client approval.
+
+---
+
+## **States**
+
+DRAFT
+
+PENDING_APPROVAL
+
+ACTIVE
+
+DELETION_PENDING
+
+COMPLETED
+
+CANCELLED
+
+---
+
+## **Lifecycle**
+
+DRAFT  
+↓ (Trainer submits)  
+PENDING_APPROVAL  
+↓ (Client accepts)  
+ACTIVE  
+↓ (V(N+1) activation replacement)  
+COMPLETED
+
+---
+
+## **Alternative Paths**
+
+PENDING_APPROVAL  
+↓ (Client rejects)  
+DRAFT
+
+ACTIVE  
+↓ (Trainer requests retirement)  
+DELETION_PENDING  
+↓ (Client accepts retirement)  
+CANCELLED
+
+DELETION_PENDING  
+↓ (Client rejects retirement)  
+ACTIVE
+
+---
+
+## **Terminal States**
+
+COMPLETED
+
+CANCELLED
+
+---
+
+## **Forbidden Transitions**
+
+DRAFT → ACTIVE (Direct activation without client approval strictly forbidden)  
+DRAFT → COMPLETED  
+PENDING_APPROVAL → COMPLETED  
+ACTIVE → DRAFT  
+ACTIVE → PENDING_APPROVAL  
+COMPLETED → *  
+CANCELLED → *
+
+---
+
+## **Core Invariants**
+
+1. Client approval is mandatory for EVERY nutrition plan activation (including V1).
+2. Trainer creates and edits plan only in DRAFT.
+3. Trainer submits DRAFT → PENDING_APPROVAL. Trainer cannot edit while pending.
+4. Client accepts PENDING_APPROVAL → ACTIVE.
+5. Client rejects PENDING_APPROVAL → DRAFT. Rejection of V2 leaves V1 ACTIVE.
+6. NutritionCompletion can only be started for an ACTIVE plan.
+
+---
+
 # **State Machine Summary**
 
 Trainer Request
@@ -942,11 +1035,13 @@ Review
 
 Trainer Status
 
+Nutrition Plan
+
 ---
 
 ## **Total State Machines**
 
-12
+13
 
 ---
 

@@ -16,7 +16,16 @@ describe('Button Component Golden Reference Suite', () => {
   });
 
   it('3. generates correct CVA classes for all 8 variants', () => {
-    const variants = ['primary', 'secondary', 'outline', 'ghost', 'danger', 'success', 'warning', 'icon'] as const;
+    const variants = [
+      'primary',
+      'secondary',
+      'outline',
+      'ghost',
+      'danger',
+      'success',
+      'warning',
+      'icon',
+    ] as const;
     variants.forEach((variant) => {
       const classes = buttonVariants({ variant });
       expect(typeof classes).toBe('string');
@@ -33,25 +42,25 @@ describe('Button Component Golden Reference Suite', () => {
     });
   });
 
-  it('5. maps primary variant to cyan gradient design token class', () => {
+  it('5. maps primary variant to primary token class', () => {
     const classes = buttonVariants({ variant: 'primary', size: 'md' });
-    expect(classes).toContain('from-cyan-500');
-    expect(classes).toContain('h-12');
+    expect(classes).toContain('bg-[var(--color-primary)]');
+    expect(classes).toContain('h-10');
   });
 
-  it('6. maps danger variant to rose gradient design token class', () => {
+  it('6. maps danger variant to danger token class', () => {
     const classes = buttonVariants({ variant: 'danger' });
-    expect(classes).toContain('from-rose-600');
+    expect(classes).toContain('bg-[var(--color-danger)]');
   });
 
-  it('7. maps success variant to emerald gradient design token class', () => {
+  it('7. maps success variant to success token class', () => {
     const classes = buttonVariants({ variant: 'success' });
-    expect(classes).toContain('from-emerald-500');
+    expect(classes).toContain('bg-[var(--color-success)]');
   });
 
-  it('8. maps warning variant to amber gradient design token class', () => {
+  it('8. maps warning variant to warning token class', () => {
     const classes = buttonVariants({ variant: 'warning' });
-    expect(classes).toContain('from-amber-500');
+    expect(classes).toContain('bg-[var(--color-warning)]');
   });
 
   it('9. handles fullWidth container boolean property', () => {

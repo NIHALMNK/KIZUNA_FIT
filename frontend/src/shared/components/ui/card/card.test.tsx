@@ -31,15 +31,15 @@ describe('Card Component Golden Reference Suite', () => {
     });
   });
 
-  it('4. maps default variant to bg-slate-900/70 glass design token class', () => {
+  it('4. maps default variant to card token class', () => {
     const classes = cardVariants({ variant: 'default' });
-    expect(classes).toContain('bg-slate-900/70');
-    expect(classes).toContain('backdrop-blur-2xl');
+    expect(classes).toContain('bg-[var(--color-card)]');
   });
 
-  it('5. maps elevated variant to bg-slate-900/80 design token class', () => {
+  it('5. maps elevated variant to elevated card design token class', () => {
     const classes = cardVariants({ variant: 'elevated' });
-    expect(classes).toContain('bg-slate-900/80');
+    expect(classes).toContain('bg-[var(--color-card)]');
+    expect(classes).toContain('shadow-md');
   });
 
   it('6. maps outlined variant to border-2 design token', () => {
@@ -57,7 +57,7 @@ describe('Card Component Golden Reference Suite', () => {
       CardHeader,
       null,
       React.createElement(CardTitle, null, 'Login'),
-      React.createElement(CardDescription, null, 'Enter credentials to access account')
+      React.createElement(CardDescription, null, 'Enter credentials to access account'),
     );
     expect(headerElement.type).toBe(CardHeader);
     expect(headerElement.props.children).toBeDefined();
@@ -81,7 +81,7 @@ describe('Card Component Golden Reference Suite', () => {
       { variant: 'elevated', size: 'lg' },
       React.createElement(CardHeader, null, React.createElement(CardTitle, null, 'Dashboard')),
       React.createElement(CardContent, null, React.createElement('p', null, 'Analytics Summary')),
-      React.createElement(CardFooter, null, React.createElement('button', null, 'View Details'))
+      React.createElement(CardFooter, null, React.createElement('button', null, 'View Details')),
     );
     expect(fullCard.props.variant).toBe('elevated');
     expect(fullCard.props.size).toBe('lg');

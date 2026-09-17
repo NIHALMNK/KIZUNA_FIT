@@ -65,17 +65,17 @@ describe('Label Component Golden Reference Suite', () => {
 
   it('11. handles error status styling class', () => {
     const classes = labelVariants({ status: 'error' });
-    expect(classes).toContain('text-rose-400');
+    expect(classes).toContain('text-[var(--color-danger)]');
   });
 
   it('12. handles success status styling class', () => {
     const classes = labelVariants({ status: 'success' });
-    expect(classes).toContain('text-emerald-400');
+    expect(classes).toContain('text-[var(--color-success)]');
   });
 
   it('13. handles warning status styling class', () => {
     const classes = labelVariants({ status: 'warning' });
-    expect(classes).toContain('text-amber-400');
+    expect(classes).toContain('text-[var(--color-warning)]');
   });
 
   it('14. forwards custom className override', () => {

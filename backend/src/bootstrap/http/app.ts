@@ -16,6 +16,7 @@ import { offerModuleRouter } from '../../modules/offer/routes';
 import { paymentModuleRouter } from '../../modules/payment/routes';
 import { coachingModuleRouter } from '../../modules/coaching/routes';
 import { workoutModuleRouter } from '../../modules/workout/routes';
+import { nutritionModuleRouter } from '../../modules/nutrition/routes';
 
 export function createApp(container: AwilixContainer): express.Application {
   const app = express();
@@ -70,6 +71,7 @@ export function createApp(container: AwilixContainer): express.Application {
   app.use('/api/v1', paymentModuleRouter());
   app.use('/api/v1', coachingModuleRouter());
   app.use('/api/v1', workoutModuleRouter());
+  app.use('/api/v1', nutritionModuleRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

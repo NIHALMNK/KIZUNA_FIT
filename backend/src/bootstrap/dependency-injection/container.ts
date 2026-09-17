@@ -16,6 +16,7 @@ import { registerOfferModule } from '../../modules/offer/module';
 import { registerPaymentModule } from '../../modules/payment/module';
 import { registerCoachingModule } from '../../modules/coaching/module';
 import { registerWorkoutModule } from '../../modules/workout/module';
+import { registerNutritionModule } from '../../modules/nutrition/module';
 
 export const configureContainer = () => {
   const container = createContainer({
@@ -42,6 +43,7 @@ export const configureContainer = () => {
   registerPaymentModule(container);
   registerCoachingModule(container);
   registerWorkoutModule(container);
+  registerNutritionModule(container);
 
   return container;
 };

@@ -1,0 +1,38 @@
+export enum NutritionPlanStatus {
+  DRAFT = 'DRAFT',
+  PENDING_APPROVAL = 'PENDING_APPROVAL',
+  ACTIVE = 'ACTIVE',
+  DELETION_PENDING = 'DELETION_PENDING',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum NutritionCompletionStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+}
+
+export enum MealType {
+  BREAKFAST = 'BREAKFAST',
+  LUNCH = 'LUNCH',
+  DINNER = 'DINNER',
+  SNACK = 'SNACK',
+  CUSTOM = 'CUSTOM',
+}
+
+export enum MealCompletionStatus {
+  NOT_TRACKED = 'NOT_TRACKED',
+  COMPLETED = 'COMPLETED',
+  SKIPPED = 'SKIPPED',
+  PARTIALLY_COMPLETED = 'PARTIALLY_COMPLETED',
+}
+
+export enum Weekday {
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY',
+}

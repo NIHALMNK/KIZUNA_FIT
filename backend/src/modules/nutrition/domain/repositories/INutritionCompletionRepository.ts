@@ -14,6 +14,16 @@ export interface INutritionCompletionRepository {
     skip?: number,
   ): Promise<NutritionCompletion[]>;
   findByClientId(clientId: string, limit?: number, skip?: number): Promise<NutritionCompletion[]>;
+  findByClientIdInRange(
+    clientId: string,
+    fromDate: Date,
+    toDate: Date,
+  ): Promise<NutritionCompletion[]>;
+  findByRelationshipIdInRange(
+    relationshipId: string,
+    fromDate: Date,
+    toDate: Date,
+  ): Promise<NutritionCompletion[]>;
   save(completion: NutritionCompletion): Promise<void>;
   delete(id: string): Promise<void>;
 }

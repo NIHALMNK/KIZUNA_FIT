@@ -117,6 +117,8 @@ describe('Nutrition Completion Application Use Cases Tests', () => {
       findByPlanClientAndDate: vi.fn(),
       findByRelationshipId: vi.fn(),
       findByClientId: vi.fn(),
+      findByClientIdInRange: vi.fn(),
+      findByRelationshipIdInRange: vi.fn(),
       save: vi.fn().mockResolvedValue(undefined),
       delete: vi.fn().mockResolvedValue(undefined),
     };

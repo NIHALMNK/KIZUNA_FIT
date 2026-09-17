@@ -29,6 +29,12 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+export class ForbiddenError extends AppError {
+  constructor(message: string = 'Forbidden: Access denied.') {
+    super(message, 'FORBIDDEN_ERROR', true);
+  }
+}
+
 export class AuthenticationIntegrityException extends AppError {
   constructor(message: string) {
     super(message, 'AUTHENTICATION_INTEGRITY_ERROR', false);

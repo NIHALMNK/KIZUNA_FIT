@@ -13,6 +13,7 @@ import { RealtimeQueryBridge } from '../infrastructure/realtime/realtimeQueryBri
 import { registerPaymentRealtimeRules } from '../../modules/payment/infrastructure/realtime/paymentRealtimeBridge';
 import { registerWorkoutRealtimeRules } from '../../modules/workout/infrastructure/realtime/workoutRealtimeBridge';
 import { registerCoachingRealtimeRules } from '../../modules/coaching/infrastructure/realtime/coachingRealtimeBridge';
+import { registerNutritionRealtimeRules } from '../../modules/nutrition/infrastructure/realtime/nutritionRealtimeBridge';
 
 interface RealtimeContextValue {
   connectionState: RealtimeConnectionState;
@@ -195,6 +196,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     const unPayment = registerPaymentRealtimeRules(queryBridge, user?.role);
     const unWorkout = registerWorkoutRealtimeRules(queryBridge);
     const unCoaching = registerCoachingRealtimeRules(queryBridge);
+    const unNutrition = registerNutritionRealtimeRules(queryBridge);
 
     return () => {
       unCreated();
@@ -217,6 +219,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       unPayment();
       unWorkout();
       unCoaching();
+      unNutrition();
     };
   }, [queryBridge, user?.role]);
 

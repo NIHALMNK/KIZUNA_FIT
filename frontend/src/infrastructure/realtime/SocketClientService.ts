@@ -59,7 +59,8 @@ export class SocketClientService {
       this.currentToken = accessToken;
       this.socket.auth = { token: `Bearer ${accessToken}` };
       this.setState('CONNECTING');
-      this.socket.disconnect().connect();
+      this.socket.disconnect();
+      this.socket.connect();
       return;
     }
 

@@ -1,8 +1,5 @@
-'use client';
-
-import React from 'react';
-import { ClientConsultationsView } from '@/modules/consultation/presentation/components/ClientConsultationsView';
+import { redirect } from 'next/navigation';
 
 export default function ClientConsultationsPage() {
-  return <ClientConsultationsView />;
+  redirect('/client/find-trainer');
 }

@@ -7,8 +7,17 @@ import { errorHandler } from '../../shared/infrastructure/http/middleware/errorH
 import { AwilixContainer } from 'awilix';
 import { env } from '../../config/env.config';
 import { identityRouter } from '../../modules/identity/presentation/routes/identity.routes';
+import { userRouter } from '../../modules/identity/presentation/routes/user.routes';
 import { clientProfileRouter } from '../../modules/profile/presentation/routes/clientProfile.routes';
 import { trainerProfileRouter } from '../../modules/profile/presentation/routes/trainerProfile.routes';
+import { marketplaceRouter } from '../../modules/marketplace/routes';
+import { consultationModuleRouter } from '../../modules/consultation/routes';
+import { offerModuleRouter } from '../../modules/offer/routes';
+import { paymentModuleRouter } from '../../modules/payment/routes';
+import { coachingModuleRouter } from '../../modules/coaching/routes';
+import { workoutModuleRouter } from '../../modules/workout/routes';
+import { nutritionModuleRouter } from '../../modules/nutrition/routes';
+import { progressModuleRouter } from '../../modules/progress/routes';
 
 export function createApp(container: AwilixContainer): express.Application {
   const app = express();
@@ -26,7 +35,13 @@ export function createApp(container: AwilixContainer): express.Application {
       credentials: true,
     }),
   );
-  app.use(express.json());
+  app.use(
+    express.json({
+      verify: (req: Request, _res: Response, buf: Buffer) => {
+        (req as unknown as { rawBody?: Buffer }).rawBody = buf;
+      },
+    }),
+  );
   app.use(cookieParser());
 
   app.get('/api/v1/health', (req, res) => {
@@ -48,8 +63,17 @@ export function createApp(container: AwilixContainer): express.Application {
 
   // Mount routers
   app.use('/api/v1/identity', identityRouter());
+  app.use('/api/v1/users', userRouter());
   app.use('/api/v1/client-profiles', clientProfileRouter());
   app.use('/api/v1/trainer-profiles', trainerProfileRouter());
+  app.use('/api/v1', marketplaceRouter());
+  app.use('/api/v1', consultationModuleRouter());
+  app.use('/api/v1', offerModuleRouter());
+  app.use('/api/v1', paymentModuleRouter());
+  app.use('/api/v1', coachingModuleRouter());
+  app.use('/api/v1', workoutModuleRouter());
+  app.use('/api/v1', nutritionModuleRouter());
+  app.use('/api/v1', progressModuleRouter());
 
   app.use(notFoundHandler);
   app.use(errorHandler);

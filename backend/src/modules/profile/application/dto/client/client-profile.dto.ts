@@ -12,6 +12,7 @@ export interface CreateClientProfileDTO {
 export interface UpdateClientProfileDTO {
   userId: string;
   fullName?: string;
+  bio?: string | null;
   gender?: Gender;
   dateOfBirth?: string; // ISO date string
   phoneNumber?: string;
@@ -38,6 +39,7 @@ export interface ClientProfileResponseDTO {
   id: string;
   userId: string;
   fullName: string;
+  bio?: string | null;
   avatarUrl?: string | null;
   gender?: Gender | null;
   dateOfBirth?: string | null;

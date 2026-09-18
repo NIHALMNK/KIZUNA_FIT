@@ -1,0 +1,22 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - Z-INDEX LAYER TOKENS
+ * ==============================================================================
+ * Strict standardized stacking context layers across the application.
+ * ==============================================================================
+ */
+
+:root {
+  --z-index-deep: -1;
+  --z-index-background: 0;
+  --z-index-content: 10;
+  --z-index-sticky: 20;
+  --z-index-navbar: 30;
+  --z-index-sidebar: 40;
+  --z-index-dropdown: 50;
+  --z-index-popover: 60;
+  --z-index-overlay: 70;
+  --z-index-modal: 80;
+  --z-index-toast: 90;
+  --z-index-tooltip: 100;
+}

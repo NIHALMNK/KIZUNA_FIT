@@ -557,39 +557,56 @@ Fraud Investigation
 
 ## **Rule 29**
 
-# **Refunds Require Admin Review**
+# **Exceptional Refunds Require Admin Review**
 
-Refunds are never automatic.
+Refunds are not a normal customer cancellation mechanism.
 
-Every refund requires administrative review.
+No client-initiated discretionary refund is supported.
+
+Refunds exist exclusively as an administrator-approved service-failure remedy.
 
 ---
 
 ## **Rule 30**
 
-# **Refund Types**
+# **Refund Eligibility**
 
-Supported refund types:
+An exceptional refund may only be considered when:
 
-FULL\_REFUND
-
-PARTIAL\_REFUND
+- Trainer stops providing the agreed coaching service
+OR
+- Client raises a legitimate service complaint
+AND
+- Admin investigation determines that the trainer failed to provide the agreed coaching service
+AND
+- Trainer payout has not already been released.
 
 ---
 
 ## **Rule 31**
 
-# **Refund Lifecycle**
+# **Refund Amount & Financial Portions**
 
-Supported statuses:
+For an approved exceptional refund:
+
+- refundAmount = immutable trainerFee from PaymentPricing
+- platformFee is strictly non-refundable (retained by platform)
+- Trainer payout becomes ₹0
+- No client- or admin-supplied arbitrary refund amount is permitted.
+
+---
+
+## **Rule 32**
+
+# **Refund Lifecycle & Dispute Freeze**
+
+Supported refund statuses:
 
 PENDING
 
-UNDER\_REVIEW
+UNDER_REVIEW
 
 APPROVED
-
-PARTIALLY\_APPROVED
 
 REJECTED
 
@@ -597,15 +614,17 @@ PROCESSED
 
 CANCELLED
 
+Active disputes freeze refund processing and payout release until resolution.
+
 Official lifecycle transitions are defined in:
 
-06\_STATE\_MACHINES.md
+06_STATE_MACHINES.md
 
 ---
 
 # **Dispute Rules**
 
-## **Rule 32**
+## **Rule 33**
 
 # **Dispute Eligibility**
 
@@ -623,7 +642,7 @@ Payout Not Released
 
 ---
 
-## **Rule 33**
+## **Rule 34**
 
 # **Dispute Resolution**
 
@@ -639,9 +658,7 @@ Payment Records
 
 Possible outcomes:
 
-Refund
-
-Partial Refund
+Exceptional Trainer-Fee Refund
 
 Warning
 
@@ -653,7 +670,7 @@ No Action
 
 ---
 
-## **Rule 34**
+## **Rule 35**
 
 # **Dispute Freeze**
 

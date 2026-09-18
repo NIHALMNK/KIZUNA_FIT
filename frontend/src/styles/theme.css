@@ -1,0 +1,11 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT GLOBAL DESIGN TOKENS & COLOR SYSTEM ENTRY POINT
+ * ==============================================================================
+ * Centralized semantic token architecture for KIZUNAFIT's 4 portal scopes.
+ * Single source of truth for theme tokens is defined in tokens/themes.css.
+ * ==============================================================================
+ */
+
+@import './tokens/tokens.css';
+

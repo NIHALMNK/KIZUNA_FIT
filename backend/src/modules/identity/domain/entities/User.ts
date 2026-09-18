@@ -19,6 +19,7 @@ export interface UserProps {
   role: UserRole;
   status: UserStatus;
   emailVerified: boolean;
+  phoneNumber?: string | null;
   lastLoginAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -47,6 +48,19 @@ export class User extends AggregateRoot<UserProps> {
 
   get emailVerified(): boolean {
     return this.props.emailVerified;
+  }
+
+  get phoneNumber(): string | null | undefined {
+    return this.props.phoneNumber;
+  }
+
+  public updateProfileInfo(fullName?: string, phoneNumber?: string | null): void {
+    if (fullName !== undefined && fullName.trim().length > 0) {
+      this.props.fullName = fullName.trim();
+    }
+    if (phoneNumber !== undefined) {
+      this.props.phoneNumber = phoneNumber ? phoneNumber.trim() : null;
+    }
   }
 
   get passwordHash(): PasswordHash | undefined {

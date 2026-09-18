@@ -35,6 +35,7 @@ export const updateClientProfileSchema = z.object({
     })
     .optional(),
   medicalNotes: z.string().max(1000).optional(),
+  bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
   dietaryPreferences: z.array(z.nativeEnum(DietaryPreference)).optional(),
   fitnessGoals: z.array(z.nativeEnum(FitnessGoal)).optional(),
   experienceLevel: z.nativeEnum(ExperienceLevel).optional(),

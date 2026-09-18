@@ -6,6 +6,7 @@ import { AuthInitializer } from './AuthInitializer';
 import { GoogleAuthInitializer } from './GoogleAuthInitializer';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryProvider } from './QueryProvider';
+import { RealtimeProvider } from './RealtimeProvider';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -17,10 +18,10 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       <QueryProvider>
         <AuthInitializer>
           <GoogleAuthInitializer />
-          {children}
+          <RealtimeProvider>{children}</RealtimeProvider>
         </AuthInitializer>
         <Toaster position="top-right" />
       </QueryProvider>
     </GoogleOAuthProvider>
   );
-}
+};

@@ -9068,6 +9068,9 @@ The WebRTC Signaling Architecture exists to:
 
 The backend never transports media.
 
+> [!NOTE]
+> **Phase 4 Reconciliation (ADR-015):** The `Consultation` aggregate is the sole business owner for Phase 4 Marketplace Consultations. WebRTC signaling handlers interface directly with `IConsultationRepository` for socket authorization and room access control. Zero SDP or ICE candidate metadata is stored in MongoDB.
+
 ---
 
 # **22.2 Architectural Position**
@@ -13091,6 +13094,7 @@ Major architectural decisions adopted by the project.
 | ADR-012 | Event-Driven Domain Events |
 | ADR-013 | Feature-Based Package Structure |
 | ADR-014 | Ports & Adapters Pattern |
+| ADR-015 | Video Consultation WebRTC Architecture |
 
 Future architectural decisions should be documented as additional ADRs.
 

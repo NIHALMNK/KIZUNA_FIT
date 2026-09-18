@@ -64,7 +64,7 @@ export const IdentityControls = () => {
         <Button 
           onClick={handleLogoutAll} 
           isLoading={isLoading}
-          variant="destructive"
+          variant="danger"
         >
           Logout All Sessions
         </Button>

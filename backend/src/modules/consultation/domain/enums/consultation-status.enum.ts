@@ -1,0 +1,8 @@
+export enum ConsultationStatus {
+  CREATED = 'CREATED',
+  SLOT_BOOKED = 'SLOT_BOOKED',
+  SCHEDULED = 'SCHEDULED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  NO_SHOW = 'NO_SHOW',
+}

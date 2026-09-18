@@ -46,4 +46,42 @@ describe('ClientProfile Aggregate Root', () => {
     expect(updateRes.isSuccess).toBe(true);
     expect(profile.profileCompleted).toBe(true);
   });
+
+  it('should update bio and clear bio correctly', () => {
+    const profile = ClientProfileFactory.createNew({
+      userId: 'user-123',
+      fullName: 'John Client',
+    }).getValue();
+
+    expect(profile.bio).toBeUndefined();
+
+    const updateRes = profile.updateDetails({
+      bio: 'Training for strength and muscle gain.',
+    });
+
+    expect(updateRes.isSuccess).toBe(true);
+    expect(profile.bio).toBe('Training for strength and muscle gain.');
+
+    const clearRes = profile.updateDetails({
+      bio: null,
+    });
+
+    expect(clearRes.isSuccess).toBe(true);
+    expect(profile.bio).toBeNull();
+  });
+
+  it('should reject bio exceeding 500 characters', () => {
+    const profile = ClientProfileFactory.createNew({
+      userId: 'user-123',
+      fullName: 'John Client',
+    }).getValue();
+
+    const longBio = 'a'.repeat(501);
+    const updateRes = profile.updateDetails({
+      bio: longBio,
+    });
+
+    expect(updateRes.isFailure).toBe(true);
+    expect(updateRes.error).toContain('Bio must not exceed 500 characters');
+  });
 });

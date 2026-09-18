@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { certificationUseCases } from '../../application/usecases/CertificationUseCases';
 import { AddCertificationDTO, UpdateCertificationDTO } from '../../domain/types/profile.types';
 import { TRAINER_PROFILE_QUERY_KEY } from './useTrainerProfile';
+import { PUBLIC_TRAINER_PROFILE_QUERY_KEY, SEARCH_TRAINERS_QUERY_KEY } from './usePublicTrainers';
 
 export function useAddCertification() {
   const queryClient = useQueryClient();
@@ -11,6 +12,8 @@ export function useAddCertification() {
     mutationFn: (dto: AddCertificationDTO) => certificationUseCases.addCertification(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRAINER_PROFILE_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [PUBLIC_TRAINER_PROFILE_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEARCH_TRAINERS_QUERY_KEY] });
       toast.success('Certification added successfully!');
     },
     onError: (error: any) => {
@@ -27,6 +30,8 @@ export function useUpdateCertification() {
       certificationUseCases.updateCertification(id, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRAINER_PROFILE_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [PUBLIC_TRAINER_PROFILE_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEARCH_TRAINERS_QUERY_KEY] });
       toast.success('Certification updated successfully!');
     },
     onError: (error: any) => {
@@ -42,6 +47,8 @@ export function useDeleteCertification() {
     mutationFn: (id: string) => certificationUseCases.deleteCertification(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRAINER_PROFILE_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [PUBLIC_TRAINER_PROFILE_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SEARCH_TRAINERS_QUERY_KEY] });
       toast.success('Certification deleted successfully!');
     },
     onError: (error: any) => {

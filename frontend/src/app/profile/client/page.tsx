@@ -1,205 +1,301 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { AuthGuard } from '@/shared/components/guards/AuthGuard';
-import { RoleGuard } from '@/shared/components/guards/RoleGuard';
-import { Permission } from '@/shared/components/navigation/permissions';
-import { ROUTES } from '@/shared/constants/routes';
-import { useGetClientProfile, useUploadClientAvatar, useDeleteClientAvatar } from '@/modules/profile/presentation/hooks/useClientProfile';
-import { PageHeader } from '@/modules/profile/presentation/components/PageHeader';
-import { SectionCard } from '@/modules/profile/presentation/components/SectionCard';
-import { InfoCard } from '@/modules/profile/presentation/components/InfoCard';
-import { AvatarUploader } from '@/modules/profile/presentation/components/AvatarUploader';
-import { ProfileCompletionCard } from '@/modules/profile/presentation/components/ProfileCompletionCard';
-import { LoadingState } from '@/shared/components/feedback/LoadingState';
-import { ErrorState } from '@/shared/components/feedback/ErrorState';
-import { EmptyState } from '@/shared/components/feedback/EmptyState';
-import { mapApiError } from '@/shared/utils/errorMapper';
+import {
+  useGetClientProfile,
+  useUploadClientAvatar,
+  useDeleteClientAvatar,
+} from '../../../modules/profile/presentation/hooks/useClientProfile';
+import {
+  formatGender,
+  formatActivityLevel,
+  formatExperienceLevel,
+  formatFitnessGoal,
+} from '../../../modules/profile/presentation/utils/profileMappers';
 
-function ClientProfileContent() {
+import { Avatar } from '../../../shared/components/ui/Avatar';
+import { Button } from '../../../shared/components/ui/Button';
+import { ClientAvatarDialog } from '../../../modules/profile/presentation/components/ClientAvatarDialog';
+import { EmptyState } from '../../../shared/components/feedback/EmptyState';
+import { ErrorState } from '../../../shared/components/feedback/ErrorState';
+import { mapApiError } from '../../../shared/utils/errorMapper';
+import { useAuthStore } from '../../../modules/identity/application/store/authStore';
+
+export default function ClientProfilePage() {
+  const { user } = useAuthStore();
   const { data: profile, isLoading, isError, error, refetch } = useGetClientProfile();
   const uploadAvatarMutation = useUploadClientAvatar();
   const deleteAvatarMutation = useDeleteClientAvatar();
 
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
+
+  // Skeleton loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-12">
-        <PageHeader title="Client Profile" role="CLIENT" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <LoadingState message="Loading client profile data..." />
+      <div className="space-y-6 animate-pulse" aria-label="Loading profile">
+        <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-7 h-44" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 h-56" />
+          <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 h-56" />
         </div>
       </div>
     );
   }
 
-  // Differentiate 404 (Not Created) from 500/Connection Error
+  // 404 / Missing Profile Handling -> Guided Onboarding CTA
   if (isError) {
     const mapped = mapApiError(error);
-
-    if (mapped.isNotFound) {
+    if (mapped.isNotFound || (error as any)?.status === 404) {
       return (
-        <div className="min-h-screen bg-gray-50 pb-12">
-          <PageHeader title="Client Profile" role="CLIENT" />
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <EmptyState
-              title="You haven't created your client profile yet"
-              description="Set up your physical details, health metrics, and fitness preferences to get matched with coaches."
-              action={
-                <Link
-                  href={ROUTES.CLIENT_PROFILE_CREATE}
-                  className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-                >
-                  Create Client Profile
-                </Link>
-              }
-            />
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="min-h-screen bg-gray-50 pb-12">
-        <PageHeader title="Client Profile" role="CLIENT" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <ErrorState error={error} onRetry={refetch} />
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-gray-50 pb-12">
-        <PageHeader title="Client Profile" role="CLIENT" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-8 sm:p-12 text-center space-y-6 max-w-2xl mx-auto shadow-xs">
           <EmptyState
-            title="You haven't created your client profile yet"
-            description="Set up your client details to unlock fitness features."
+            title="Complete your fitness profile"
+            description="Set up your physical details, fitness preferences, and health goals to personalize your KIZUNAFIT coaching experience."
             action={
-              <Link
-                href={ROUTES.CLIENT_PROFILE_CREATE}
-                className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-              >
-                Create Client Profile
+              <Link href="/profile/client/create">
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-bold rounded-xl shadow-xs"
+                >
+                  Complete Profile
+                </Button>
               </Link>
             }
           />
         </div>
+      );
+    }
+
+    return <ErrorState error={error} onRetry={refetch} />;
+  }
+
+  if (!profile) {
+    return (
+      <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-8 text-center space-y-4 max-w-xl mx-auto">
+        <h2 className="text-xl font-extrabold text-[var(--color-heading)]">Complete your fitness profile</h2>
+        <p className="text-xs text-[var(--color-text-secondary)]">Set up your profile to unlock fitness features.</p>
+        <Link href="/profile/client/create">
+          <Button variant="primary" size="md" className="bg-[var(--color-primary)] text-white font-bold rounded-xl">
+            Complete Profile
+          </Button>
+        </Link>
       </div>
     );
   }
 
+  const rawName = profile.fullName || user?.email?.split('@')[0] || 'Client User';
+  const displayName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+  const initials = rawName.substring(0, 2).toUpperCase();
+
+  const formattedDob = profile.dateOfBirth
+    ? new Date(profile.dateOfBirth).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : null;
+
+  const memberSince = profile.createdAt
+    ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : null;
+
+  const locationStr = [profile.city, profile.state, profile.country].filter(Boolean).join(', ');
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
-      <PageHeader
-        title={profile.fullName}
-        subtitle="Manage your personal health details, goals, and measurements"
-        role="CLIENT"
-        action={
-          <Link
-            href={ROUTES.CLIENT_PROFILE_EDIT}
-            className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-          >
-            Edit Profile
-          </Link>
-        }
-      />
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
-        <ProfileCompletionCard completed={profile.profileCompleted} role="CLIENT" />
-
-        <AvatarUploader
-          currentAvatarUrl={profile.avatarUrl}
-          onUpload={async (file) => {
-            await uploadAvatarMutation.mutateAsync(file);
-          }}
-          onDelete={async () => {
-            await deleteAvatarMutation.mutateAsync();
-          }}
-          isLoading={uploadAvatarMutation.isPending || deleteAvatarMutation.isPending}
-          role="CLIENT"
-        />
-
-        <SectionCard title="Personal Details">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <InfoCard label="Full Name" value={profile.fullName} />
-            <InfoCard label="Gender" value={profile.gender} />
-            <InfoCard
-              label="Date of Birth"
-              value={profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : null}
-            />
-            <InfoCard label="Phone Number" value={profile.phoneNumber} />
-            <InfoCard label="Location" value={[profile.city, profile.state, profile.country].filter(Boolean).join(', ')} />
-            <InfoCard label="Timezone" value={profile.timezone} />
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Health & Physical Metrics">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-            <InfoCard
-              label="Weight"
-              value={profile.weight ? `${profile.weight.value} ${profile.weight.unit}` : null}
-            />
-            <InfoCard
-              label="Height"
-              value={profile.height ? `${profile.height.value} ${profile.height.unit}` : null}
-            />
-            <InfoCard label="Experience Level" value={profile.experienceLevel} />
-            <InfoCard label="Activity Level" value={profile.activityLevel} />
-          </div>
-          <InfoCard label="Medical Notes & Injuries" value={profile.medicalNotes} />
-        </SectionCard>
-
-        <SectionCard title="Goals & Dietary Preferences">
-          <div className="space-y-4">
-            <div>
-              <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Fitness Goals
-              </span>
-              {profile.fitnessGoals.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {profile.fitnessGoals.map((goal) => (
-                    <span key={goal} className="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded">
-                      {goal}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-gray-400 italic">No fitness goals selected</p>
-              )}
-            </div>
-
-            <div>
-              <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Dietary Preferences
-              </span>
-              {profile.dietaryPreferences.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {profile.dietaryPreferences.map((pref) => (
-                    <span key={pref} className="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 rounded">
-                      {pref}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-gray-400 italic">No dietary preferences selected</p>
-              )}
-            </div>
-          </div>
-        </SectionCard>
+    <div className="space-y-6">
+      {/* Header Title */}
+      <div className="space-y-1">
+        <h1 className="text-2xl font-extrabold text-[var(--color-heading)] tracking-tight">Profile</h1>
+        <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] font-normal">
+          Manage your personal information, fitness profile, and account identity.
+        </p>
       </div>
-    </div>
-  );
-}
 
-export default function ClientProfilePage() {
-  return (
-    <AuthGuard>
-      <RoleGuard permission={Permission.CLIENT_PROFILE}>
-        <ClientProfileContent />
-      </RoleGuard>
-    </AuthGuard>
+      {/* Profile Hero / Identity Card */}
+      <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all">
+        <div className="flex items-center gap-5">
+          <div className="relative group">
+            <Avatar
+              src={profile.avatarUrl || undefined}
+              fallback={initials}
+              size="xl"
+              className="ring-4 ring-[var(--color-border)] shrink-0 shadow-md"
+            />
+            <button
+              type="button"
+              onClick={() => setIsAvatarDialogOpen(true)}
+              className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:text-[var(--color-primary)] border border-[var(--color-border)] shadow-md transition-all focus:outline-none cursor-pointer"
+              title="Change Photo"
+              aria-label="Change photo"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--color-heading)] truncate capitalize">
+                {displayName}
+              </h2>
+              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-[var(--color-tag)] text-[var(--color-tag-text)] border border-[var(--color-border)]">
+                CLIENT
+              </span>
+            </div>
+            {memberSince && (
+              <p className="text-xs text-[var(--color-text-muted)] font-medium">Member since {memberSince}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <Button
+            variant="outline"
+            size="md"
+            onClick={() => setIsAvatarDialogOpen(true)}
+            className="border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] font-semibold rounded-xl text-xs"
+          >
+            {profile.avatarUrl ? 'Change Photo' : 'Add Photo'}
+          </Button>
+          <Link href="/profile/client/edit" className="flex-1 md:flex-initial">
+            <Button
+              variant="primary"
+              size="md"
+              fullWidth
+              className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-bold rounded-xl text-xs"
+            >
+              Edit Profile
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Two-Column Workspace Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Personal Details Card */}
+        <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 shadow-xs space-y-4">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--color-primary)] block">
+            PERSONAL DETAILS
+          </span>
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Date of Birth</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{formattedDob || 'Not specified'}</span>
+            </div>
+            <div>
+              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Gender</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{formatGender(profile.gender)}</span>
+            </div>
+            {locationStr && (
+              <div>
+                <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Location</span>
+                <span className="font-semibold text-[var(--color-text-primary)]">{locationStr}</span>
+              </div>
+            )}
+            {profile.timezone && (
+              <div>
+                <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Timezone</span>
+                <span className="font-semibold text-[var(--color-text-primary)]">{profile.timezone}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Fitness Profile Card */}
+        <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 shadow-xs space-y-4">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--color-primary)] block">
+            FITNESS PROFILE
+          </span>
+          <div className="space-y-3 text-xs">
+            <div>
+              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Fitness Goals</span>
+              {profile.fitnessGoals && profile.fitnessGoals.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {profile.fitnessGoals.map((g) => (
+                    <span key={g} className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[var(--color-tag)] text-[var(--color-tag-text)] border border-[var(--color-border)]">
+                      {formatFitnessGoal(g)}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-[var(--color-text-muted)] italic">No goals specified</span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-1">
+              <div>
+                <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Activity Level</span>
+                <span className="font-semibold text-[var(--color-text-primary)]">{formatActivityLevel(profile.activityLevel)}</span>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Experience Level</span>
+                <span className="font-semibold text-[var(--color-text-primary)]">{formatExperienceLevel(profile.experienceLevel)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Body Metrics Card */}
+        <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 shadow-xs space-y-4">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--color-primary)] block">
+            BODY METRICS
+          </span>
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Height</span>
+              <span className="font-extrabold text-base text-[var(--color-heading)]">
+                {profile.height ? `${profile.height.value} ${profile.height.unit || 'cm'}` : 'Not added'}
+              </span>
+            </div>
+            <div>
+              <span className="block text-[10px] font-bold text-[var(--color-text-muted)] uppercase">Weight</span>
+              <span className="font-extrabold text-base text-[var(--color-heading)]">
+                {profile.weight ? `${profile.weight.value} ${profile.weight.unit || 'kg'}` : 'Not added'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* About You / Bio Section */}
+        <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 shadow-xs space-y-3">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--color-primary)] block">
+            ABOUT YOU
+          </span>
+          <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+            {profile.bio ? profile.bio : (
+              <span className="text-[var(--color-text-muted)] italic">No bio added yet.</span>
+            )}
+          </p>
+        </div>
+      </div>
+
+      {/* Health Information (Discreet & Sensitive) */}
+      <div className="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-6 shadow-xs space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--color-text-muted)]">
+            HEALTH INFORMATION
+          </span>
+          <span className="text-[10px] text-[var(--color-text-muted)] font-medium">Private to you and your coach</span>
+        </div>
+        <p className="text-xs text-[var(--color-text-secondary)]">
+          {profile.medicalNotes ? profile.medicalNotes : 'No health conditions added.'}
+        </p>
+      </div>
+
+      {/* Avatar Dialog */}
+      <ClientAvatarDialog
+        isOpen={isAvatarDialogOpen}
+        onClose={() => setIsAvatarDialogOpen(false)}
+        currentAvatarUrl={profile.avatarUrl}
+        onUpload={async (file: File) => {
+          await uploadAvatarMutation.mutateAsync(file);
+        }}
+        onDelete={async () => {
+          await deleteAvatarMutation.mutateAsync();
+        }}
+        isUploading={uploadAvatarMutation.isPending}
+        isDeleting={deleteAvatarMutation.isPending}
+      />
+    </div>
   );
 }

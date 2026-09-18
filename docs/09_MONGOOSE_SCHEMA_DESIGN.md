@@ -2715,6 +2715,7 @@ Both objects are value objects with no independent lifecycle.
 | \_id | ObjectId | ✓ | Primary Key |
 | userId | ObjectId | ✓ | Unique Reference → User |
 | fullName | String | ✓ | Client display name |
+| bio | String | null | No | Client biography (About You, max 500 chars) |
 | avatarUrl | String | null | No | Profile image |
 | gender | Gender | No | Gender |
 | dateOfBirth | Date | null | No | Birth date |
@@ -11805,6 +11806,10 @@ The `MessageReport` aggregate provides a dedicated moderation workflow without c
  
 
 # **VideoSession**
+
+> [!IMPORTANT]
+> **Phase 4 Architecture Reconciliation (ADR-015):**
+> This `VideoSession` schema definition is **DEFERRED** and **NOT implemented** for Phase 4 Marketplace Consultations. Phase 4 Marketplace Consultations rely exclusively on the `Consultation` aggregate (`Consultation.schema.ts`) for business scheduling, authorization, and room identity (`consultation:<id>`). WebRTC signaling is transient via Socket.IO without database persistence. The schema below is reserved for post-acquisition 1-on-1 coaching relationship video sessions.
 
 ---
 

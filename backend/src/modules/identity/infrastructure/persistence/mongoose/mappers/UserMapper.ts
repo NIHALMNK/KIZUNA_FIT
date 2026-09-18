@@ -15,11 +15,12 @@ export class UserMapper {
       status: raw.status as UserStatus,
       role: raw.role as UserRole,
       passwordHash: raw.passwordHash ? PasswordHash.create(raw.passwordHash).getValue() : undefined,
-      authProviders: raw.authProviders.map(p => p as AuthProvider),
+      authProviders: raw.authProviders.map((p) => p as AuthProvider),
       emailVerified: raw.emailVerified,
+      phoneNumber: raw.phoneNumber || null,
       lastLoginAt: raw.lastLoginAt,
       createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt
+      updatedAt: raw.updatedAt,
     };
 
     return User.create(userProps, raw._id.toString()).getValue();
@@ -34,7 +35,8 @@ export class UserMapper {
       status: user.status,
       authProviders: user.authProviders,
       emailVerified: user.emailVerified,
-      lastLoginAt: user.lastLoginAt
+      phoneNumber: user.phoneNumber || null,
+      lastLoginAt: user.lastLoginAt,
     };
 
     if (user.passwordHash) {

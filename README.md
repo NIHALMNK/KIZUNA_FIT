@@ -36,6 +36,7 @@ The backend and frontend environments are completely decoupled.
 ## Required Environment Variables
 
 ### Backend (`backend/.env`)
+
 - `NODE_ENV`: e.g. `development`
 - `MONGODB_URI`: Your MongoDB connection string
 - `REDIS_URL`: Your Redis connection URL
@@ -45,7 +46,8 @@ The backend and frontend environments are completely decoupled.
 - (Various other configuration parameters defined in `.env.example`)
 
 ### Frontend (`frontend/.env.local`)
-- `NEXT_PUBLIC_API_URL`: The URL of the backend API (e.g. `http://localhost:3000/api/v1`)
+
+- `NEXT_PUBLIC_API_URL`: The URL of the backend API (e.g. `http://localhost:5000/api/v1`)
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID`: Your Google OAuth Client ID (must match backend)
 
 ## Google OAuth Setup
@@ -53,7 +55,7 @@ The backend and frontend environments are completely decoupled.
 1. Create a project in the Google Cloud Console.
 2. Configure the OAuth consent screen.
 3. Create Web application credentials.
-4. Add your frontend URL (e.g., `http://localhost:3002`) to the Authorized JavaScript origins.
+4. Add your frontend URL (e.g., `http://localhost:3100`) to the Authorized JavaScript origins.
 5. Copy the generated Client ID and paste it into both `backend/.env` (as `GOOGLE_CLIENT_ID`) and `frontend/.env.local` (as `NEXT_PUBLIC_GOOGLE_CLIENT_ID`).
 
 ## Startup

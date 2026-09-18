@@ -40,7 +40,8 @@ import { GetAuthProvidersUseCase } from './application/use-cases/GetAuthProvider
 import { RefreshTokenUseCase } from './application/use-cases/RefreshTokenUseCase';
 import { LogoutUseCase, LogoutAllUseCase } from './application/use-cases/LogoutUseCases';
 import { CheckEmailUseCase } from './application/use-cases/CheckEmailUseCase';
-import { GetSessionsUseCase } from './application/use-cases/QueryUseCases';
+import { GetSessionsUseCase, GetCurrentUserUseCase } from './application/use-cases/QueryUseCases';
+import { UpdateUserUseCase } from './application/use-cases/UpdateUserUseCase';
 import { VerifyEmailUseCase } from './application/use-cases/VerifyEmailUseCase';
 import { ResendVerificationUseCase } from './application/use-cases/ResendVerificationUseCase';
 import { ForgotPasswordUseCase } from './application/use-cases/ForgotPasswordUseCase';
@@ -53,18 +54,20 @@ import { UserController } from './presentation/controllers/UserController';
 export const registerIdentityModule = (container: AwilixContainer): void => {
   // Config
   container.register({
-    config: asClass(JwtConfiguration).singleton()
+    config: asClass(JwtConfiguration).singleton(),
   });
 
   // Shared Infrastructure (Singletons)
   container.register({
     eventBus: asClass(InMemoryEventBus).singleton(),
-    emailProvider: env.EMAIL_PROVIDER === 'mock'
-      ? asClass(MockEmailProvider).singleton()
-      : asClass(NodemailerSmtpEmailProvider).singleton(),
-    emailDispatcher: env.EMAIL_DISPATCH_MODE === 'queue'
-      ? asClass(BullMQEmailDispatcher).singleton()
-      : asClass(SyncEmailDispatcher).singleton(),
+    emailProvider:
+      env.EMAIL_PROVIDER === 'mock'
+        ? asClass(MockEmailProvider).singleton()
+        : asClass(NodemailerSmtpEmailProvider).singleton(),
+    emailDispatcher:
+      env.EMAIL_DISPATCH_MODE === 'queue'
+        ? asClass(BullMQEmailDispatcher).singleton()
+        : asClass(SyncEmailDispatcher).singleton(),
   });
 
   // Application Event Handlers (Singletons)
@@ -75,8 +78,14 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
 
   // Wire Handlers to EventBus
   const eventBus = container.resolve('eventBus');
-  eventBus.subscribe('EmailVerificationRequestedEvent', container.resolve('sendVerificationEmailHandler'));
-  eventBus.subscribe('PasswordResetRequestedEvent', container.resolve('sendPasswordResetEmailHandler'));
+  eventBus.subscribe(
+    'EmailVerificationRequestedEvent',
+    container.resolve('sendVerificationEmailHandler'),
+  );
+  eventBus.subscribe(
+    'PasswordResetRequestedEvent',
+    container.resolve('sendPasswordResetEmailHandler'),
+  );
 
   // Identity Adapters (Singletons)
   container.register({
@@ -114,6 +123,8 @@ export const registerIdentityModule = (container: AwilixContainer): void => {
     logoutAllUseCase: asClass(LogoutAllUseCase).scoped(),
     checkEmailUseCase: asClass(CheckEmailUseCase).scoped(),
     getSessionsUseCase: asClass(GetSessionsUseCase).scoped(),
+    getCurrentUserUseCase: asClass(GetCurrentUserUseCase).scoped(),
+    updateUserUseCase: asClass(UpdateUserUseCase).scoped(),
     verifyEmailUseCase: asClass(VerifyEmailUseCase).scoped(),
     resendVerificationUseCase: asClass(ResendVerificationUseCase).scoped(),
     forgotPasswordUseCase: asClass(ForgotPasswordUseCase).scoped(),

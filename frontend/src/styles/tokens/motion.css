@@ -1,0 +1,37 @@
+/**
+ * ==============================================================================
+ * KIZUNAFIT DESIGN SYSTEM - MOTION & ANIMATION TOKENS
+ * ==============================================================================
+ * Transition durations, easing curves, and UI feedback animation timings.
+ * ==============================================================================
+ */
+
+:root {
+  /* --- Durations --- */
+  --duration-instantly: 50ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-deliberate: 500ms;
+
+  /* --- Easing Functions --- */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* --- Contextual UI Timings --- */
+  --motion-hover: var(--duration-fast) var(--ease-out);
+  --motion-active: var(--duration-instantly) var(--ease-out);
+  --motion-focus: var(--duration-fast) var(--ease-out);
+
+  --motion-dialog-enter: var(--duration-normal) var(--ease-out);
+  --motion-dialog-exit: var(--duration-fast) var(--ease-in);
+
+  --motion-toast-enter: var(--duration-normal) var(--ease-bounce);
+  --motion-toast-exit: var(--duration-fast) var(--ease-in);
+
+  --motion-page-transition: var(--duration-slow) var(--ease-in-out);
+  --motion-loading-spin: 1000ms var(--ease-linear) infinite;
+}

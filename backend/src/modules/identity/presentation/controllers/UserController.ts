@@ -5,15 +5,58 @@ import { ApiResponse } from '../../../../shared/infrastructure/http/responses/Ap
 import { CookieHelper } from '../../../../shared/infrastructure/http/utils/CookieHelper';
 import { ApiErrorCode } from '../../../../shared/infrastructure/http/responses/ApiErrorCode';
 
+import { GetCurrentUserUseCase } from '../../application/use-cases/QueryUseCases';
+import { UpdateUserUseCase } from '../../application/use-cases/UpdateUserUseCase';
+
 export class UserController {
   constructor(
     private readonly changePasswordUseCase: ChangePasswordUseCase,
-    private readonly deleteAccountUseCase: DeleteAccountUseCase
+    private readonly deleteAccountUseCase: DeleteAccountUseCase,
+    private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
   ) {}
 
+  public getMe = async (req: Request, res: Response): Promise<void> => {
+    if (!req.auth) {
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
 
+    const result = await this.getCurrentUserUseCase.execute({ userId: req.auth.userId });
+    if (result.isFailure) {
+      ApiResponse.error(res, result.error as string, ApiErrorCode.USER_NOT_FOUND, 404);
+      return;
+    }
 
-  private handleUseCaseError(res: Response, error: string, defaultCode: ApiErrorCode, defaultStatus: number): void {
+    ApiResponse.ok(res, result.getValue(), 200);
+  };
+
+  public updateMe = async (req: Request, res: Response): Promise<void> => {
+    if (!req.auth) {
+      ApiResponse.error(res, 'Unauthorized', ApiErrorCode.UNAUTHORIZED, 401);
+      return;
+    }
+
+    const result = await this.updateUserUseCase.execute({
+      userId: req.auth.userId,
+      fullName: req.body.fullName,
+      phoneNumber: req.body.phoneNumber,
+    });
+
+    if (result.isFailure) {
+      this.handleUseCaseError(res, result.error as string, ApiErrorCode.VALIDATION_ERROR, 400);
+      return;
+    }
+
+    ApiResponse.ok(res, result.getValue(), 200);
+  };
+
+  private handleUseCaseError(
+    res: Response,
+    error: string,
+    defaultCode: ApiErrorCode,
+    defaultStatus: number,
+  ): void {
     if (error === 'Invalid current password') {
       ApiResponse.error(res, error, ApiErrorCode.INVALID_CREDENTIALS, 401);
       return;
@@ -42,7 +85,12 @@ export class UserController {
     });
 
     if (result.isFailure) {
-      this.handleUseCaseError(res, result.error as string, ApiErrorCode.CHANGE_PASSWORD_FAILED, 400);
+      this.handleUseCaseError(
+        res,
+        result.error as string,
+        ApiErrorCode.CHANGE_PASSWORD_FAILED,
+        400,
+      );
       return;
     }
 

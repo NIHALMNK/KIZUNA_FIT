@@ -43,11 +43,26 @@ export interface TrainerProfileProps {
   showcase: TrainerShowcase[];
   createdAt?: Date;
   updatedAt?: Date;
+  fullName?: string | null;
+  trainerName?: string | null;
 }
 
 export class TrainerProfile extends AggregateRoot<TrainerProfileProps> {
   get userId(): string {
     return this.props.userId;
+  }
+
+  get fullName(): string | null | undefined {
+    return this.props.fullName;
+  }
+
+  get trainerName(): string | null | undefined {
+    return this.props.trainerName;
+  }
+
+  public setFullName(fullName: string): void {
+    this.props.fullName = fullName;
+    this.props.trainerName = fullName;
   }
 
   get headline(): string {
@@ -231,7 +246,9 @@ export class TrainerProfile extends AggregateRoot<TrainerProfileProps> {
   public updateAvailability(newAvailability: TrainerAvailability): Result<void> {
     this.props.availability = newAvailability;
     this.props.updatedAt = new Date();
-    this.addDomainEvent(new TrainerAvailabilityChangedEvent(this.id, newAvailability.status));
+    this.addDomainEvent(
+      new TrainerAvailabilityChangedEvent(this.id, this.userId, newAvailability.status),
+    );
     return Result.ok<void>();
   }
 

@@ -6,8 +6,11 @@ export class UserApplicationMapper {
     return {
       id: user.id,
       email: user.email.value,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber || null,
+      role: user.role,
       status: user.status,
-      emailVerified: user.emailVerified
+      emailVerified: user.emailVerified,
     };
   }
 }

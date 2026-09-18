@@ -7,6 +7,7 @@ export class ClientProfileMapper {
       id: profile.id,
       userId: profile.userId,
       fullName: profile.fullName,
+      bio: profile.bio || null,
       avatarUrl: profile.avatarUrl || null,
       gender: profile.gender || null,
       dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.toISOString() : null,

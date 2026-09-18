@@ -267,7 +267,7 @@ Does NOT manage: Authentication, Authorization, Payments, Coaching Relationships
 | **Lifecycle** | Independent |
 | **Ownership** | Aggregate Root — Profile Domain |
 | **References** | userId → User |
-| **Fields** | \_id | userId | fullName | dateOfBirth | gender | height | weight | activityLevel | experienceLevel | fitnessGoals | dietaryPreferences | medicalNotes | profileCompleted | createdAt | updatedAt |
+| **Fields** | _id | userId | fullName | bio | dateOfBirth | gender | height | weight | activityLevel | experienceLevel | fitnessGoals | dietaryPreferences | medicalNotes | profileCompleted | createdAt | updatedAt |
 
  
 
@@ -432,7 +432,7 @@ The Marketplace Domain exists to connect Client → Trainer before consultation,
 | :---- | :---- |
 | **Ownership** | Owned By: AcquisitionPipeline |
 | **Storage Strategy** | Embedded Entity |
-| **Fields** | requestId | clientMessage | status | submittedAt | respondedAt | responseReason |
+| **Fields** | requestId | clientGoal | clientMessage | status | submittedAt | respondedAt | responseReason |
 | **Lifecycle States** | REQUEST\_PENDING | REQUEST\_ACCEPTED | REQUEST\_REJECTED | REQUEST\_CANCELLED |
 
  
@@ -671,7 +671,7 @@ The Payment Domain is the sole owner of financial data. No other domain may modi
 | **Ownership** | Aggregate Root — Payment Domain |
 | **References** | acquisitionPipelineId → AcquisitionPipeline | offerId → CoachingOffer | clientId → User | trainerId → User |
 | **Fields** | \_id | acquisitionPipelineId | offerId | clientId | trainerId | status | amount | currency | paymentProvider | providerPaymentId | invoice | settlement | createdAt | updatedAt |
-| **Lifecycle States** | CREATED | PROCESSING | SUCCESS | PARTIALLY\_REFUNDED | REFUNDED | FAILED |
+| **Lifecycle States** | CREATED | PROCESSING | SUCCESS | FAILED | REFUNDED |
 
  
 
@@ -712,12 +712,12 @@ The Payment Domain is the sole owner of financial data. No other domain may modi
 
 ## **Entity: Refund**
 
-| Purpose | Represents a refund request and its resolution. |
+| Purpose | Represents an exceptional service-failure refund request and its administrative resolution. |
 | :---- | :---- |
 | **Fields** | refundId | requestedBy | refundType | reason | amount | status | requestedAt | processedAt |
-| **Types** | FULL\_REFUND | PARTIAL\_REFUND |
-| **Lifecycle States** | PENDING | UNDER\_REVIEW | APPROVED | PARTIALLY\_APPROVED | REJECTED | PROCESSED | CANCELLED |
-| **Rules** | R-1: Refunds are never automatic.  R-2: Every refund requires administrative review.  R-3: Refund history is immutable. |
+| **Types** | FULL\_TRAINER\_FEE\_REFUND |
+| **Lifecycle States** | PENDING | UNDER\_REVIEW | APPROVED | REJECTED | PROCESSED | CANCELLED |
+| **Rules** | R-1: Refunds are never automatic or client-discretionary.  R-2: Every refund requires administrative review for service failure.  R-3: Approved refund amount equals immutable trainerFee from PaymentPricing (platformFee is non-refundable).  R-4: Refund history is immutable. |
 
  
 

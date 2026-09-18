@@ -1,0 +1,3 @@
+export enum RefundType {
+  FULL_TRAINER_FEE_REFUND = 'FULL_TRAINER_FEE_REFUND',
+}

@@ -18,6 +18,11 @@ export const CreateClientProfileSchema = z.object({
 export const UpdateClientProfileSchema = z.object({
   body: z.object({
     fullName: optionalString(),
+    bio: z.preprocess((val) => {
+      if (val === null || val === undefined) return val;
+      if (typeof val === 'string' && val.trim() === '') return null;
+      return val;
+    }, z.string().max(500, 'Bio must not exceed 500 characters').nullable().optional()),
     gender: z.nativeEnum(Gender).optional(),
     dateOfBirth: optionalDateFromHtmlInput('Date of birth'),
     phoneNumber: optionalString(),

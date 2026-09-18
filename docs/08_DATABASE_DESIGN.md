@@ -1581,6 +1581,7 @@ Profile
 \_id  
 userId  
 fullName  
+bio  
 dateOfBirth  
 gender  
 height  

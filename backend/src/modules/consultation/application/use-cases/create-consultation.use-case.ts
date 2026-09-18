@@ -5,6 +5,7 @@ import { IAcquisitionPipelineRepository } from '../../../marketplace/domain/repo
 import { AcquisitionPipelineStatus } from '../../../marketplace/domain/enums/acquisition-pipeline-status.enum';
 import { Consultation } from '../../domain/aggregates/consultation.aggregate';
 import { ConsultationSlot } from '../../domain/value-objects/consultation-slot.vo';
+import { ConsultationPlatform } from '../../domain/enums/consultation-platform.enum';
 import { CreateConsultationCommandDTO } from '../dtos/consultation-command.dto';
 import { ConsultationResponseDTO } from '../dtos/consultation-response.dto';
 import { ConsultationDTOMapper } from '../mappers/consultation-dto.mapper';
@@ -25,46 +26,78 @@ export class CreateConsultationUseCase {
     dto: CreateConsultationCommandDTO,
   ): Promise<Result<ConsultationResponseDTO>> {
     try {
-      const pipeline = await this.pipelineRepo.findById(dto.acquisitionPipelineId);
+      // 1. Resolve trainerRequestId ONLY through findByRequestId
+      const pipeline = await this.pipelineRepo.findByRequestId(dto.trainerRequestId);
       if (!pipeline) {
-        throw new PipelineNotFoundException(dto.acquisitionPipelineId);
-      }
-
-      if (pipeline.status !== AcquisitionPipelineStatus.ACCEPTED) {
-        throw new PipelineNotAcceptedException(dto.acquisitionPipelineId, pipeline.status);
-      }
-
-      const isParticipant = dto.userId === pipeline.clientId || dto.userId === pipeline.trainerId;
-      if (!isParticipant) {
-        throw new UnauthorizedConsultationParticipantException(
-          dto.userId,
-          dto.acquisitionPipelineId,
+        return Result.fail<ConsultationResponseDTO>(
+          `Trainer request not found with ID: ${dto.trainerRequestId}`,
         );
       }
 
-      const existingConsultation = await this.consultationRepo.findByAcquisitionPipelineId(
-        dto.acquisitionPipelineId,
-      );
-      if (existingConsultation) {
-        throw new ConsultationAlreadyExistsException(dto.acquisitionPipelineId);
+      // 2. Verify pipeline is in ACCEPTED status
+      if (pipeline.status !== AcquisitionPipelineStatus.ACCEPTED) {
+        throw new PipelineNotAcceptedException(pipeline.id, pipeline.status);
       }
 
+      // 3. Verify participant authorization
+      const isParticipant = dto.userId === pipeline.clientId || dto.userId === pipeline.trainerId;
+      if (!isParticipant) {
+        throw new UnauthorizedConsultationParticipantException(dto.userId, pipeline.id);
+      }
+
+      // 4. Verify no consultation already exists for this pipeline
+      const existingConsultation = await this.consultationRepo.findByAcquisitionPipelineId(
+        pipeline.id,
+      );
+      if (existingConsultation) {
+        throw new ConsultationAlreadyExistsException(pipeline.id);
+      }
+
+      // 5. Convert scheduledAt + duration to start and end dates
+      const scheduledStartAt = new Date(dto.scheduledAt);
+      if (isNaN(scheduledStartAt.getTime())) {
+        return Result.fail<ConsultationResponseDTO>('Invalid scheduledAt date format');
+      }
+
+      if (scheduledStartAt.getTime() <= Date.now()) {
+        return Result.fail<ConsultationResponseDTO>('scheduledAt must be a future date and time');
+      }
+
+      const scheduledEndAt = new Date(scheduledStartAt.getTime() + dto.duration * 60 * 1000);
+
+      // 6. Map meetingMode to ConsultationPlatform
+      let platform: ConsultationPlatform;
+      if (dto.meetingMode === 'VIDEO_CALL') {
+        platform = ConsultationPlatform.WEBRTC;
+      } else if (dto.meetingMode === 'PHONE_CALL') {
+        return Result.fail<ConsultationResponseDTO>(
+          'PHONE_CALL is not currently supported by the video consultation system. Please select VIDEO_CALL.',
+        );
+      } else {
+        return Result.fail<ConsultationResponseDTO>(`Unsupported meetingMode: ${dto.meetingMode}`);
+      }
+
+      // 7. Derive timezone from scheduling context or system environment
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
+      // 8. Create ConsultationSlot value object
       const slotResult = ConsultationSlot.create({
-        scheduledStartAt: dto.scheduledStartAt,
-        scheduledEndAt: dto.scheduledEndAt,
-        timezone: dto.timezone,
+        scheduledStartAt,
+        scheduledEndAt,
+        timezone,
       });
 
       if (slotResult.isFailure) {
         return Result.fail<ConsultationResponseDTO>(slotResult.error);
       }
 
+      // 9. Create Consultation aggregate
       const consultationResult = Consultation.create({
         acquisitionPipelineId: pipeline.id,
         clientId: pipeline.clientId,
         trainerId: pipeline.trainerId,
         slot: slotResult.getValue(),
-        platform: dto.platform,
+        platform,
       });
 
       if (consultationResult.isFailure) {
@@ -73,6 +106,10 @@ export class CreateConsultationUseCase {
 
       const consultation = consultationResult.getValue();
       await this.consultationRepo.save(consultation);
+
+      // 10. Transition AcquisitionPipeline to CONSULTATION_SCHEDULED
+      pipeline.scheduleConsultation();
+      await this.pipelineRepo.save(pipeline);
 
       return Result.ok<ConsultationResponseDTO>(ConsultationDTOMapper.toDTO(consultation));
     } catch (error: unknown) {

@@ -54,6 +54,11 @@ describe('Consultation Application Layer Use Cases', () => {
     status: AcquisitionPipelineStatus.ACCEPTED,
   };
 
+  const samplePipelineObj = {
+    ...samplePipeline,
+    scheduleConsultation: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -79,7 +84,9 @@ describe('Consultation Application Layer Use Cases', () => {
     };
 
     mockPipelineRepo = {
-      findById: vi.fn().mockResolvedValue(samplePipeline),
+      findById: vi.fn().mockResolvedValue(samplePipelineObj),
+      findByRequestId: vi.fn().mockResolvedValue(samplePipelineObj),
+      save: vi.fn().mockResolvedValue(undefined),
     };
   });
 
@@ -87,11 +94,11 @@ describe('Consultation Application Layer Use Cases', () => {
     it('should successfully create and save a new consultation for an ACCEPTED pipeline', async () => {
       const useCase = new CreateConsultationUseCase(mockConsultationRepo, mockPipelineRepo);
       const result = await useCase.execute({
-        acquisitionPipelineId: pipelineId,
+        trainerRequestId: 'request_123',
         userId: clientId,
-        scheduledStartAt: new Date(Date.now() + 3600000),
-        scheduledEndAt: new Date(Date.now() + 7200000),
-        timezone: 'UTC',
+        scheduledAt: new Date(Date.now() + 3600000).toISOString(),
+        duration: 60,
+        meetingMode: 'VIDEO_CALL',
       });
 
       expect(result.isSuccess).toBe(true);
@@ -102,32 +109,32 @@ describe('Consultation Application Layer Use Cases', () => {
     });
 
     it('should fail if acquisition pipeline is not found', async () => {
-      mockPipelineRepo.findById.mockResolvedValueOnce(null);
+      mockPipelineRepo.findByRequestId.mockResolvedValueOnce(null);
       const useCase = new CreateConsultationUseCase(mockConsultationRepo, mockPipelineRepo);
       const result = await useCase.execute({
-        acquisitionPipelineId: 'non_existent_pipe',
+        trainerRequestId: 'non_existent_req',
         userId: clientId,
-        scheduledStartAt: new Date(Date.now() + 3600000),
-        scheduledEndAt: new Date(Date.now() + 7200000),
-        timezone: 'UTC',
+        scheduledAt: new Date(Date.now() + 3600000).toISOString(),
+        duration: 60,
+        meetingMode: 'VIDEO_CALL',
       });
 
       expect(result.isFailure).toBe(true);
-      expect(result.error).toContain('was not found');
+      expect(result.error).toContain('not found');
     });
 
     it('should fail if acquisition pipeline is not in ACCEPTED status', async () => {
-      mockPipelineRepo.findById.mockResolvedValueOnce({
-        ...samplePipeline,
+      mockPipelineRepo.findByRequestId.mockResolvedValueOnce({
+        ...samplePipelineObj,
         status: AcquisitionPipelineStatus.REQUESTED,
       });
       const useCase = new CreateConsultationUseCase(mockConsultationRepo, mockPipelineRepo);
       const result = await useCase.execute({
-        acquisitionPipelineId: pipelineId,
+        trainerRequestId: 'request_123',
         userId: clientId,
-        scheduledStartAt: new Date(Date.now() + 3600000),
-        scheduledEndAt: new Date(Date.now() + 7200000),
-        timezone: 'UTC',
+        scheduledAt: new Date(Date.now() + 3600000).toISOString(),
+        duration: 60,
+        meetingMode: 'VIDEO_CALL',
       });
 
       expect(result.isFailure).toBe(true);
@@ -138,11 +145,11 @@ describe('Consultation Application Layer Use Cases', () => {
       mockConsultationRepo.findByAcquisitionPipelineId.mockResolvedValueOnce(sampleConsultation);
       const useCase = new CreateConsultationUseCase(mockConsultationRepo, mockPipelineRepo);
       const result = await useCase.execute({
-        acquisitionPipelineId: pipelineId,
+        trainerRequestId: 'request_123',
         userId: clientId,
-        scheduledStartAt: new Date(Date.now() + 3600000),
-        scheduledEndAt: new Date(Date.now() + 7200000),
-        timezone: 'UTC',
+        scheduledAt: new Date(Date.now() + 3600000).toISOString(),
+        duration: 60,
+        meetingMode: 'VIDEO_CALL',
       });
 
       expect(result.isFailure).toBe(true);

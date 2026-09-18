@@ -45,11 +45,10 @@ describe('consultationApi Infrastructure Tests', () => {
     vi.mocked(httpClient.post).mockResolvedValue(sampleResponse);
 
     const payload = {
-      acquisitionPipelineId: 'pipe_123',
-      scheduledStartAt: '2026-09-01T10:00:00.000Z',
-      scheduledEndAt: '2026-09-01T10:45:00.000Z',
-      timezone: 'UTC',
-      platform: ConsultationPlatform.WEBRTC,
+      trainerRequestId: 'request_123',
+      scheduledAt: '2026-09-01T10:00:00.000Z',
+      duration: 60,
+      meetingMode: 'VIDEO_CALL' as const,
     };
 
     const res = await consultationApi.createConsultation(payload);

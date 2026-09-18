@@ -98,6 +98,7 @@ export class UpdateClientProfileUseCase {
 
     const updateResult = profile.updateDetails({
       fullName: dto.fullName,
+      bio: dto.bio,
       gender: dto.gender,
       dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
       phoneNumber: dto.phoneNumber,

@@ -12,6 +12,7 @@ export class ClientProfilePersistenceMapper {
       {
         userId: doc.userId,
         fullName: doc.fullName,
+        bio: doc.bio || undefined,
         avatarUrl: doc.avatarUrl,
         gender: doc.gender || undefined,
         dateOfBirth: doc.dateOfBirth || undefined,
@@ -46,6 +47,7 @@ export class ClientProfilePersistenceMapper {
       _id: profile.id,
       userId: profile.userId,
       fullName: profile.fullName,
+      bio: profile.bio || null,
       avatarUrl: profile.avatarUrl || null,
       gender: profile.gender || null,
       dateOfBirth: profile.dateOfBirth || null,

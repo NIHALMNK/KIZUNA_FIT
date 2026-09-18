@@ -45,12 +45,12 @@ export class ConsultationController {
     }
 
     const result = await this.createConsultationUseCase.execute({
-      acquisitionPipelineId: req.body.acquisitionPipelineId,
+      trainerRequestId: req.body.trainerRequestId,
       userId,
-      scheduledStartAt: new Date(req.body.scheduledStartAt),
-      scheduledEndAt: new Date(req.body.scheduledEndAt),
-      timezone: req.body.timezone,
-      platform: req.body.platform,
+      scheduledAt: req.body.scheduledAt,
+      duration: req.body.duration,
+      meetingMode: req.body.meetingMode,
+      notes: req.body.notes,
     });
 
     if (result.isFailure) {

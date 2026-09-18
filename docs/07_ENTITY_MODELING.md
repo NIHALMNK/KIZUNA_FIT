@@ -267,7 +267,7 @@ Does NOT manage: Authentication, Authorization, Payments, Coaching Relationships
 | **Lifecycle** | Independent |
 | **Ownership** | Aggregate Root — Profile Domain |
 | **References** | userId → User |
-| **Fields** | \_id | userId | fullName | dateOfBirth | gender | height | weight | activityLevel | experienceLevel | fitnessGoals | dietaryPreferences | medicalNotes | profileCompleted | createdAt | updatedAt |
+| **Fields** | _id | userId | fullName | bio | dateOfBirth | gender | height | weight | activityLevel | experienceLevel | fitnessGoals | dietaryPreferences | medicalNotes | profileCompleted | createdAt | updatedAt |
 
  
 

@@ -17,6 +17,7 @@ import {
 export interface ClientProfileProps {
   userId: string;
   fullName: string;
+  bio?: string | null;
   avatarUrl?: string | null;
   gender?: Gender | null;
   dateOfBirth?: Date | null;
@@ -44,6 +45,10 @@ export class ClientProfile extends AggregateRoot<ClientProfileProps> {
 
   get fullName(): string {
     return this.props.fullName;
+  }
+
+  get bio(): string | null | undefined {
+    return this.props.bio;
   }
 
   get avatarUrl(): string | null | undefined {
@@ -136,12 +141,16 @@ export class ClientProfile extends AggregateRoot<ClientProfileProps> {
     if (!props.fullName || !props.fullName.trim()) {
       return Result.fail<ClientProfile>('fullName is required');
     }
+    if (props.bio !== undefined && props.bio !== null && props.bio.length > 500) {
+      return Result.fail<ClientProfile>('Bio must not exceed 500 characters');
+    }
 
     const isNew = !id;
     const profile = new ClientProfile(
       {
         ...props,
         fullName: props.fullName.trim(),
+        bio: props.bio ? props.bio.trim() : props.bio === null ? null : undefined,
         dietaryPreferences: props.dietaryPreferences || [],
         fitnessGoals: props.fitnessGoals || [],
         profileCompleted: props.profileCompleted ?? false,
@@ -164,6 +173,12 @@ export class ClientProfile extends AggregateRoot<ClientProfileProps> {
     if (updates.fullName !== undefined) {
       if (!updates.fullName.trim()) return Result.fail<void>('Full name cannot be empty');
       this.props.fullName = updates.fullName.trim();
+    }
+    if (updates.bio !== undefined) {
+      if (updates.bio !== null && updates.bio.length > 500) {
+        return Result.fail<void>('Bio must not exceed 500 characters');
+      }
+      this.props.bio = updates.bio ? updates.bio.trim() : updates.bio === null ? null : undefined;
     }
     if (updates.gender !== undefined) this.props.gender = updates.gender;
     if (updates.dateOfBirth !== undefined) this.props.dateOfBirth = updates.dateOfBirth;

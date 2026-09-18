@@ -7,7 +7,6 @@ import {
   useUpcomingConsultations,
   useAssignedWorkouts,
   useAssignedNutrition,
-  useCoachingEvaluations,
 } from '../../../modules/client-dashboard/application/hooks/useClientDashboard';
 
 import { ClientDashboardWelcome } from '../../../modules/client-dashboard/presentation/components/ClientDashboardWelcome';
@@ -21,12 +20,28 @@ import { ClientDashboardSkeleton } from '../../../modules/client-dashboard/prese
 import { ErrorState } from '../../../shared/components/feedback/ErrorState';
 
 export default function ClientDashboard() {
-  const { data: activeCoaching, isLoading: isLoadingCoaching, isError: isErrorCoaching, refetch: refetchCoaching } = useActiveCoaching();
+  const {
+    data: activeCoaching,
+    isLoading: isLoadingCoaching,
+    isError: isErrorCoaching,
+    refetch: refetchCoaching,
+  } = useActiveCoaching();
   const { data: pendingOffers, isLoading: isLoadingOffers } = usePendingOffers();
-  const { data: consultations, isError: isErrorConsultations, refetch: refetchConsultations } = useUpcomingConsultations();
-  const { data: workouts, isError: isErrorWorkouts, refetch: refetchWorkouts } = useAssignedWorkouts();
-  const { data: nutrition, isError: isErrorNutrition, refetch: refetchNutrition } = useAssignedNutrition();
-  const { data: evaluations, isError: isErrorEvaluations, refetch: refetchEvaluations } = useCoachingEvaluations();
+  const {
+    data: consultations,
+    isError: isErrorConsultations,
+    refetch: refetchConsultations,
+  } = useUpcomingConsultations();
+  const {
+    data: workouts,
+    isError: isErrorWorkouts,
+    refetch: refetchWorkouts,
+  } = useAssignedWorkouts();
+  const {
+    data: nutrition,
+    isError: isErrorNutrition,
+    refetch: refetchNutrition,
+  } = useAssignedNutrition();
 
   // Full page skeleton loading during initial coaching fetch
   if (isLoadingCoaching || isLoadingOffers) {
@@ -43,7 +58,9 @@ export default function ClientDashboard() {
 
       {/* Primary Hero Section: Coaching Hero + Pending Action Required */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className={pendingOffers && pendingOffers.length > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
+        <div
+          className={pendingOffers && pendingOffers.length > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}
+        >
           {isErrorCoaching ? (
             <ErrorState
               title="Unable to load coaching status"
@@ -87,15 +104,7 @@ export default function ClientDashboard() {
 
       {/* Secondary Domain Grid: Recent Progress & Upcoming Consultation */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {isErrorEvaluations ? (
-          <ErrorState
-            title="Progress Data Unavailable"
-            message="Could not load recent evaluation records."
-            onRetry={refetchEvaluations}
-          />
-        ) : (
-          <ClientProgressCard evaluations={evaluations} />
-        )}
+        <ClientProgressCard />
 
         {isErrorConsultations ? (
           <ErrorState

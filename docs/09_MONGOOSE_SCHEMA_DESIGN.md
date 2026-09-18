@@ -2715,6 +2715,7 @@ Both objects are value objects with no independent lifecycle.
 | \_id | ObjectId | ✓ | Primary Key |
 | userId | ObjectId | ✓ | Unique Reference → User |
 | fullName | String | ✓ | Client display name |
+| bio | String | null | No | Client biography (About You, max 500 chars) |
 | avatarUrl | String | null | No | Profile image |
 | gender | Gender | No | Gender |
 | dateOfBirth | Date | null | No | Birth date |

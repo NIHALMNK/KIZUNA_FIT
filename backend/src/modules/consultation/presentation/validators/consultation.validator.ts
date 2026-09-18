@@ -4,15 +4,13 @@ import { ConsultationStatus } from '../../domain/enums/consultation-status.enum'
 
 export const CreateConsultationSchema = z.object({
   body: z.object({
-    acquisitionPipelineId: z.string().min(1, 'acquisitionPipelineId is required'),
-    scheduledStartAt: z
+    trainerRequestId: z.string().min(1, 'trainerRequestId is required'),
+    scheduledAt: z
       .string()
-      .datetime({ message: 'scheduledStartAt must be a valid ISO 8601 date string' }),
-    scheduledEndAt: z
-      .string()
-      .datetime({ message: 'scheduledEndAt must be a valid ISO 8601 date string' }),
-    timezone: z.string().min(1, 'timezone is required'),
-    platform: z.nativeEnum(ConsultationPlatform).optional(),
+      .datetime({ message: 'scheduledAt must be a valid ISO 8601 date string' }),
+    duration: z.number().positive('duration must be a positive number in minutes'),
+    meetingMode: z.enum(['VIDEO_CALL', 'PHONE_CALL']),
+    notes: z.string().max(1000, 'notes cannot exceed 1000 characters').optional(),
   }),
 });
 

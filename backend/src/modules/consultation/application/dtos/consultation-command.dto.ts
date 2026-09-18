@@ -3,12 +3,12 @@ import { ConsultationPlatform } from '../../domain/enums/consultation-platform.e
 import { CancellationActor } from '../../domain/enums/cancellation-actor.enum';
 
 export interface CreateConsultationCommandDTO {
-  acquisitionPipelineId: string;
+  trainerRequestId: string;
   userId: string;
-  scheduledStartAt: Date;
-  scheduledEndAt: Date;
-  timezone: string;
-  platform?: ConsultationPlatform;
+  scheduledAt: string;
+  duration: number;
+  meetingMode: 'VIDEO_CALL' | 'PHONE_CALL';
+  notes?: string;
 }
 
 export interface BookConsultationSlotCommandDTO {

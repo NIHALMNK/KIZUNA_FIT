@@ -69,14 +69,3 @@ export interface PendingCoachingOffer {
 export interface PendingOffersResponse {
   offers: PendingCoachingOffer[];
 }
-
-export interface CoachingEvaluationSummary {
-  id: string;
-  evaluatedAt: string;
-  summaryText?: string;
-  nextSteps?: string;
-}
-
-export interface CoachingEvaluationsResponse {
-  evaluations: CoachingEvaluationSummary[];
-}

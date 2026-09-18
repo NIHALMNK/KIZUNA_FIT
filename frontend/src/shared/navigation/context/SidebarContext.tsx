@@ -15,7 +15,7 @@ interface SidebarContextValue {
   openMobile: () => void;
   closeMobile: () => void;
   toggleGroup: (groupId: string) => void;
-  isRouteActive: (href: string) => boolean;
+  isRouteActive: (href: string, exact?: boolean) => boolean;
 }
 
 const STORAGE_KEY = 'kizunafit_sidebar_collapsed';
@@ -77,7 +77,7 @@ export const SidebarContextProvider: React.FC<{ children: React.ReactNode }> = (
     });
   };
 
-  const isRouteActive = (href: string) => isNavRouteActive(pathname, href);
+  const isRouteActive = (href: string, exact?: boolean) => isNavRouteActive(pathname, href, exact);
 
   return (
     <SidebarContext.Provider

@@ -123,10 +123,10 @@ describe('ConsultationController Presentation Tests', () => {
   describe('create', () => {
     it('should return 201 Created on successful consultation creation', async () => {
       mockReq.body = {
-        acquisitionPipelineId: 'pipe_1786359655394_11qed',
-        scheduledStartAt: '2026-09-01T10:00:00Z',
-        scheduledEndAt: '2026-09-01T10:45:00Z',
-        timezone: 'UTC',
+        trainerRequestId: 'request_1786359655394_11qed',
+        scheduledAt: '2026-09-01T10:00:00Z',
+        duration: 60,
+        meetingMode: 'VIDEO_CALL',
       };
 
       await controller.create(mockReq as Request, mockRes as Response);
@@ -151,7 +151,12 @@ describe('ConsultationController Presentation Tests', () => {
       mockCreateConsultationUseCase.execute.mockResolvedValueOnce(
         Result.fail('A consultation already exists for acquisition pipeline'),
       );
-      mockReq.body = { acquisitionPipelineId: 'pipe_123' };
+      mockReq.body = {
+        trainerRequestId: 'request_123',
+        scheduledAt: '2026-09-01T10:00:00Z',
+        duration: 60,
+        meetingMode: 'VIDEO_CALL',
+      };
 
       await controller.create(mockReq as Request, mockRes as Response);
 

@@ -8,6 +8,7 @@ import { ExperienceLevel, ActivityLevel } from '../../../../domain/enums/ClientL
 export interface IClientProfileDocument extends Document {
   userId: string;
   fullName: string;
+  bio?: string | null;
   avatarUrl?: string | null;
   gender?: Gender | null;
   dateOfBirth?: Date | null;
@@ -39,6 +40,7 @@ const ClientProfileSchema = new Schema(
     _id: { type: String, required: true },
     userId: { type: String, required: true, unique: true, index: true },
     fullName: { type: String, required: true, trim: true },
+    bio: { type: String, default: null },
     avatarUrl: { type: String, default: null },
     gender: { type: String, enum: Object.values(Gender), default: null },
     dateOfBirth: { type: Date, default: null },

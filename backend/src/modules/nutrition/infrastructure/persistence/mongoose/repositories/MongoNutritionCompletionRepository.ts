@@ -94,6 +94,42 @@ export class MongoNutritionCompletionRepository implements INutritionCompletionR
     return docs.map(NutritionCompletionPersistenceMapper.toDomain);
   }
 
+  async findByClientIdInRange(
+    clientId: string,
+    fromDate: Date,
+    toDate: Date,
+  ): Promise<NutritionCompletion[]> {
+    const docs = await NutritionCompletionModel.find(
+      {
+        clientId,
+        completionDate: { $gte: fromDate, $lte: toDate },
+      },
+      null,
+      { session: this.session },
+    )
+      .sort({ completionDate: 1 })
+      .exec();
+    return docs.map(NutritionCompletionPersistenceMapper.toDomain);
+  }
+
+  async findByRelationshipIdInRange(
+    relationshipId: string,
+    fromDate: Date,
+    toDate: Date,
+  ): Promise<NutritionCompletion[]> {
+    const docs = await NutritionCompletionModel.find(
+      {
+        coachingRelationshipId: relationshipId,
+        completionDate: { $gte: fromDate, $lte: toDate },
+      },
+      null,
+      { session: this.session },
+    )
+      .sort({ completionDate: 1 })
+      .exec();
+    return docs.map(NutritionCompletionPersistenceMapper.toDomain);
+  }
+
   async save(completion: NutritionCompletion): Promise<void> {
     const raw = NutritionCompletionPersistenceMapper.toPersistence(completion);
     try {

@@ -16,7 +16,7 @@ import {
   Award,
   ArrowRight,
 } from 'lucide-react';
-import Image from 'next/image';
+import { Avatar } from '@/shared/components/ui/Avatar';
 
 interface Stage6MyTrainerProps {
   coaching: CoachingRelationship;
@@ -30,11 +30,17 @@ export const Stage6MyTrainer: React.FC<Stage6MyTrainerProps> = ({ coaching }) =>
     trainerProfile?.trainerName ||
     trainerProfile?.name ||
     coaching.trainer?.fullName ||
+    (coaching as any).trainerName ||
     'Your Assigned Coach';
 
-  const displayAvatar = trainerProfile?.avatarUrl || coaching.trainer?.avatarUrl;
+  const displayAvatar =
+    trainerProfile?.avatarUrl ||
+    coaching.trainer?.avatarUrl ||
+    (coaching as any).trainerAvatarUrl ||
+    undefined;
 
-  const startDateStr = coaching.startedAt || coaching.timeline?.activatedAt || coaching.createdAt;
+  const startDateStr =
+    (coaching as any).startedAt || coaching.timeline?.activatedAt || coaching.createdAt;
 
   const formattedStartDate = startDateStr
     ? new Date(startDateStr).toLocaleDateString(undefined, {
@@ -44,9 +50,22 @@ export const Stage6MyTrainer: React.FC<Stage6MyTrainerProps> = ({ coaching }) =>
       })
     : 'Active';
 
+  const endDateStr = (coaching as any).endsAt;
+  const formattedEndDate = endDateStr
+    ? new Date(endDateStr).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null;
+
   const specializations =
     trainerProfile?.specializations ||
-    (coaching.trainer?.specialization ? [coaching.trainer.specialization] : []);
+    (coaching.trainer?.specialization
+      ? [coaching.trainer.specialization]
+      : (coaching as any).planType
+        ? [(coaching as any).planType]
+        : []);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -54,13 +73,13 @@ export const Stage6MyTrainer: React.FC<Stage6MyTrainerProps> = ({ coaching }) =>
       <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[var(--color-surface-alt)] border-2 border-[var(--color-primary)] overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
-              {displayAvatar ? (
-                <Image src={displayAvatar} alt={displayName} fill className="object-cover" />
-              ) : (
-                <User className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--color-text-muted)]" />
-              )}
-            </div>
+            <Avatar
+              src={displayAvatar}
+              alt={displayName}
+              fallback={displayName.substring(0, 2).toUpperCase()}
+              size="xl"
+              className="w-16 h-16 sm:w-20 sm:h-20 ring-2 ring-[var(--color-primary)] shrink-0 shadow-xs"
+            />
             <div>
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 uppercase tracking-wider">
@@ -77,13 +96,18 @@ export const Stage6MyTrainer: React.FC<Stage6MyTrainerProps> = ({ coaching }) =>
             </div>
           </div>
 
-          <div className="flex sm:flex-col items-start sm:items-end justify-between border-t sm:border-t-0 pt-3 sm:pt-0 border-[var(--color-border)]">
+          <div className="flex sm:flex-col items-start sm:items-end justify-between border-t sm:border-t-0 pt-3 sm:pt-0 border-[var(--color-border)] gap-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
-              Coaching Since
+              Coaching Started
             </span>
             <span className="text-xs sm:text-sm font-extrabold text-[var(--color-heading)]">
               {formattedStartDate}
             </span>
+            {formattedEndDate && (
+              <span className="text-[11px] text-[var(--color-text-secondary)]">
+                Ends: {formattedEndDate}
+              </span>
+            )}
             {coaching.planType && (
               <span className="text-[11px] font-semibold text-[var(--color-primary)] mt-0.5">
                 {coaching.planType} Plan
@@ -117,7 +141,7 @@ export const Stage6MyTrainer: React.FC<Stage6MyTrainerProps> = ({ coaching }) =>
                     key={i}
                     className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-[var(--color-tag)] text-[var(--color-primary)] border border-[var(--color-border)]"
                   >
-                    {spec.replace(/_/g, ' ')}
+                    {String(spec).replace(/_/g, ' ')}
                   </span>
                 ))}
               </div>
@@ -136,7 +160,7 @@ export const Stage6MyTrainer: React.FC<Stage6MyTrainerProps> = ({ coaching }) =>
                     className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)]"
                   >
                     <Award className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
-                    <span className="font-semibold">{cert.title}</span>
+                    <span className="font-semibold">{cert?.title}</span>
                   </div>
                 ))}
               </div>

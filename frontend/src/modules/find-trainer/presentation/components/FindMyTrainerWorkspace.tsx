@@ -91,8 +91,8 @@ export const FindMyTrainerWorkspace: React.FC = () => {
         <Stage3RequestPending request={activeRequest} />
       )}
 
-      {currentStage === JourneyStage.STAGE_4_CONSULTATION && activeConsultation && (
-        <Stage4Consultation consultation={activeConsultation} />
+      {currentStage === JourneyStage.STAGE_4_CONSULTATION && (
+        <Stage4Consultation consultation={activeConsultation} acceptedRequest={activeRequest} />
       )}
 
       {currentStage === JourneyStage.STAGE_5_OFFER && activeOffer && (

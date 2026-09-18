@@ -14,7 +14,7 @@ import {
   Target,
   Loader2,
 } from 'lucide-react';
-import Image from 'next/image';
+import { Avatar } from '@/shared/components/ui/Avatar';
 
 interface Stage3RequestPendingProps {
   request: TrainerRequestResponseDTO;
@@ -65,7 +65,7 @@ export const Stage3RequestPending: React.FC<Stage3RequestPendingProps> = ({ requ
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-[var(--color-text-muted)]">
-                  Ref: {request.requestId.slice(-8)}
+                  Ref: {(request.requestId || (request as any).id || '').slice(-8) || 'REQ'}
                 </span>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide ${
@@ -92,18 +92,13 @@ export const Stage3RequestPending: React.FC<Stage3RequestPendingProps> = ({ requ
 
         {/* Coach Snapshot */}
         <div className="flex items-center gap-3.5 p-4 bg-[var(--color-surface-alt)] rounded-xl border border-[var(--color-border)]">
-          <div className="relative w-12 h-12 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden shrink-0 flex items-center justify-center">
-            {request.trainerSnapshot?.profileImage ? (
-              <Image
-                src={request.trainerSnapshot.profileImage}
-                alt={trainerName}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <User className="w-6 h-6 text-[var(--color-text-muted)]" />
-            )}
-          </div>
+          <Avatar
+            src={request.trainerSnapshot?.profileImage}
+            alt={trainerName}
+            fallback={trainerName.substring(0, 2).toUpperCase()}
+            size="lg"
+            className="ring-1 ring-[var(--color-border)] shrink-0"
+          />
           <div className="flex-1 min-w-0">
             <h3 className="text-xs sm:text-sm font-extrabold text-[var(--color-heading)] truncate">
               {trainerName}

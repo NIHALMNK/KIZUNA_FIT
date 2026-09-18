@@ -23,19 +23,34 @@ export class CoachingRepositoryImpl implements ICoachingRepository {
   }
 
   public async getActive(): Promise<CoachingRelationship[]> {
-    const res = await coachingApi.getActive();
-    if (Array.isArray(res)) return res;
-    if (res && 'relationships' in res && Array.isArray((res as any).relationships)) {
-      return (res as any).relationships;
-    }
-    if (res && (res as any).data) {
-      const inner = (res as any).data;
-      if (Array.isArray(inner)) return inner;
-      if (inner && 'relationships' in inner && Array.isArray(inner.relationships)) {
-        return inner.relationships;
+    try {
+      const res = await coachingApi.getActive();
+      if (Array.isArray(res)) return res;
+      if (res && 'relationships' in res && Array.isArray((res as any).relationships)) {
+        return (res as any).relationships;
       }
+      if (res && (res as any).data) {
+        const inner = (res as any).data;
+        if (Array.isArray(inner)) return inner;
+        if (inner && 'relationships' in inner && Array.isArray(inner.relationships)) {
+          return inner.relationships;
+        }
+      }
+      if (res && typeof res === 'object' && ('relationshipId' in res || 'id' in res)) {
+        return [res as any];
+      }
+      return [];
+    } catch (error: any) {
+      if (
+        error?.status === 404 ||
+        error?.response?.status === 404 ||
+        error?.statusCode === 404 ||
+        error?.status === 200
+      ) {
+        return [];
+      }
+      throw error;
     }
-    return [];
   }
 
   public async getHistory(params?: CoachingQueryParams): Promise<PaginatedCoachingResponse> {

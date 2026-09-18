@@ -66,11 +66,11 @@ export interface PaginatedConsultationsResponseDTO {
 }
 
 export interface CreateConsultationPayload {
-  acquisitionPipelineId: string;
-  scheduledStartAt: string;
-  scheduledEndAt: string;
-  timezone: string;
-  platform?: ConsultationPlatform;
+  trainerRequestId: string;
+  scheduledAt: string;
+  duration: number;
+  meetingMode: 'VIDEO_CALL' | 'PHONE_CALL';
+  notes?: string;
 }
 
 export interface BookConsultationSlotPayload {

@@ -19,7 +19,7 @@ import {
   XCircle,
   FileText,
 } from 'lucide-react';
-import Image from 'next/image';
+import { Avatar } from '@/shared/components/ui/Avatar';
 
 export const HistoryWorkspace: React.FC = () => {
   const [openSections, setOpenSections] = useState<{
@@ -125,7 +125,7 @@ export const HistoryWorkspace: React.FC = () => {
                   </p>
                 ) : (
                   <div className="divide-y divide-[var(--color-border)]">
-                    {requests.map((req) => {
+                    {requests.map((req, i) => {
                       const statusStr = (
                         req.requestStatus ||
                         req.status ||
@@ -139,36 +139,32 @@ export const HistoryWorkspace: React.FC = () => {
                             year: 'numeric',
                           })
                         : '—';
+                      const reqId = req.requestId || (req as any).id || `req_${i}`;
 
                       return (
                         <div
-                          key={req.requestId}
+                          key={reqId}
                           className="py-3.5 first:pt-2 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
                           <div className="flex items-start gap-3">
-                            <div className="relative w-10 h-10 rounded-full bg-[var(--color-surface-alt)] border border-[var(--color-border)] overflow-hidden shrink-0 flex items-center justify-center">
-                              {req.trainerSnapshot?.profileImage ? (
-                                <Image
-                                  src={req.trainerSnapshot.profileImage}
-                                  alt={trainerName}
-                                  fill
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <User className="w-5 h-5 text-[var(--color-text-muted)]" />
-                              )}
-                            </div>
+                            <Avatar
+                              src={req.trainerSnapshot?.profileImage}
+                              alt={trainerName}
+                              fallback={trainerName.substring(0, 2).toUpperCase()}
+                              size="md"
+                              className="ring-1 ring-[var(--color-border)] shrink-0"
+                            />
                             <div className="space-y-0.5 min-w-0">
                               <div className="flex items-center gap-2">
                                 <h4 className="text-xs sm:text-sm font-extrabold text-[var(--color-heading)] truncate">
                                   {trainerName}
                                 </h4>
                                 <span className="text-[10px] font-mono text-[var(--color-text-muted)]">
-                                  {req.requestId.slice(-6)}
+                                  {reqId.slice(-6)}
                                 </span>
                               </div>
                               <p className="text-xs text-[var(--color-text-secondary)] line-clamp-1">
-                                Goal: &ldquo;{req.goal}&rdquo;
+                                Goal: &ldquo;{req.goal || 'General Fitness'}&rdquo;
                               </p>
                               <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-muted)]">
                                 <Clock className="w-3 h-3" />
@@ -229,7 +225,7 @@ export const HistoryWorkspace: React.FC = () => {
                   </p>
                 ) : (
                   <div className="divide-y divide-[var(--color-border)]">
-                    {consultations.map((cons) => {
+                    {consultations.map((cons, i) => {
                       const statusStr = (cons.status || '').toUpperCase();
                       const scheduledStart = cons.slot?.scheduledStartAt;
                       const formattedDate = scheduledStart
@@ -241,10 +237,11 @@ export const HistoryWorkspace: React.FC = () => {
                             minute: '2-digit',
                           })
                         : 'No slot booked';
+                      const consId = cons.consultationId || (cons as any).id || `cons_${i}`;
 
                       return (
                         <div
-                          key={cons.consultationId}
+                          key={consId}
                           className="py-3.5 first:pt-2 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
                           <div className="space-y-1">
@@ -253,7 +250,7 @@ export const HistoryWorkspace: React.FC = () => {
                                 1-on-1 Consultation
                               </span>
                               <span className="text-[10px] font-mono text-[var(--color-text-muted)]">
-                                {cons.consultationId.slice(-6)}
+                                {consId.slice(-6)}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
@@ -322,7 +319,7 @@ export const HistoryWorkspace: React.FC = () => {
                   </p>
                 ) : (
                   <div className="divide-y divide-[var(--color-border)]">
-                    {offers.map((off) => {
+                    {offers.map((off, i) => {
                       const formattedDate = off.createdAt
                         ? new Date(off.createdAt).toLocaleDateString(undefined, {
                             month: 'short',
@@ -330,24 +327,29 @@ export const HistoryWorkspace: React.FC = () => {
                             year: 'numeric',
                           })
                         : '—';
+                      const offerId = off.offerId || (off as any).id || `offer_${i}`;
+                      const planType = off.scope?.planType || 'Custom';
+                      const durationDays = off.scope?.durationDays || 30;
+                      const currency = off.pricing?.currency || 'INR';
+                      const totalAmount = (off.pricing?.totalAmount ?? 0).toLocaleString();
 
                       return (
                         <div
-                          key={off.offerId}
+                          key={offerId}
                           className="py-3.5 first:pt-2 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-extrabold text-[var(--color-heading)]">
-                                {off.scope.planType} Plan ({off.scope.durationDays} Days)
+                                {planType} Plan ({durationDays} Days)
                               </span>
                               <span className="text-[10px] font-mono text-[var(--color-text-muted)]">
-                                {off.offerId.slice(-6)}
+                                {offerId.slice(-6)}
                               </span>
                             </div>
                             <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
                               <span className="font-extrabold text-[var(--color-primary)] font-mono">
-                                {off.pricing.currency} {off.pricing.totalAmount.toLocaleString()}
+                                {currency} {totalAmount}
                               </span>
                               <span>•</span>
                               <span>Issued: {formattedDate}</span>

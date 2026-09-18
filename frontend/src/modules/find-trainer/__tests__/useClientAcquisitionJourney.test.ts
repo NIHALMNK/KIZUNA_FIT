@@ -238,6 +238,91 @@ describe('useClientAcquisitionJourney', () => {
     expect(result.current.activeCoaching?.relationshipId).toBe('rel-999');
   });
 
+  it('resolves to Stage 4 (Consultation) when request is accepted by trainer', () => {
+    mockUseGetTrainerRequests.mockReturnValue({
+      data: {
+        requests: [
+          {
+            requestId: 'req-accepted-1',
+            status: TrainerRequestStatus.REQUEST_ACCEPTED,
+            trainerSnapshot: { fullName: 'Coach Accepted' },
+          },
+        ],
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
+    const { result } = renderTestHook();
+
+    expect(result.current.currentStage).toBe(JourneyStage.STAGE_4_CONSULTATION);
+    expect(result.current.activeRequest?.requestId).toBe('req-accepted-1');
+  });
+
+  it('handles coaching data returned as an object wrapper with relationships array', () => {
+    mockUseActiveCoachingRelationship.mockReturnValue({
+      data: {
+        relationships: [
+          {
+            relationshipId: 'rel-wrapped',
+            status: 'ACTIVE',
+            trainer: { fullName: 'Wrapped Coach' },
+          },
+        ],
+      } as any,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
+    const { result } = renderTestHook();
+
+    expect(result.current.currentStage).toBe(JourneyStage.STAGE_6_MY_TRAINER);
+    expect(result.current.activeCoaching?.relationshipId).toBe('rel-wrapped');
+  });
+
+  it('handles undefined or malformed query data gracefully without crashing', () => {
+    mockUseActiveCoachingRelationship.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    mockUseReceivedOffers.mockReturnValue({
+      data: null as any,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    mockUseUpcomingConsultations.mockReturnValue({
+      data: 'invalid string' as any,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    mockUseGetTrainerRequests.mockReturnValue({
+      data: 12345 as any,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
+    const { result } = renderTestHook();
+
+    expect(result.current.currentStage).toBe(JourneyStage.STAGE_1_DISCOVERY);
+    expect(result.current.activeCoaching).toBeNull();
+    expect(result.current.activeOffer).toBeNull();
+    expect(result.current.activeConsultation).toBeNull();
+    expect(result.current.activeRequest).toBeNull();
+  });
+
   describe('Priority conflict tests', () => {
     it('Active coaching takes precedence over an old offer (Priority 1 > 2)', () => {
       mockUseActiveCoachingRelationship.mockReturnValue({

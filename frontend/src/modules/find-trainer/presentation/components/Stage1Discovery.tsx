@@ -16,7 +16,7 @@ import {
   ChevronRight,
   User,
 } from 'lucide-react';
-import Image from 'next/image';
+import { Avatar } from '@/shared/components/ui/Avatar';
 
 interface Stage1DiscoveryProps {
   onSelectTrainer: (trainer: SelectedTrainerInfo) => void;
@@ -188,18 +188,13 @@ export const Stage1Discovery: React.FC<Stage1DiscoveryProps> = ({ onSelectTraine
                 <div className="space-y-4">
                   {/* Top Avatar & Info */}
                   <div className="flex items-start gap-3.5">
-                    <div className="relative w-12 h-12 rounded-full bg-[var(--color-surface-alt)] border border-[var(--color-border)] overflow-hidden shrink-0 flex items-center justify-center">
-                      {trainer.avatarUrl ? (
-                        <Image
-                          src={trainer.avatarUrl}
-                          alt={displayName}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <User className="w-6 h-6 text-[var(--color-text-muted)]" />
-                      )}
-                    </div>
+                    <Avatar
+                      src={trainer.avatarUrl || undefined}
+                      alt={displayName}
+                      fallback={displayName.substring(0, 2).toUpperCase()}
+                      size="lg"
+                      className="ring-1 ring-[var(--color-border)] shrink-0"
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <h3 className="text-sm font-extrabold text-[var(--color-heading)] truncate">

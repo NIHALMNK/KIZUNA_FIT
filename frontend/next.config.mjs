@@ -8,9 +8,16 @@ const __dirname = path.dirname(__filename);
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
+    ],
+  },
   turbopack: {
     root: path.resolve(__dirname, '..'),
   },
 };
 
 export default nextConfig;
+

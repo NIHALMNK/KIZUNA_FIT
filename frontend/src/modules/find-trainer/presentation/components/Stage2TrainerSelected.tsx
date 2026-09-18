@@ -15,7 +15,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
-import Image from 'next/image';
+import { Avatar } from '@/shared/components/ui/Avatar';
 
 interface Stage2TrainerSelectedProps {
   trainer: SelectedTrainerInfo;
@@ -90,18 +90,13 @@ export const Stage2TrainerSelected: React.FC<Stage2TrainerSelectedProps> = ({
         <div className="lg:col-span-5 space-y-4">
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 shadow-xs space-y-4">
             <div className="flex items-center gap-4">
-              <div className="relative w-16 h-16 rounded-full bg-[var(--color-surface-alt)] border border-[var(--color-border)] overflow-hidden shrink-0 flex items-center justify-center">
-                {trainer.avatarUrl || fullProfile?.avatarUrl ? (
-                  <Image
-                    src={fullProfile?.avatarUrl || trainer.avatarUrl!}
-                    alt={displayName}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <User className="w-8 h-8 text-[var(--color-text-muted)]" />
-                )}
-              </div>
+              <Avatar
+                src={fullProfile?.avatarUrl || trainer.avatarUrl || undefined}
+                alt={displayName}
+                fallback={displayName.substring(0, 2).toUpperCase()}
+                size="xl"
+                className="w-16 h-16 ring-1 ring-[var(--color-border)] shrink-0"
+              />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <h2 className="text-base font-extrabold text-[var(--color-heading)] truncate">

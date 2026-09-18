@@ -23,7 +23,7 @@ import {
   CreditCard,
   Eye,
 } from 'lucide-react';
-import Image from 'next/image';
+import { Avatar } from '@/shared/components/ui/Avatar';
 
 interface Stage5OfferProps {
   offer: CoachingOfferResponseDTO;
@@ -85,7 +85,7 @@ export const Stage5Offer: React.FC<Stage5OfferProps> = ({ offer }) => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-[var(--color-text-muted)]">
-                  Offer: {offer.offerId.slice(-8)}
+                  Offer: {(offer.offerId || (offer as any).id || '').slice(-8) || 'OFFER'}
                 </span>
                 <OfferStatusBadge status={offer.status} />
               </div>
@@ -102,25 +102,21 @@ export const Stage5Offer: React.FC<Stage5OfferProps> = ({ offer }) => {
               Total Fee
             </span>
             <span className="text-lg sm:text-xl font-black text-[var(--color-primary)] font-mono">
-              {offer.pricing.currency} {offer.pricing.totalAmount.toLocaleString()}
+              {offer.pricing?.currency || 'INR'}{' '}
+              {(offer.pricing?.totalAmount ?? 0).toLocaleString()}
             </span>
           </div>
         </div>
 
         {/* Coach card */}
         <div className="flex items-center gap-3.5 p-4 bg-[var(--color-surface-alt)] rounded-xl border border-[var(--color-border)]">
-          <div className="relative w-12 h-12 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden shrink-0 flex items-center justify-center">
-            {trainerProfile?.avatarUrl ? (
-              <Image
-                src={trainerProfile.avatarUrl}
-                alt={displayName}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <User className="w-6 h-6 text-[var(--color-text-muted)]" />
-            )}
-          </div>
+          <Avatar
+            src={trainerProfile?.avatarUrl || undefined}
+            alt={displayName}
+            fallback={displayName.substring(0, 2).toUpperCase()}
+            size="lg"
+            className="ring-1 ring-[var(--color-border)] shrink-0"
+          />
           <div className="flex-1 min-w-0">
             <h3 className="text-xs sm:text-sm font-extrabold text-[var(--color-heading)] truncate">
               {displayName}
@@ -139,7 +135,7 @@ export const Stage5Offer: React.FC<Stage5OfferProps> = ({ offer }) => {
                 Plan Tier
               </span>
               <span className="text-xs sm:text-sm font-extrabold text-[var(--color-heading)]">
-                {offer.scope.planType} Plan
+                {offer.scope?.planType || 'Custom'} Plan
               </span>
             </div>
 
@@ -148,13 +144,13 @@ export const Stage5Offer: React.FC<Stage5OfferProps> = ({ offer }) => {
                 Duration
               </span>
               <span className="text-xs sm:text-sm font-extrabold text-[var(--color-heading)]">
-                {offer.scope.durationDays} Days
+                {offer.scope?.durationDays || 30} Days
               </span>
             </div>
           </div>
 
           {/* Included Services */}
-          {offer.scope.includedFeatures && offer.scope.includedFeatures.length > 0 && (
+          {offer.scope?.includedFeatures && offer.scope.includedFeatures.length > 0 && (
             <div className="space-y-2">
               <span className="text-xs font-bold text-[var(--color-heading)] block">
                 Included Features & Services
@@ -174,14 +170,14 @@ export const Stage5Offer: React.FC<Stage5OfferProps> = ({ offer }) => {
           )}
 
           {/* Trainer Notes if available */}
-          {offer.scope.trainerNotes && (
+          {offer.scope?.trainerNotes && (
             <div className="space-y-1.5 p-3.5 bg-[var(--color-surface-alt)] rounded-xl border border-[var(--color-border)]">
               <span className="text-xs font-bold text-[var(--color-heading)] flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                Coach Note
+                Special Instructions from Coach
               </span>
-              <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                {offer.scope.trainerNotes}
+              <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed italic">
+                &ldquo;{offer.scope.trainerNotes}&rdquo;
               </p>
             </div>
           )}

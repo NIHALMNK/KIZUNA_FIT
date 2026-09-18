@@ -54,6 +54,12 @@ export const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
     } else if (pathname.startsWith('/client/offers')) {
       computedTitle = 'Coaching Offers';
       computedBreadcrumb = ['Dashboard', 'Offers'];
+    } else if (pathname === '/client/find-trainer/history') {
+      computedTitle = 'Journey History';
+      computedBreadcrumb = ['Dashboard', 'Find Trainer', 'History'];
+    } else if (pathname.startsWith('/client/find-trainer')) {
+      computedTitle = 'Find My Trainer';
+      computedBreadcrumb = ['Dashboard', 'Find Trainer', 'Find My Trainer'];
     } else if (pathname === '/client/settings/change-password') {
       computedTitle = 'Change Password';
       computedBreadcrumb = ['Dashboard', 'Settings', 'Change Password'];
@@ -93,22 +99,35 @@ export const ClientDashboardHeader: React.FC<ClientDashboardHeaderProps> = ({
               className="h-full w-full object-contain"
             />
           </div>
-          <span className="font-extrabold text-base tracking-tight text-[var(--color-heading)]">KIZUNA-FIT</span>
+          <span className="font-extrabold text-base tracking-tight text-[var(--color-heading)]">
+            KIZUNA-FIT
+          </span>
         </Link>
 
         {/* Desktop Breadcrumbs & Page Title */}
         <div className="hidden md:flex flex-col">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--color-text-muted)]">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--color-text-muted)]"
+          >
             {computedBreadcrumb.map((item, index) => (
               <React.Fragment key={item}>
                 {index > 0 && <span className="opacity-60">/</span>}
-                <span className={index === computedBreadcrumb.length - 1 ? 'text-[var(--color-primary)] font-bold' : ''}>
+                <span
+                  className={
+                    index === computedBreadcrumb.length - 1
+                      ? 'text-[var(--color-primary)] font-bold'
+                      : ''
+                  }
+                >
                   {item}
                 </span>
               </React.Fragment>
             ))}
           </nav>
-          <h1 className="text-base sm:text-lg font-extrabold text-[var(--color-heading)] tracking-tight leading-tight">{computedTitle}</h1>
+          <h1 className="text-base sm:text-lg font-extrabold text-[var(--color-heading)] tracking-tight leading-tight">
+            {computedTitle}
+          </h1>
         </div>
       </div>
 

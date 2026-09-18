@@ -211,7 +211,7 @@ export const ClientRequestList: React.FC = () => {
                   )}
 
                   {(req.requestStatus || req.status || '').toUpperCase().includes('ACCEPT') && (
-                    <AcceptedScheduleButton pipelineId={req.pipelineId} />
+                    <AcceptedScheduleButton requestId={req.requestId} pipelineId={req.pipelineId} />
                   )}
                 </div>
               </div>
@@ -223,7 +223,10 @@ export const ClientRequestList: React.FC = () => {
   );
 };
 
-const AcceptedScheduleButton: React.FC<{ pipelineId: string }> = ({ pipelineId }) => {
+const AcceptedScheduleButton: React.FC<{ requestId: string; pipelineId: string }> = ({
+  requestId,
+  pipelineId,
+}) => {
   const router = useRouter();
   const createMutation = useCreateConsultation();
   const [isChecking, setIsChecking] = useState(false);
@@ -244,14 +247,13 @@ const AcceptedScheduleButton: React.FC<{ pipelineId: string }> = ({ pipelineId }
 
     const tomorrowMs = Date.now() + 86400000;
     const startIso = new Date(tomorrowMs).toISOString();
-    const endIso = new Date(tomorrowMs + 2700000).toISOString();
 
     createMutation.mutate(
       {
-        acquisitionPipelineId: pipelineId,
-        scheduledStartAt: startIso,
-        scheduledEndAt: endIso,
-        timezone: 'UTC',
+        trainerRequestId: requestId || pipelineId,
+        scheduledAt: startIso,
+        duration: 45,
+        meetingMode: 'VIDEO_CALL',
       },
       {
         onSuccess: (data) => {

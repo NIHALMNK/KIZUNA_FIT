@@ -3,12 +3,16 @@ import { Dialog, DialogFooter } from '../../../../shared/components/ui/Dialog';
 import { Button } from '../../../../shared/components/ui/Button';
 import { Input } from '../../../../shared/components/ui/Input';
 import { Select } from '../../../../shared/components/ui/Select';
-import { useBookSlot } from '../../application/hooks/useConsultationMutations';
+import {
+  useBookSlot,
+  useCreateConsultation,
+} from '../../application/hooks/useConsultationMutations';
 
 interface BookSlotModalProps {
   isOpen: boolean;
   onClose: () => void;
-  consultationId: string;
+  consultationId?: string;
+  acquisitionPipelineId?: string;
   initialStartAt?: string;
   initialTimezone?: string;
 }
@@ -17,6 +21,7 @@ export const BookSlotModal: React.FC<BookSlotModalProps> = ({
   isOpen,
   onClose,
   consultationId,
+  acquisitionPipelineId,
   initialStartAt,
   initialTimezone = 'UTC',
 }) => {
@@ -34,6 +39,7 @@ export const BookSlotModal: React.FC<BookSlotModalProps> = ({
   const [formError, setFormError] = useState<string | null>(null);
 
   const bookSlotMutation = useBookSlot();
+  const createConsultationMutation = useCreateConsultation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,21 +55,39 @@ export const BookSlotModal: React.FC<BookSlotModalProps> = ({
       const endMs = new Date(startIso).getTime() + durationMinutes * 60 * 1000;
       const endIso = new Date(endMs).toISOString();
 
-      bookSlotMutation.mutate(
-        {
-          consultationId,
-          payload: {
-            scheduledStartAt: startIso,
-            scheduledEndAt: endIso,
-            timezone,
+      if (consultationId) {
+        bookSlotMutation.mutate(
+          {
+            consultationId,
+            payload: {
+              scheduledStartAt: startIso,
+              scheduledEndAt: endIso,
+              timezone,
+            },
           },
-        },
-        {
-          onSuccess: () => {
-            onClose();
+          {
+            onSuccess: () => {
+              onClose();
+            },
           },
-        },
-      );
+        );
+      } else if (acquisitionPipelineId) {
+        createConsultationMutation.mutate(
+          {
+            trainerRequestId: acquisitionPipelineId,
+            scheduledAt: startIso,
+            duration: durationMinutes,
+            meetingMode: 'VIDEO_CALL',
+          },
+          {
+            onSuccess: () => {
+              onClose();
+            },
+          },
+        );
+      } else {
+        setFormError('Missing request or consultation reference.');
+      }
     } catch {
       setFormError('Invalid date or time selected.');
     }
@@ -132,7 +156,12 @@ export const BookSlotModal: React.FC<BookSlotModalProps> = ({
           <Button type="button" variant="outline" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="sm" isLoading={bookSlotMutation.isPending}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="sm"
+            isLoading={bookSlotMutation.isPending || createConsultationMutation.isPending}
+          >
             Book Slot
           </Button>
         </DialogFooter>

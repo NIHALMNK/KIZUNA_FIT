@@ -13,6 +13,7 @@ import { CoachingPeriodMarker } from '../components/CoachingPeriodMarker';
 import { WorkoutProgressChart } from '../components/WorkoutProgressChart';
 import { NutritionProgressChart } from '../components/NutritionProgressChart';
 import { ProgressEmptyState } from '../components/ProgressEmptyState';
+import { ClientSelector, ClientOption } from '../components/ClientSelector';
 import { Button } from '../../../../shared/components/ui/Button';
 
 interface TrainerClientProgressViewProps {
@@ -35,6 +36,16 @@ export const TrainerClientProgressView: React.FC<TrainerClientProgressViewProps>
   });
 
   const relationships = clientsData?.relationships || [];
+
+  const clientOptions: ClientOption[] = useMemo(() => {
+    return relationships.map((rel) => ({
+      relationshipId: rel.relationshipId,
+      clientId: rel.client?.id || '',
+      fullName: rel.client?.fullName || rel.client?.id?.slice(0, 8) || 'Client',
+      avatarUrl: rel.client?.avatarUrl || null,
+      status: rel.status,
+    }));
+  }, [relationships]);
 
   useEffect(() => {
     if (!selectedRelationshipId && relationships.length > 0) {
@@ -132,7 +143,7 @@ export const TrainerClientProgressView: React.FC<TrainerClientProgressViewProps>
       </div>
 
       {/* Client Selector */}
-      {relationships.length > 0 && (
+      {clientOptions.length > 0 && (
         <div className="p-4 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-xs flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-[var(--color-primary)]" />
@@ -141,19 +152,11 @@ export const TrainerClientProgressView: React.FC<TrainerClientProgressViewProps>
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <select
-              value={selectedRelationshipId || ''}
-              onChange={(e) => setSelectedRelationshipId(e.target.value)}
-              className="bg-[var(--color-surface-alt)] text-[var(--color-heading)] text-xs font-semibold px-3 py-2 rounded-xl border border-[var(--color-border)] outline-none focus:border-[var(--color-primary)]"
-            >
-              {relationships.map((rel) => (
-                <option key={rel.relationshipId} value={rel.relationshipId}>
-                  {rel.client?.fullName || rel.client?.id?.slice(0, 8) || 'Client'} ({rel.status})
-                </option>
-              ))}
-            </select>
-          </div>
+          <ClientSelector
+            clients={clientOptions}
+            selectedRelationshipId={selectedRelationshipId}
+            onSelectClient={(id) => setSelectedRelationshipId(id)}
+          />
         </div>
       )}
 
